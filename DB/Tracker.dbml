@@ -1,0 +1,1047 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="MDS7" Class="TrackerDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="WebSettings" ConnectionString="Data Source=meddentsoldbserver.database.windows.net;Initial Catalog=MDS7;Persist Security Info=True;User ID=MedDentSol;Connect Timeout=30;Encrypt=True;TrustServerCertificate=False" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="MDS7ConnectionString1" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.EquipTypeTest" Member="EquipTypeTests">
+    <Type Name="EquipTypeTest">
+      <Column Name="EquipTypeTestID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="EquipTypeCode" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="Test" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TravelType" Member="TravelTypes">
+    <Type Name="TravelType">
+      <Column Name="TravelTypeCode" Type="System.String" DbType="NVarChar(5) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="TravelType" Member="TravelType1" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="TravelChargeRate" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ChargeType" Member="ChargeTypes">
+    <Type Name="ChargeType">
+      <Column Name="ChargeTypecode" Type="System.String" DbType="NVarChar(5) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ChargeType" Member="ChargeType1" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="ChargeRate" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Vendor" Member="Vendors">
+    <Type Name="Vendor">
+      <Column Name="VendorUID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="CompanyName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="PhysicalAddress" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="PostalAddress" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="Phone" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="Phone2" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="Fax" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="ContactName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Email" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="URL" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="ContractDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="ContractDetails" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="Notes" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="VendorUID_AccessDB" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ServiceArea" Member="ServiceAreas">
+    <Type Name="ServiceArea">
+      <Column Name="ServiceAreaUID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="AreaDescription" Type="System.String" DbType="NVarChar(40) NOT NULL" CanBeNull="false" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.EquipManufacturer" Member="EquipManufacturers">
+    <Type Name="EquipManufacturer">
+      <Column Name="Manufacturer" Type="System.String" DbType="NVarChar(40) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ServiceFunction" Member="ServiceFunctions">
+    <Type Name="ServiceFunction">
+      <Column Name="ServiceFunctionCode" Type="System.String" DbType="NVarChar(5) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ServiceFunctionDesc" Type="System.String" DbType="NVarChar(40)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.NextService" Member="NextServices">
+    <Type Name="NextService">
+      <Column Name="EquipUID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="NextServiceYear" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="NextServiceMonth" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="LastServiceUID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="NextServiceType" Type="System.String" DbType="NVarChar(7)" CanBeNull="true" />
+      <Column Name="Overdue" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Branch" Member="Branches">
+    <Type Name="Branch">
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BranchName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="PrefixCode" Type="System.String" DbType="NVarChar(5)" CanBeNull="true" />
+      <Column Name="Password" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="RecoveryEmail" Type="System.String" DbType="NVarChar(150)" CanBeNull="true" />
+      <Column Name="PasswordROTech" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.EquipModel" Member="EquipModels">
+    <Type Name="EquipModel">
+      <Column Name="ModelUID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="EquipTypeCode" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="Manufacturer" Type="System.String" DbType="NVarChar(40)" CanBeNull="true" />
+      <Column Name="Model" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="ModelNotes" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Customer" Member="Customers">
+    <Type Name="Customer">
+      <Column Name="CustomerCode" Type="System.String" DbType="NVarChar(10) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="CompanyName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="PhysicalAddress" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="PostalAddress" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="Phone" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="Phone2" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="Fax" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="ContactName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Email" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="URL" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="ContractDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="ContractRenewalDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Notes" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="DefaultServiceAreaUID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="StopSupply" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="StopDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="StoppedBy" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="OnLinePassword" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.EquipTypeModel" Member="EquipTypeModels">
+    <Type Name="EquipTypeModel">
+      <Column Name="EquipTypeCode" Type="System.String" DbType="NVarChar(10) NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="CustomerCode" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ServiceTestScript" Member="ServiceTestScripts">
+    <Type Name="ServiceTestScript">
+      <Column Name="ServiceTestScriptID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="EquipTypeTestID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Checked" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="Comment" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="ServiceUID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Parts" Member="Parts">
+    <Type Name="Part">
+      <Column Name="ActiiveStatus" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="Type" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="Item" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="Descrip" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="TaxCode" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="Account" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="COGSA" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="ASSETSA" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="AccDep" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="PurDesc" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="QOH" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="Cost" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="TaxAgency" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="Price" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="Reorder" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="MPN" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.CustomerDepartment" Member="CustomerDepartments">
+    <Type Name="CustomerDepartment">
+      <Column Name="CustomerCode" Type="System.String" DbType="NVarChar(10) NOT NULL" CanBeNull="false" />
+      <Column Name="Department" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="DeptID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.CustomerLocation" Member="CustomerLocations">
+    <Type Name="CustomerLocation">
+      <Column Name="CustomerCode" Type="System.String" DbType="NVarChar(10) NOT NULL" CanBeNull="false" />
+      <Column Name="Location" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LocationID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Audit" Member="Audits">
+    <Type Name="Audit">
+      <Column Name="AuditID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="UserName" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="ActivityDteTme" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Page" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="RecordKey" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="IPAddress" Type="System.String" DbType="NChar(30)" CanBeNull="true" />
+      <Column Name="Browser" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Branch" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.StdWorkDone" Member="StdWorkDones">
+    <Type Name="StdWorkDone">
+      <Column Name="StdWorkDoneID" Type="System.String" DbType="NVarChar(150) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="StdWorkDoneDesc" Type="System.String" DbType="NVarChar(1000)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Condition" Member="Conditions">
+    <Type Name="Condition">
+      <Column Name="ConditionID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ConditionDesc" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Photos" Member="Photos">
+    <Type Name="Photo">
+      <Column Name="PhotosID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Title" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="URL" Type="System.String" DbType="NVarChar(400)" CanBeNull="true" />
+      <Column Name="Type" Type="System.String" DbType="NVarChar(150)" CanBeNull="true" />
+      <Column Name="RepairID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ServiceID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Attach_Audio" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.UserBranch" Member="UserBranches">
+    <Type Name="UserBranch">
+      <Column Name="UserEmail" Type="System.String" DbType="NVarChar(150) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Audit" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="DefaultBranch" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.RepairPart" Member="RepairParts">
+    <Type Name="RepairPart">
+      <Column Name="RepairPartId" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="RepairOrServiceUID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PartDesc" Type="System.String" DbType="NVarChar(200) NOT NULL" CanBeNull="false" />
+      <Column Name="PartNumber" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="NumberUsed" Type="System.Int16" DbType="SmallInt NOT NULL" CanBeNull="false" />
+      <Column Name="CostPerUnit" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PartID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ServicePart" Member="ServiceParts">
+    <Type Name="ServicePart">
+      <Column Name="ServicePartId" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="RepairOrServiceUID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="PartDesc" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="PartNumber" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="NumberUsed" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="CostPerUnit" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="PartID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.EquipType" Member="EquipTypes">
+    <Type Name="EquipType">
+      <Column Name="EquipTypeCode" Type="System.String" DbType="NVarChar(10) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Description" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="AccessForm" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="WebForm" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="TSTesterSNLabel" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="TSTemplateName" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="HeadCode" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="TechWorkDone" Type="System.String" DbType="NVarChar(1000)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.RepairEngineer" Member="RepairEngineers">
+    <Type Name="RepairEngineer">
+      <Column Name="RepairID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="EngineerID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Notes" Member="Notes">
+    <Type Name="Note">
+      <Column Name="NotesID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="JobID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Notes" Type="System.String" DbType="NVarChar(4000)" CanBeNull="true" />
+      <Column Name="Dte" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="Admin_Tech" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="Repair" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Service" Member="Services">
+    <Type Name="Service">
+      <Column Name="ServiceUID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="EquipUID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="DateServiced" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="WorkDone" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="PartsUsed" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="EngineerName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="MajorService" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="FutureService" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="Notes" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="Servicable" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="DataEntryComplete" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="EarthResistance" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
+      <Column Name="InsulationResistance" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
+      <Column Name="LeakageCurrent" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
+      <Column Name="SafetyTestDone" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="TSPassFail" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="TSRemarks" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="TSCalibDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="TSParts" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="TSTesterSN" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="EngineerID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ServiceFormRefNumber" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ServiceMonth" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ServiceYear" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ServiceFunctionCode" Type="System.String" DbType="NVarChar(5)" CanBeNull="true" />
+      <Column Name="ServiceJobUID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ConditionID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="RiskAssessmentDone" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ServiceWorkDone" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ServConditions" Type="System.String" DbType="NVarChar(1000)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Repair" Member="Repairs">
+    <Type Name="Repair">
+      <Column Name="RepairUID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="JobCode" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="BNQLocationCode" Type="System.String" DbType="NVarChar(1)" CanBeNull="true" />
+      <Column Name="ServiceJobUID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="EquipUID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="DateCallReceived" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="TimeCallReceived" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="DateIn" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="TimeIn" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="ApprovalRequired" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="TechContact" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="ApprovalContact" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="OrderNumberRequired" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="Accessories" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="VerbalApprovalObtained" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ApprovedBy" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="OrderNumber" Type="System.String" DbType="NVarChar(15)" CanBeNull="true" />
+      <Column Name="FaultDetails" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="WorkDone" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="EngineerIDX" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="RepairHours" Type="System.Single" DbType="Real" CanBeNull="true" />
+      <Column Name="SafetyTestDone" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="Notes" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="RepairCompleted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ResultedInRetirement" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="NotRepaired" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="HandoverCompleted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="DateOut" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="TimeOut" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="NoCharge" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="Charge" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ChargePartsOnly" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="HasBeenInvoiced" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="InvoiceNumber" Type="System.String" DbType="NVarChar(15)" CanBeNull="true" />
+      <Column Name="InvoiceDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Amount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="RetirementReportPrinted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="EarthResistance" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
+      <Column Name="InsulationResistance" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
+      <Column Name="LeakageCurrent" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
+      <Column Name="ChargeType" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="TravelHours" Type="System.Single" DbType="Real" CanBeNull="true" />
+      <Column Name="ExpensesProportion" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="TravelType" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="ChargeRate" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="TravelChargeRate" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="ChargeTypecode" Type="System.String" DbType="NVarChar(5)" CanBeNull="true" />
+      <Column Name="TravelTypecode" Type="System.String" DbType="NVarChar(5)" CanBeNull="true" />
+      <Column Name="InvoiceThruServiceJob" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="DateRepairFinished" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="EngineerNameX" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="ReceiverName" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="ReceiptDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="ReceiptComments" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="ReceiptHandover" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="ReceiptTested" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="CustomerSignature" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="TechConfirmedEquipDetails" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ConditionID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ScheduledStart" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="ScheduledEnd" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="TechConfirmedStartTime" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="TechConfirmedEndTime" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="CustName" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Engineer" Member="Engineers">
+    <Type Name="Engineer">
+      <Column Name="EngineerName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="EngineerID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="UserName" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="AdminEmail" Type="System.String" DbType="NVarChar(500)" CanBeNull="true" />
+      <Column Name="Color" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ServiceEngineerWorks" Member="ServiceEngineerWorks">
+    <Type Name="ServiceEngineerWork">
+      <Column Name="ServiceJobID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="EngineerID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="StartTime" Type="System.DateTime" DbType="DateTime NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="EndTime" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(150)" CanBeNull="true" />
+      <Column Name="ChargeTypecode" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Repair" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="ManualTime" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ServiceJobEngineer" Member="ServiceJobEngineers">
+    <Type Name="ServiceJobEngineer">
+      <Column Name="ServiceJobID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="EngineerID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ProgStart" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="ProgEnd" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Notes" Type="System.String" DbType="NVarChar(2000)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.UserLogin" Member="UserLogins">
+    <Type Name="UserLogin">
+      <Column Name="Email" Type="System.String" DbType="NVarChar(150) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Password" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="Admin" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="NewEquipNotify" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="NewPartsNotify" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ServiceJob" Member="ServiceJobs">
+    <Type Name="ServiceJob">
+      <Column Name="ServiceJobUID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="JobCode" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="BNQLocationCode" Type="System.String" DbType="NVarChar(1)" CanBeNull="true" />
+      <Column Name="DateProgrammed" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="CustomerCode" Type="System.String" DbType="NVarChar(10) NOT NULL" CanBeNull="false" />
+      <Column Name="Location" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="BookingNotes" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="ApprovalRequired" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="OrderNumberRequired" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ApprovalContact" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="TechContact" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="VerbalApprovalObtained" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ApprovedBy" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="OrderNumber" Type="System.String" DbType="NVarChar(15)" CanBeNull="true" />
+      <Column Name="TravelHours" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
+      <Column Name="ExpensesProportion" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="ChargeRate" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="TravelChargeRate" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="ChargeTypecode" Type="System.String" DbType="NVarChar(5)" CanBeNull="true" />
+      <Column Name="TravelTypecode" Type="System.String" DbType="NVarChar(5)" CanBeNull="true" />
+      <Column Name="zzActualDateStart" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="zzActualDateEnd" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="CompletedOK" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CompletedOutstanding" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CompletedBERs" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="NoCharge" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="HasBeenInvoiced" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="InvoiceNumber" Type="System.String" DbType="NVarChar(15)" CanBeNull="true" />
+      <Column Name="InvoiceDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Amount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ClientSignature" Type="System.String" DbType="NVarChar(150)" CanBeNull="true" />
+      <Column Name="ServiceNotes" Type="System.String" DbType="NVarChar(4000)" CanBeNull="true" />
+      <Column Name="ServiceHours" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
+      <Column Name="DeptID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="LocationID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="CustomerSignature" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="DateProgrammedEnd" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="CustName" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="TechCompleteDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="WarrantyFix" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Equipment" Member="Equipments">
+    <Type Name="Equipment">
+      <Column Name="EquipUID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="CustomerCode" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="Department" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Location" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="BNQItemCode" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="CustomerEquipCode" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="AlternativeEquipCode" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="ModelUID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="SoldByBNQ" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="VendorUID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="DeliveryDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Cost" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="InitialCondition" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="WarrantyExpirationDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Manuals" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="Notes" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="CurrentlyServicedByBNQ" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="MinorsBetweenMajors" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="NumServicesPerYear" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="InService" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="BERDisposal" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="Obselete" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="PartsNotAvailable" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="NoLongerRequired" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="DateRetired" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="RetirementComment" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="DummyRecord" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="SerialNumber" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="ServiceMonth1" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ServiceMonth2" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ServiceAreaUID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="DeptID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="LocationID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="LocationCopy" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="DELETE_NotFoundInRepServ" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="Loaner" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Function Name="dbo.USP_EuipByBranchId" Method="USP_EuipByBranchId">
+    <Parameter Name="Branch" Parameter="branch" Type="System.Int32" DbType="Int" />
+    <ElementType Name="USP_EuipByBranchIdResult">
+      <Column Name="EquipUID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="EquipDesc" Type="System.String" DbType="NVarChar(202)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.GetServiceJobDetailsbyID" Method="GetServiceJobDetailsbyID">
+    <Parameter Name="ServiceJobUID" Parameter="serviceJobUID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="GetServiceJobDetailsbyIDResult">
+      <Column Name="ServiceJobUID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Customer" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="CustomerSite" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="JobCode" Type="System.String" DbType="NVarChar(23)" CanBeNull="true" />
+      <Column Name="DateProgrammed" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="DateStart" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Engineername" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.CustomerSearch" Method="CustomerSearch">
+    <Parameter Name="CompanyNameContains" Parameter="companyNameContains" Type="System.String" DbType="NVarChar(50)" />
+    <Parameter Name="CustomerCodeContains" Parameter="customerCodeContains" Type="System.String" DbType="NVarChar(50)" />
+    <Parameter Name="CompanyNameStarts" Parameter="companyNameStarts" Type="System.String" DbType="NVarChar(50)" />
+    <Parameter Name="ContractsOverDueOrDueThisMonth" Parameter="contractsOverDueOrDueThisMonth" Type="System.Boolean" DbType="Bit" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="CustomerSearchResult">
+      <Column Name="CustomerCode" Type="System.String" DbType="NVarChar(10) NOT NULL" CanBeNull="false" />
+      <Column Name="CompanyName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="ContactName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Phone" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="Email" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="ContractDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="ContractRenewalDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.CreateRepairJobForWorkOrdersNotServiceable" Method="CreateRepairJobForWorkOrdersNotServiceable">
+    <Parameter Name="EquipTypeCode" Parameter="equipTypeCode" Type="System.String" DbType="NVarChar(10)" />
+    <Parameter Name="ServiceJobID" Parameter="serviceJobID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="CustomerID" Parameter="customerID" Type="System.String" DbType="NVarChar(10)" />
+    <Parameter Name="CustomerDept" Parameter="customerDept" Type="System.String" DbType="NVarChar(10)" />
+    <Parameter Name="EngineerID" Parameter="engineerID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="DataEntryIncompeteOnly" Parameter="dataEntryIncompeteOnly" Type="System.Boolean" DbType="Bit" />
+    <Parameter Name="ServicesAfterDate" Parameter="servicesAfterDate" Type="System.DateTime" DbType="Date" />
+    <Parameter Name="Location" Parameter="location" Type="System.String" DbType="NVarChar(50)" />
+    <Parameter Name="EquipUID" Parameter="equipUID" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.VendorSearch" Method="VendorSearch">
+    <Parameter Name="VendorNameContains" Parameter="vendorNameContains" Type="System.String" DbType="NVarChar(50)" />
+    <ElementType Name="VendorSearchResult">
+      <Column Name="VendorUID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="CompanyName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="ContactName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Phone" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.EquipManufacturerSearch" Method="EquipManufacturerSearch">
+    <Parameter Name="search" Type="System.String" DbType="NVarChar(50)" />
+    <ElementType Name="EquipManufacturerSearchResult">
+      <Column Name="Manufacturer" Type="System.String" DbType="NVarChar(40) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.USP_GetEquipName" Method="USP_GetEquipName">
+    <Parameter Name="Search" Parameter="search" Type="System.String" DbType="VarChar(30)" />
+    <Parameter Name="branchid" Type="System.Int32" DbType="Int" />
+    <ElementType Name="USP_GetEquipNameResult">
+      <Column Name="EquipUID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="EquipDesc" Type="System.String" DbType="NVarChar(202) NOT NULL" CanBeNull="false" />
+      <Column Name="CustomerInfo" Type="System.String" DbType="NVarChar(101)" CanBeNull="true" />
+      <Column Name="CustomerCode" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="WarrantyExpirationDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Location" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.CreateRepairJobFromWorkOrder" Method="CreateRepairJobFromWorkOrder">
+    <Parameter Name="ServiceUID" Parameter="serviceUID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="CreateRepairJobFromWorkOrderResult">
+      <Column Name="Added" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="Reason" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="RepairID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.FutureMonths" Method="FutureMonths">
+    <ElementType Name="FutureMonthsResult">
+      <Column Name="val" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="descrip" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.CreateNewEquipUIDFromExisting" Method="CreateNewEquipUIDFromExisting">
+    <Parameter Name="SelectedEquipUID" Parameter="selectedEquipUID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="CreateNewEquipUIDFromExistingResult">
+      <Column Name="EquipID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.ContractsOverDueAndUnscheduledServices" Method="ContractsOverDueAndUnscheduledServices" IsComposable="true">
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="ContractsOverDueAndUnscheduledServicesResult">
+      <Column Name="InformationTitle" Type="System.String" DbType="NVarChar(200) NOT NULL" CanBeNull="false" />
+      <Column Name="Cnt" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.DeleteEquipment" Method="DeleteEquipment">
+    <Parameter Name="EquipUID" Parameter="equipUID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="DeleteEquipmentResult">
+      <Column Name="msg" Type="System.String" DbType="VarChar(100) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.DeleteRepair" Method="DeleteRepair">
+    <Parameter Name="RepairUID" Parameter="repairUID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="DeleteRepairResult">
+      <Column Name="msg" Type="System.String" DbType="VarChar(93) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.DeleteServiceJob" Method="DeleteServiceJob">
+    <Parameter Name="ServiceJobUID" Parameter="serviceJobUID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="DeleteServiceJobResult">
+      <Column Name="msg" Type="System.String" DbType="VarChar(94) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.DeleteServiceWorkOrder" Method="DeleteServiceWorkOrder">
+    <Parameter Name="ServiceUID" Parameter="serviceUID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="DeleteServiceWorkOrderResult">
+      <Column Name="msg" Type="System.String" DbType="VarChar(117) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.EngineerSearch" Method="EngineerSearch">
+    <Parameter Name="search" Type="System.String" DbType="NVarChar(50)" />
+    <Parameter Name="Branchid" Parameter="branchid" Type="System.Int32" DbType="Int" />
+    <ElementType Name="EngineerSearchResult">
+      <Column Name="EngineerName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="EngineerID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="BranchName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.ServiceJobPartsList" Method="ServiceJobPartsList">
+    <Parameter Name="ServiceJobUID" Parameter="serviceJobUID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="ServiceJobPartsListResult">
+      <Column Name="BNQLocationCode" Type="System.String" DbType="NVarChar(1)" CanBeNull="true" />
+      <Column Name="JobCode" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ServiceJobUID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="EquipDesc" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="PartDesc" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="PartNumber" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="NumberUsed" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="CostPerUnit" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="Item" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.TotalRepairCostTime" Method="TotalRepairCostTime">
+    <Parameter Name="EquipmentID" Parameter="equipmentID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="branchID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="TotalRepairCostTimeResult">
+      <Column Name="Cost" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="RHours" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.SP_GetEquipTypeByManufacture" Method="SP_GetEquipTypeByManufacture">
+    <Parameter Name="Mannufacture" Parameter="mannufacture" Type="System.String" DbType="VarChar(500)" />
+    <Parameter Name="branchID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="SP_GetEquipTypeByManufactureResult">
+      <Column Name="EquipTypeCode" Type="System.String" DbType="NVarChar(10) NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.USP_GetCustomerEquipment" Method="USP_GetCustomerEquipment">
+    <Parameter Name="EquipUID" Parameter="equipUID" Type="System.String" DbType="VarChar(30)" />
+    <Parameter Name="Branchid" Parameter="branchid" Type="System.Int32" DbType="Int" />
+    <ElementType Name="USP_GetCustomerEquipmentResult">
+      <Column Name="ContactName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="CompanyName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.CostOfServicePartsForServiceJob" Method="CostOfServicePartsForServiceJob" IsComposable="true">
+    <Parameter Name="ServiceJobUID" Parameter="serviceJobUID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Decimal" />
+  </Function>
+  <Function Name="dbo.CostOfTotalRepairsForServiceJob" Method="CostOfTotalRepairsForServiceJob" IsComposable="true">
+    <Parameter Name="ServiceJobUID" Parameter="serviceJobUID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="branchID" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Decimal" />
+  </Function>
+  <Function Name="dbo.USP_GetEquipNameByEquipId" Method="USP_GetEquipNameByEquipId">
+    <Parameter Name="EquipId" Parameter="equipId" Type="System.Int32" DbType="Int" />
+    <Parameter Name="branchid" Type="System.Int32" DbType="Int" />
+    <ElementType Name="USP_GetEquipNameByEquipIdResult">
+      <Column Name="EquipUID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="EquipDesc" Type="System.String" DbType="NVarChar(202) NOT NULL" CanBeNull="false" />
+      <Column Name="CustomerInfo" Type="System.String" DbType="NVarChar(101)" CanBeNull="true" />
+      <Column Name="CustomerCode" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="WarrantyExpirationDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Location" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.RefreshNextDueService" Method="RefreshNextDueService">
+    <Parameter Name="EquipmentUID" Parameter="equipmentUID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="RefreshNextDueServiceResult">
+      <Column Name="DueServiceType" Type="System.String" DbType="NVarChar(20) NOT NULL" CanBeNull="false" />
+      <Column Name="DueMonth" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="DueYear" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Overdue" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="LastServiceUID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.CalcNextDueService" Method="CalcNextDueService">
+    <Parameter Name="EquipmentUID" Parameter="equipmentUID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="NumServicesPerYear" Parameter="numServicesPerYear" Type="System.Int32" DbType="Int" />
+    <Parameter Name="ServiceMonth1" Parameter="serviceMonth1" Type="System.Int32" DbType="Int" />
+    <Parameter Name="ServiceMonth2" Parameter="serviceMonth2" Type="System.Int32" DbType="Int" />
+    <Parameter Name="DeliveryDate" Parameter="deliveryDate" Type="System.DateTime" DbType="Date" />
+    <Parameter Name="MinorsBetweenMajors" Parameter="minorsBetweenMajors" Type="System.Int32" DbType="Int" />
+    <Parameter Name="branchID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="CalcNextDueServiceResult">
+      <Column Name="DueServiceType" Type="System.String" DbType="NVarChar(20) NOT NULL" CanBeNull="false" />
+      <Column Name="DueMonth" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="DueYear" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Overdue" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="LastServiceUID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.EquipModelSearch" Method="EquipModelSearch">
+    <Parameter Name="Manufacturer" Parameter="manufacturer" Type="System.String" DbType="NVarChar(150)" />
+    <Parameter Name="EquipTypeCode" Parameter="equipTypeCode" Type="System.String" DbType="NVarChar(20)" />
+    <Parameter Name="ModelSearch" Parameter="modelSearch" Type="System.String" DbType="NVarChar(50)" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="EquipModelSearchResult">
+      <Column Name="EquipTypeCode" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Manufacturer" Type="System.String" DbType="NVarChar(40)" CanBeNull="true" />
+      <Column Name="Model" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="ModelUID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ModelNotes" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.RepairsSearchForService" Method="RepairsSearchForService">
+    <Parameter Name="ServiceJobID" Parameter="serviceJobID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="RepairsSearchForServiceResult">
+      <Column Name="RepairUID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="JObCode" Type="System.String" DbType="NVarChar(36)" CanBeNull="true" />
+      <Column Name="OrderNumber" Type="System.String" DbType="NVarChar(15)" CanBeNull="true" />
+      <Column Name="Customer" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Equipment" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="DateIn" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="OrderNumberRequired" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="EquipmentType" Type="System.String" DbType="NVarChar(202) NOT NULL" CanBeNull="false" />
+      <Column Name="DateOut" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.ServiceJobCode" Method="ServiceJobCode" IsComposable="true">
+    <Parameter Name="ServiceJobUID" Parameter="serviceJobUID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="branchID" Type="System.Int32" DbType="Int" />
+    <Return Type="System.String" />
+  </Function>
+  <Function Name="dbo.BranchSearch" Method="BranchSearch">
+    <Parameter Name="search" Type="System.String" DbType="NVarChar(50)" />
+    <ElementType Name="BranchSearchResult">
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="BranchName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="PrefixCode" Type="System.String" DbType="NVarChar(5)" CanBeNull="true" />
+      <Column Name="Password" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="RecoveryEmail" Type="System.String" DbType="NVarChar(150)" CanBeNull="true" />
+      <Column Name="PasswordROTech" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.PartsSearch" Method="PartsSearch">
+    <Parameter Name="Search" Parameter="search" Type="System.String" DbType="NVarChar(50)" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="PartsSearchResult">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Item" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="Descrip" Type="System.String" DbType="NVarChar(513)" CanBeNull="true" />
+      <Column Name="Cost" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="Price" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.EquipLastRepairOrServiceDateReason" Method="EquipLastRepairOrServiceDateReason">
+    <Parameter Name="EquipUID" Parameter="equipUID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="CurrentServiceOrRepairDate" Parameter="currentServiceOrRepairDate" Type="System.DateTime" DbType="DateTime" />
+    <Parameter Name="ServiceUID" Parameter="serviceUID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="RepairUID" Parameter="repairUID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="EquipLastRepairOrServiceDateReasonResult">
+      <Column Name="RepairServiceDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="notes" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="bWithin90Days" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="LastNotes" Type="System.String" DbType="NVarChar(2000)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.DeletePart" Method="DeletePart">
+    <Parameter Name="PartID" Parameter="partID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="DeletePartResult">
+      <Column Name="msg" Type="System.String" DbType="VarChar(83) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.EquipmentOverdueService" Method="EquipmentOverdueService">
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="CustomerID" Parameter="customerID" Type="System.String" DbType="NVarChar(10)" />
+    <Parameter Name="EquipmentType" Parameter="equipmentType" Type="System.String" DbType="NVarChar(10)" />
+    <ElementType Name="EquipmentOverdueServiceResult">
+      <Column Name="EquipementType" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Manufacturer" Type="System.String" DbType="NVarChar(40) NOT NULL" CanBeNull="false" />
+      <Column Name="Model" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="NextServiceMonth" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="NextServiceYear" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="Cust" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="EquipUID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="lastserviced" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="NumServicesPerYear" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="EquipDesc" Type="System.String" DbType="NVarChar(214) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.NextServiceSearch" Method="NextServiceSearch">
+    <Parameter Name="DueOption" Parameter="dueOption" Type="System.String" DbType="NVarChar(5)" />
+    <Parameter Name="CustomerID" Parameter="customerID" Type="System.String" DbType="NVarChar(10)" />
+    <Parameter Name="CustomerDept" Parameter="customerDept" Type="System.String" DbType="NVarChar(200)" />
+    <Parameter Name="Location" Parameter="location" Type="System.String" DbType="NVarChar(200)" />
+    <Parameter Name="EquipID" Parameter="equipID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="MonthYear_DueBy" Parameter="monthYear_DueBy" Type="System.Int32" DbType="Int" />
+    <Parameter Name="Count" Parameter="count" Type="System.Int32" DbType="Int" />
+    <ElementType Name="NextServiceSearchResult">
+      <Column Name="branchid" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="CustomerCode" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="LastServiceUID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="BNQItemCode" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="Overdue" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="Department" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="Manufacturer" Type="System.String" DbType="NVarChar(40)" CanBeNull="true" />
+      <Column Name="SerialNumber" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Location" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="CompanyName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="DueOn" Type="System.String" DbType="NVarChar(21)" CanBeNull="true" />
+      <Column Name="OtherCodes" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="CustomerEquipCode" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="EquipTypeName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="DateServiced" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="FutureService" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="NextServiceType" Type="System.String" DbType="NVarChar(7)" CanBeNull="true" />
+      <Column Name="NextServiceYear" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="NextServiceMonth" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="EquipUID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="DeptID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="LocationID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.RecalcNextServiceAllEquipment" Method="RecalcNextServiceAllEquipment">
+    <Parameter Name="DueOption" Parameter="dueOption" Type="System.String" DbType="NVarChar(5)" />
+    <Parameter Name="CustomerID" Parameter="customerID" Type="System.String" DbType="NVarChar(10)" />
+    <Parameter Name="CustomerDept" Parameter="customerDept" Type="System.String" DbType="NVarChar(200)" />
+    <Parameter Name="Location" Parameter="location" Type="System.String" DbType="NVarChar(200)" />
+    <Parameter Name="EquipID" Parameter="equipID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="MonthYear_DueBy" Parameter="monthYear_DueBy" Type="System.Int32" DbType="Int" />
+    <Parameter Name="Count" Parameter="count" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.AddNewServiceJobAndCustomersWorkOrders2" Method="AddNewServiceJobAndCustomersWorkOrders2">
+    <Parameter Name="DueOption" Parameter="dueOption" Type="System.String" DbType="NVarChar(5)" />
+    <Parameter Name="CustomerID" Parameter="customerID" Type="System.String" DbType="NVarChar(10)" />
+    <Parameter Name="CustomerDept" Parameter="customerDept" Type="System.String" DbType="NVarChar(100)" />
+    <Parameter Name="Location" Parameter="location" Type="System.String" DbType="NVarChar(100)" />
+    <Parameter Name="EquipID" Parameter="equipID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="MonthYear_DueBy" Parameter="monthYear_DueBy" Type="System.Int32" DbType="Int" />
+    <Parameter Name="progDate" Type="System.DateTime" DbType="DateTime" />
+    <Parameter Name="Count" Parameter="count" Type="System.Int32" DbType="Int" />
+    <Parameter Name="progEngineerID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="AddNewServiceJobAndCustomersWorkOrders2Result">
+      <Column Name="messages" Type="System.String" DbType="NVarChar(500)" CanBeNull="true" />
+      <Column Name="success" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.ClearAudit" Method="ClearAudit">
+    <ElementType Name="ClearAuditResult">
+      <Column Name="" Member="Column1" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.RepairsSearch" Method="RepairsSearch">
+    <Parameter Name="dateInFrom" Type="System.DateTime" DbType="DateTime" />
+    <Parameter Name="dateInTo" Type="System.DateTime" DbType="DateTime" />
+    <Parameter Name="CustomerID" Parameter="customerID" Type="System.String" DbType="NVarChar(10)" />
+    <Parameter Name="EquipmentType" Parameter="equipmentType" Type="System.String" DbType="NVarChar(10)" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="Resolved_NotResolved_Either" Parameter="resolved_NotResolved_Either" Type="System.Char" DbType="Char(1)" />
+    <Parameter Name="HandoverCompleted_Incomplete_Either" Parameter="handoverCompleted_Incomplete_Either" Type="System.Char" DbType="Char(1)" />
+    <Parameter Name="ServiceJobID" Parameter="serviceJobID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="EquipmentID" Parameter="equipmentID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="Department" Parameter="department" Type="System.String" DbType="NVarChar(200)" />
+    <Parameter Name="Location" Parameter="location" Type="System.String" DbType="NVarChar(200)" />
+    <Parameter Name="EngineerID" Parameter="engineerID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="CustOrderNo" Parameter="custOrderNo" Type="System.String" DbType="NVarChar(20)" />
+    <Parameter Name="RepairJobNo" Parameter="repairJobNo" Type="System.String" DbType="NVarChar(20)" />
+    <Parameter Name="dateOutFrom" Type="System.DateTime" DbType="DateTime" />
+    <Parameter Name="dateOutTo" Type="System.DateTime" DbType="DateTime" />
+    <Parameter Name="DateInFilter" Parameter="dateInFilter" Type="System.Boolean" DbType="Bit" />
+    <Parameter Name="DateOutFilter" Parameter="dateOutFilter" Type="System.Boolean" DbType="Bit" />
+    <Parameter Name="Count" Parameter="count" Type="System.Int32" DbType="Int" />
+    <ElementType Name="RepairsSearchResult">
+      <Column Name="RepairUID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="JObCode" Type="System.String" DbType="NVarChar(36)" CanBeNull="true" />
+      <Column Name="OrderNumber" Type="System.String" DbType="NVarChar(15)" CanBeNull="true" />
+      <Column Name="Customer" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Equipment" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="DateIn" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="OrderNumberRequired" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="EquipmentType" Type="System.String" DbType="NVarChar(202) NOT NULL" CanBeNull="false" />
+      <Column Name="DateOut" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="CustomerCode" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="EquipDesc" Type="System.String" DbType="NVarChar(264) NOT NULL" CanBeNull="false" />
+      <Column Name="RepairCompleted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="HandoverCompleted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="Engineername" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="BERDisposal" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="RepairTravelExpenseCost" Type="System.Single" DbType="Real" CanBeNull="true" />
+      <Column Name="FaultDetails" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="WorkDone" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="PartsCost" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="WarrantyExpirationDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="EngWork" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.ServiceJobSearch" Method="ServiceJobSearch">
+    <Parameter Name="dateFrom" Type="System.DateTime" DbType="DateTime" />
+    <Parameter Name="dateTo" Type="System.DateTime" DbType="DateTime" />
+    <Parameter Name="CustomerID" Parameter="customerID" Type="System.String" DbType="NVarChar(10)" />
+    <Parameter Name="CustomerDept" Parameter="customerDept" Type="System.String" DbType="NVarChar(200)" />
+    <Parameter Name="EngineerID" Parameter="engineerID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="CompleteIncomplete" Parameter="completeIncomplete" Type="System.String" DbType="NVarChar(10)" />
+    <Parameter Name="Invoice" Parameter="invoice" Type="System.String" DbType="NVarChar(10)" />
+    <Parameter Name="Location" Parameter="location" Type="System.String" DbType="NVarChar(10)" />
+    <Parameter Name="ServiceJobNo" Parameter="serviceJobNo" Type="System.String" DbType="NVarChar(10)" />
+    <Parameter Name="CustOrderNo" Parameter="custOrderNo" Type="System.String" DbType="NVarChar(10)" />
+    <Parameter Name="OutDateFrom" Parameter="outDateFrom" Type="System.DateTime" DbType="DateTime" />
+    <Parameter Name="OutDateTo" Parameter="outDateTo" Type="System.DateTime" DbType="DateTime" />
+    <Parameter Name="DateInFilter" Parameter="dateInFilter" Type="System.Boolean" DbType="Bit" />
+    <Parameter Name="DateOutFilter" Parameter="dateOutFilter" Type="System.Boolean" DbType="Bit" />
+    <Parameter Name="Excel" Parameter="excel" Type="System.Boolean" DbType="Bit" />
+    <Parameter Name="Count" Parameter="count" Type="System.Int32" DbType="Int" />
+    <Parameter Name="SWCompleteMonth" Parameter="sWCompleteMonth" Type="System.Int32" DbType="Int" />
+    <Parameter Name="SWCompleteYear" Parameter="sWCompleteYear" Type="System.Int32" DbType="Int" />
+    <ElementType Name="ServiceJobSearchResult">
+      <Column Name="ServiceJobUID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Customer" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="CustomerSite" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="JobCode" Type="System.String" DbType="NVarChar(23)" CanBeNull="true" />
+      <Column Name="DateProgrammed" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="DateStart" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Engineername" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="NoCharge" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CompletedOK" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CompletedBERs" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CompletedOutstanding" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="Invoiced" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="OK" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="Location" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="EngWork" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.ServiceWorkOrderSearchNew" Method="ServiceWorkOrderSearchNew">
+    <Parameter Name="EquipTypeCode" Parameter="equipTypeCode" Type="System.String" DbType="NVarChar(10)" />
+    <Parameter Name="ServiceJobID" Parameter="serviceJobID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="CustomerID" Parameter="customerID" Type="System.String" DbType="NVarChar(10)" />
+    <Parameter Name="CustomerDept" Parameter="customerDept" Type="System.String" DbType="NVarChar(10)" />
+    <Parameter Name="EngineerID" Parameter="engineerID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="DataEntryIncompeteOnly" Parameter="dataEntryIncompeteOnly" Type="System.Boolean" DbType="Bit" />
+    <Parameter Name="ServicesAfterDate" Parameter="servicesAfterDate" Type="System.DateTime" DbType="Date" />
+    <Parameter Name="Location" Parameter="location" Type="System.String" DbType="NVarChar(200)" />
+    <Parameter Name="EquipUID" Parameter="equipUID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="ServicesAfterDateFilter" Parameter="servicesAfterDateFilter" Type="System.Boolean" DbType="Bit" />
+    <Parameter Name="Count" Parameter="count" Type="System.Int32" DbType="Int" />
+    <ElementType Name="ServiceWorkOrderSearchNewResult">
+      <Column Name="ServiceJobCode" Type="System.String" DbType="NVarChar(23)" CanBeNull="true" />
+      <Column Name="CompanyName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="ServiceArea" Type="System.String" DbType="VarChar(2) NOT NULL" CanBeNull="false" />
+      <Column Name="EquipDesc" Type="System.String" DbType="NVarChar(264) NOT NULL" CanBeNull="false" />
+      <Column Name="WorkDone" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="DateServiced" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="EngineerName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="CustomerEquipCode" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="MajorService" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="Servicable" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="Notes" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="ServiceUID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="BranchID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Location" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="NotesForNextService" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="NotesForThisService" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="WarrantyExpirationDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="PartsCost" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="PartsUsed" Type="System.String" DbType="NVarChar(400)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.SearchEquipment" Method="SearchEquipment">
+    <Parameter Name="CustomerID" Parameter="customerID" Type="System.String" DbType="NVarChar(10)" />
+    <Parameter Name="Department" Parameter="department" Type="System.String" DbType="NVarChar(200)" />
+    <Parameter Name="Location" Parameter="location" Type="System.String" DbType="NVarChar(200)" />
+    <Parameter Name="EquipmentType" Parameter="equipmentType" Type="System.String" DbType="NVarChar(10)" />
+    <Parameter Name="BranchID" Parameter="branchID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="InService" Parameter="inService" Type="System.Boolean" DbType="Bit" />
+    <Parameter Name="SearchCode" Parameter="searchCode" Type="System.String" DbType="NVarChar(20)" />
+    <Parameter Name="MDSNQ" Parameter="mDSNQ" Type="System.Boolean" DbType="Bit" />
+    <Parameter Name="All" Parameter="all" Type="System.Boolean" DbType="Bit" />
+    <Parameter Name="ModelUID" Parameter="modelUID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="Loaner" Parameter="loaner" Type="System.Boolean" DbType="Bit" />
+    <Parameter Name="Count" Parameter="count" Type="System.Int32" DbType="Int" />
+    <ElementType Name="SearchEquipmentResult">
+      <Column Name="Customer" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="MDSItemNo" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="SerialNumber" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="CustomerSite" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="Location" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="EquipDesc" Type="System.String" DbType="NVarChar(264) NOT NULL" CanBeNull="false" />
+      <Column Name="EquipUID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="EquipementType" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Manufacturer" Type="System.String" DbType="NVarChar(40) NOT NULL" CanBeNull="false" />
+      <Column Name="Model" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="VendorName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="CurrentlyServicedByMDS" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="InService" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="WarrantyExpirationDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="TotalCostOfRepairs" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="TotalRepairHours" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Cost" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="lastServiced" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+    </ElementType>
+  </Function>
+</Database>

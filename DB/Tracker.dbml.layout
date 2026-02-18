@@ -1,0 +1,198 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 13.125, 17.125" name="Tracker">
+  <DataContextMoniker Name="/TrackerDataContext" />
+  <nestedChildShapes>
+    <classShape Id="69961a59-cae4-4230-b96e-da5754cbc4f5" isExpanded="false" absoluteBounds="7.875, 0.5, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/EquipTypeTest" />
+      <nestedChildShapes>
+        <elementListCompartment Id="e4a6ec48-f964-47f9-b85d-8b56cfc5d172" absoluteBounds="7.8900000000000006, 0.96, 1.9700000000000002, 0.8262939453125" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="233d0d0b-9e60-4b03-b3e9-738b2a2e1f9e" isExpanded="false" absoluteBounds="2.875, 1.125, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/EquipType" />
+      <nestedChildShapes>
+        <elementListCompartment Id="edc7a870-c1af-4c5f-a000-7c82d730ee45" absoluteBounds="2.89, 1.585, 1.9700000000000002, 1.7878011067708333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="f4d5e0c1-2aa9-4b53-b2df-6dba81c7b103" isExpanded="false" absoluteBounds="3, 4.875, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/TravelType" />
+      <nestedChildShapes>
+        <elementListCompartment Id="15e1dd20-d961-4ecd-89d4-36f199713ee3" absoluteBounds="3.015, 5.335, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="b867c2ff-c752-439f-8ea5-b3714d10a115" isExpanded="false" absoluteBounds="0.5, 0.5, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/ChargeType" />
+      <nestedChildShapes>
+        <elementListCompartment Id="20efb215-5fd7-4bf9-b3b6-b3e22a88faa0" absoluteBounds="0.51500000000000012, 0.96, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="2ce6d46a-695d-47e7-b6e1-4c597f47881d" isExpanded="false" absoluteBounds="0.5, 2.125, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/Vendor" />
+      <nestedChildShapes>
+        <elementListCompartment Id="6b2d26a8-1037-4a76-ade7-799ebe922a15" absoluteBounds="0.515, 2.585, 1.9700000000000002, 3.1339111328125" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="ea4b3f2d-9853-4c7a-b4fd-830b83f1120d" isExpanded="false" absoluteBounds="0.5, 2.75, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/ServiceArea" />
+      <nestedChildShapes>
+        <elementListCompartment Id="957b2e6a-d90d-47cd-ba85-e329369a12a5" absoluteBounds="0.51500000000000012, 3.21, 1.9700000000000002, 0.8262939453125" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="c2ce0539-2fd0-4d98-8d8a-2ee7287271c5" isExpanded="false" absoluteBounds="0.5, 3.25, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/EquipManufacturer" />
+      <nestedChildShapes>
+        <elementListCompartment Id="7162e0ca-db09-4b74-a1d5-6cbc3bb4dd8c" absoluteBounds="0.515, 3.71, 1.9700000000000002, 0.44169108072916663" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="a864fbd5-f7bf-4e2a-82b6-601599fda105" isExpanded="false" absoluteBounds="0.5, 3.875, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/RepairPart" />
+      <nestedChildShapes>
+        <elementListCompartment Id="b97209d4-6204-49c4-ab53-d81e4fab66ff" absoluteBounds="0.515, 4.335, 1.9700000000000002, 1.7878011067708333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="d65eff6f-acc3-4590-9cbb-8e29641d7560" isExpanded="false" absoluteBounds="3, 5.5, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/ServiceFunction" />
+      <nestedChildShapes>
+        <elementListCompartment Id="77a3fe95-809b-43b9-9a03-89828ecfa297" absoluteBounds="3.015, 5.96, 1.9700000000000002, 0.63399251302083326" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="6cc69b45-e02a-486d-b771-9aa911b84850" isExpanded="false" absoluteBounds="3, 6.375, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/NextService" />
+      <nestedChildShapes>
+        <elementListCompartment Id="6b728c96-5f7d-4814-8a3c-d3b78a0d8d07" absoluteBounds="3.015, 6.835, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="929bfa87-cb3e-4ea2-9ef1-72d00994e180" isExpanded="false" absoluteBounds="3, 7.125, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/ServicePart" />
+      <nestedChildShapes>
+        <elementListCompartment Id="5e50363b-5bb7-4eee-83ce-2957ba22331e" absoluteBounds="3.015, 7.585, 1.9700000000000002, 1.7878011067708333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="81406030-a794-415c-b826-49fc0edbd3bc" isExpanded="false" absoluteBounds="3, 2.125, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/Branch" />
+      <nestedChildShapes>
+        <elementListCompartment Id="38a8032c-e70c-4847-8b88-1ce89bdcd4f3" absoluteBounds="3.015, 2.585, 1.9700000000000002, 1.4031982421875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="7763d5bc-100a-4085-9c97-55c4deb5861d" isExpanded="false" absoluteBounds="10.375, 3.875, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/EquipModel" />
+      <nestedChildShapes>
+        <elementListCompartment Id="c6eb6fcd-46cf-4f0e-96bc-2ccf49227452" absoluteBounds="10.39, 4.335, 1.9700000000000002, 1.4031982421875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="d89ec493-ce58-48a8-af33-022c3ed2b61a" isExpanded="false" absoluteBounds="2.75, 0.5, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/Customer" />
+      <nestedChildShapes>
+        <elementListCompartment Id="79025cfb-54d5-403f-84cc-4e12fe2f4127" absoluteBounds="2.765, 0.96, 1.9700000000000002, 3.9031168619791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="75817266-2f7f-4776-8b9c-e6abb42d30c7" isExpanded="false" absoluteBounds="3, 3.125, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/EquipTypeModel" />
+      <nestedChildShapes>
+        <elementListCompartment Id="dddd1be2-c811-49c1-8843-359bb53d5e9f" absoluteBounds="3.015, 3.585, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="21016de3-7fe4-499d-a797-5db6883f5dd9" isExpanded="false" absoluteBounds="7.875, 4, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/ServiceTestScript" />
+      <nestedChildShapes>
+        <elementListCompartment Id="30600aeb-c47a-47f0-9add-1c22da437eb7" absoluteBounds="7.89, 4.46, 1.9700000000000002, 1.4031982421875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="2f1095a1-7b68-46d4-af7a-fea40e32098d" isExpanded="false" absoluteBounds="0.875, 6.125, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/Part" />
+      <nestedChildShapes>
+        <elementListCompartment Id="4cb13c20-580e-48ed-abcc-d389bdeba1fd" absoluteBounds="0.89, 6.585, 1.9700000000000002, 3.7108154296875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="0dd83a0d-fb0e-4252-8eb1-36a9efc655e0" isExpanded="false" absoluteBounds="10.875, 1.5, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/CustomerDepartment" />
+      <nestedChildShapes>
+        <elementListCompartment Id="8dcb82a9-3a50-4f15-969d-8dbb7e473720" absoluteBounds="10.89, 1.96, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="5015aaa2-4e84-4dfa-a5a1-dece3c1c685e" isExpanded="false" absoluteBounds="7.875, 3.5, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/CustomerLocation" />
+      <nestedChildShapes>
+        <elementListCompartment Id="abeedd7b-4625-45f5-9e6c-1d1d9965fb2f" absoluteBounds="7.89, 3.96, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="2689602d-3e51-4902-98cb-887031ba3af8" isExpanded="false" absoluteBounds="7.625, 4.5, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/Audit" />
+      <nestedChildShapes>
+        <elementListCompartment Id="1ee51a10-bebd-428d-b578-e6908fe28224" absoluteBounds="7.6400000000000006, 4.96, 1.9700000000000002, 1.7878011067708335" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="2e8fbebb-93e2-464e-bd68-5296dcbd1387" isExpanded="false" absoluteBounds="3, 1.625, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/StdWorkDone" />
+      <nestedChildShapes>
+        <elementListCompartment Id="accda64b-dc00-4aa9-ac1e-aaba27ac03b1" absoluteBounds="3.015, 2.085, 1.9700000000000002, 0.63399251302083326" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="3b223ec1-c81a-44a7-81a9-b72d201b8f04" isExpanded="false" absoluteBounds="0.875, 7.25, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/Condition" />
+      <nestedChildShapes>
+        <elementListCompartment Id="65f555eb-76ca-4eca-add4-c2eccce28511" absoluteBounds="0.89000000000000012, 7.71, 1.9700000000000002, 0.63399251302083326" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="e3302aa9-6c76-4fa2-b796-58e838d99b31" isExpanded="false" absoluteBounds="7.875, 5.625, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/Service" />
+      <nestedChildShapes>
+        <elementListCompartment Id="800b3fe2-6199-4521-8b51-fe62696b1ac2" absoluteBounds="7.89, 6.085, 1.9700000000000002, 5.6338297526041661" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="1dfeed80-0ca3-43ae-a060-a097aee34159" isExpanded="false" absoluteBounds="8.125, 3, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/Equipment" />
+      <nestedChildShapes>
+        <elementListCompartment Id="2e3c9cdf-f50c-4151-aafe-5d6e6249f253" absoluteBounds="8.14, 3.46, 1.9700000000000002, 7.1722412109375" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="f809f135-6165-4831-bf76-b7df2117d145" absoluteBounds="5.25, 4.875, 2, 1.3862939453124996">
+      <DataClassMoniker Name="/TrackerDataContext/UserLogin" />
+      <nestedChildShapes>
+        <elementListCompartment Id="650381f2-634f-4374-933e-93e69477770b" absoluteBounds="5.265, 5.335, 1.9700000000000002, 0.8262939453125" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="5fa604a2-4f82-45e7-b52d-3240a39ed316" isExpanded="false" absoluteBounds="8.25, 2.375, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/Photo" />
+      <nestedChildShapes>
+        <elementListCompartment Id="60d6adbd-f311-4d0f-be69-93a17955d074" absoluteBounds="8.265, 2.835, 1.9700000000000002, 1.7878011067708335" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="a453792b-f7fe-4d97-90b5-3cbc1daab78d" absoluteBounds="0.5, 4.5, 2, 12.347475585937502">
+      <DataClassMoniker Name="/TrackerDataContext/Repair" />
+      <nestedChildShapes>
+        <elementListCompartment Id="7d3615bd-7a9c-431b-a21f-30e05e7c4846" absoluteBounds="0.515, 4.96, 1.9700000000000002, 11.7874755859375" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="26cb0f97-2500-4c0e-a596-9b43eec4c5b1" isExpanded="false" absoluteBounds="0.75, 1.375, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/UserBranch" />
+      <nestedChildShapes>
+        <elementListCompartment Id="8e7d3ee1-ff0a-46d0-b16e-01cc157f9c82" absoluteBounds="0.765, 1.835, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="46e363c9-cbbb-4a4b-b976-9bd6e59e0dc0" isExpanded="false" absoluteBounds="5.125, 0.5, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/ServiceJobEngineer" />
+      <nestedChildShapes>
+        <elementListCompartment Id="dcdee025-8ff0-44c8-9b05-d7fd91942595" absoluteBounds="5.14, 0.96, 1.9700000000000002, 0.8262939453125" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="3c317996-61d6-4dac-bd7b-eda17b68019c" isExpanded="false" absoluteBounds="3.625, 0.875, 2.625, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/ServiceJob" />
+      <nestedChildShapes>
+        <elementListCompartment Id="ba7b1892-4643-4889-b8dd-d1e5a1e3ee41" absoluteBounds="3.64, 1.335, 2.5949999999999998, 7.1722412109375" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="19bcbffd-bc86-49cf-b3fc-08dba60b1a84" absoluteBounds="4.375, 1.375, 2, 1.7708968098958331">
+      <DataClassMoniker Name="/TrackerDataContext/Engineer" />
+      <nestedChildShapes>
+        <elementListCompartment Id="859dbf87-4b0f-447c-8619-b900237ef450" absoluteBounds="4.39, 1.835, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="32649f46-3444-4b2f-870e-4758597d3b73" isExpanded="false" absoluteBounds="4, 3.75, 2, 0.45">
+      <DataClassMoniker Name="/TrackerDataContext/ServiceEngineerWork" />
+      <nestedChildShapes>
+        <elementListCompartment Id="e289dba5-0644-427f-9244-eb87d47718d0" absoluteBounds="4.015, 4.21, 1.9700000000000002, 1.7878011067708335" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>
