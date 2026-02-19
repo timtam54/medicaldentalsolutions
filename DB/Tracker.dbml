@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?><Database Name="MDS7" Class="TrackerDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
-  <Connection Mode="WebSettings" ConnectionString="Data Source=meddentsoldbserver.database.windows.net;Initial Catalog=MDS7;Persist Security Info=True;User ID=MedDentSol;Connect Timeout=30;Encrypt=True;TrustServerCertificate=False" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="MDS7ConnectionString1" Provider="System.Data.SqlClient" />
+  <Connection Mode="WebSettings" ConnectionString="Data Source=yourserver.database.windows.net;Initial Catalog=YourDatabase;Persist Security Info=True;User ID=YourUserID;Connect Timeout=30;Encrypt=True;TrustServerCertificate=False" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="MDS7ConnectionString1" Provider="System.Data.SqlClient" />
   <Table Name="dbo.EquipTypeTest" Member="EquipTypeTests">
     <Type Name="EquipTypeTest">
       <Column Name="EquipTypeTestID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />

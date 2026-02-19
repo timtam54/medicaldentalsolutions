@@ -61,8 +61,8 @@ namespace MDS
 
             app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
             {
-                ClientId = "891083635477-u0nkh6j24spc26n97tk8gserpl2ov7fe.apps.googleusercontent.com",
-                ClientSecret = "whnEe-y62bAROzg3qvskuuBH"
+                ClientId = "YOUR_GOOGLE_CLIENT_ID",
+                ClientSecret = "YOUR_GOOGLE_CLIENT_SECRET"
             });
 
         }

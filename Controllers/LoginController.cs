@@ -70,7 +70,7 @@ namespace MDS.Controllers
         {
             SmtpClient client = new SmtpClient("smtp.gmail.com");
 
-            client.Credentials = new NetworkCredential("tim.hams@gmail.com", "#Ben123!@#");
+            client.Credentials = new NetworkCredential("your-email@example.com", "");
             client.Port = 587;
             client.EnableSsl = true;
             MailMessage mailMessage = new MailMessage();

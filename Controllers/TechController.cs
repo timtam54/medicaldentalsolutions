@@ -1109,14 +1109,14 @@ namespace MDS.Controllers
 
                 SmtpClient client = new SmtpClient("smtp.gmail.com");
 
-                client.Credentials = new System.Net.NetworkCredential("tim.hams@gmail.com", "#Ben123!@#");
+                client.Credentials = new System.Net.NetworkCredential("your-email@example.com", "");
                 client.Port = 587;
                 client.EnableSsl = true;
                 MailMessage mailMessage = new MailMessage();
                 mailMessage.From = new MailAddress("noreply@mds.com");
                 string recipients;
                 if (EngineerID == -1)
-                    recipients = "timtam54@hotmail.com";
+                    recipients = "admin@example.com";
                 else
                     recipients = db.Engineers.Where(ul => ul.EngineerID == EngineerID).FirstOrDefault().AdminEmail;
 
