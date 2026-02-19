@@ -1,0 +1,90 @@
+﻿@{
+    ViewBag.Title = "LabourCharges";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model MDS.Models.LabourChargeList
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+</style>
+<h2 style="text-align: center;">Labour Charges</h2>
+
+@using (Html.BeginForm("LabourChargeIndex", "Repair", FormMethod.Post, new { id = "SiteForm" }))
+{
+   
+    <div class="contact-info">
+        <div class="content">
+            <table style="margin-left: 10px; margin-top: 10px; width: 95%">
+
+                <tr>
+                    <td colspan="2">
+
+                         @(Html.Kendo().Grid(Model.LabourCharges)
+                           .Name("locGrid")
+                           .Columns(columns =>
+                           {
+                               columns.Bound(p => p.ChargeTypeCode).Title("Code").ClientTemplate(@Html.ActionLink("#=ChargeTypeCode#", "EditCharge", new { id = "#=ChargeTypeCodeURLFriendly#", LabTrav="Lab" }).ToHtmlString());
+
+                               columns.Bound(p => p.ChargeType).Title("Description / Type");
+                               columns.Bound(p => p.ChargeRate).Title("Rate");
+
+
+                           })
+//.ToolBar(t=>t.Create())
+.Pageable()
+.Sortable()
+//.Editable(editable => editable.Mode(GridEditMode.InLine))
+.Filterable()
+.DataSource(dataSource => dataSource
+        .Ajax()
+        .Model(model =>
+        {
+            model.Id(p => p.ChargeTypeCode);
+            model.Field(p => p.ChargeType).Editable(true);
+            //model.Field(p => p.ChargeTypeCode).Editable(true);
+
+        })
+        //.Update(update => update.Action("UpdateLabourCharge",
+        //                          "Repair"))
+        //                          .Create(create => create.Action("CreateLabourCharge", "Repair"))
+        .PageSize(200)
+        .ServerOperation(false)
+     )
+)
+                    
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.ActionLink("Add New","EditCharge",new { id="",LabTrav="Lab"})
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+
+    function dropdownlist_change() {
+        $("#SiteForm").submit();
+    }
+
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>

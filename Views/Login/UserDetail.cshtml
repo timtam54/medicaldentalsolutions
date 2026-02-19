@@ -1,0 +1,192 @@
+﻿@model MDS.Models.UserDetailBranches
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@using (Html.BeginForm("UserDetail", "Login", FormMethod.Post, new { id = "UserDetail" }))
+{
+    @Html.AntiForgeryToken()
+    @*<div id="box2">
+                </div>*@
+<div id="box2">
+    @Html.HiddenFor(mbox=>mbox.New)
+    <table cellspacing="8" cellpadding="0" width="100%" border="0">
+        <tr>
+            <td colspan="2">
+                @Html.ValidationSummary(true)
+            </td>
+        </tr>
+        <tr>
+            <td class="text">Username (Email)<span style="color: red;">*</span></td>
+            <td>
+                @if (Model.New)
+                {
+                @(Html.Kendo().TextBoxFor(mbox => mbox.Email)
+                                                                        .Name("Email")
+                                                                        .HtmlAttributes(new { data_required_msg = "Email Name is required.", required = "required", style = "width: 400px" })
+                )
+                }
+                else
+                {
+            @(Html.DisplayFor(mbox => mbox.Email)
+            )
+            @(Html.HiddenFor(mbox => mbox.Email)
+            )
+                }
+            </td>
+            <td class="text">Password<span style="color: red;">*</span></td>
+            <td>
+                @(Html.Kendo().TextBoxFor(mbox => mbox.Password)
+                                                    .Name("Password")
+                                                    .HtmlAttributes(new { data_required_msg = "Password is required.", required = "required", style = "width: 240px" })
+                )
+            </td>
+        </tr>
+        <tr>
+            <td>
+                New Equipment Notify
+            </td>
+            <td>
+                @Html.CheckBoxFor(i => i.NewEquipNotify)
+            </td>
+            <td>
+                New Parts Notify
+            </td>
+            <td>
+                @Html.CheckBoxFor(i => i.NewPartsNotify)
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @* SECURITY: Removed password-in-URL link - this was a security vulnerability *@
+            </td>
+            <td class="text">Admin (A,T,U)<span style="color: red;">*</span></td>
+            <td>
+                @(Html.EditorFor(mbox => mbox.Admin )
+                )
+            </td>
+        </tr>
+
+
+    </table>
+    <table style="text-align:center" width="100%">
+
+        <tr>
+            <td></td>
+
+            @foreach (MDS.Models.UserBranchList item in Model.branches)
+        {
+            <td>
+                <label>
+                    @item.BranchID - @item.BranchName
+                </label>
+            </td>
+    }
+        </tr>
+
+        <tr>
+            <td>
+                <b>
+                    Access
+                </b>
+            </td>
+
+            @foreach (MDS.Models.UserBranchList item in Model.branches)
+        {
+            <td>
+                <label>
+                    <input type="checkbox" checked="@item.Selected"
+                           name="SelectedBranch" id="@item.BranchID"
+                           value="@item.BranchID" />
+                </label>
+            </td>
+    }
+        </tr>
+
+        <tr>
+            <td>
+                <b>
+                    Audit
+                </b>
+            </td>
+
+            @foreach (MDS.Models.UserBranchList item in Model.branches)
+        {
+            <td>
+                <label>
+                    <input type="checkbox" checked="@item.Audit"
+                           name="AuditBranch" id="@item.BranchID"
+                           value="@item.BranchID" />
+                </label>
+            </td>
+    }
+        </tr>
+
+
+    </table>
+
+    <table width="100%">
+        <tr>
+
+            <td>
+                <input type="button" class="inputbuttonbg inputbig" value="Back" onclick="cancel()">
+            </td>
+            <td>
+                <input type="button" class="inputbuttonbg inputbig" onclick="$('#UserDetail').submit();" value="Save">
+            </td>
+            <td>
+                @Html.ActionLink("Delete","DeleteUser",new { UserName = Model.Email })
+            </td>
+        </tr>
+    </table>
+</div>
+}
+<script>
+
+    $("#AddForm").kendoValidator({
+    });
+
+</script>
+<script type="text/javascript">
+
+    var somethingChanged = false;
+    $(document).ready(function () {
+        $('input').change(function () {
+            somethingChanged = true;
+        });
+        $('textarea').change(function () {
+            somethingChanged = true;
+        });
+    });
+
+    function cancel() {
+        if (somethingChanged) {
+            var r = confirm("Do you wish to discard any changes you have made?");
+            if (r) {
+                back();
+            }
+        }
+        else {
+            back();
+        }
+    }
+
+    function back() {
+        window.location.href = '@Url.Action("AllUsers", "Login")';
+        @*var popup = '@Model.PopUp';
+        if (popup=="True") {
+            var url = '@Url.Action("IndexPopUp", "Engineer")';
+            window.location.href = url;
+        }
+        else {
+            window.location.href = '@Url.Action("Index", "Engineer")';
+        }*@
+    }
+
+</script>
+
+
+
+

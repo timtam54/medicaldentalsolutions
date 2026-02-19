@@ -1,0 +1,44 @@
+﻿@model MDS.Models.AdminTech
+@{
+    ViewBag.Title = "Admin/Tech";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@using (Html.BeginForm("AdminTech", "Login", FormMethod.Post, new { id = "AdminTech" }))
+{
+    <br />
+    <br />
+    <div id="box2">
+        <table style="text-align:center" width="100%">
+            <tr>
+                <td colspan="2">
+                    <br />
+
+                    <b style="font-size:18px">
+                        Select Admin / Tech
+                    </b>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.HiddenFor(i => i.username)
+                    @Html.HiddenFor(i => i.BranchID)
+                    @Html.HiddenFor(i => i.EngineerID)
+                    <input type="submit" value="Admin" name="Command" class="inputbuttonbg inputbig" />
+                </td>
+                <td>
+                    <input type="submit" value="Tech" name="Command" class="inputbuttonbg inputbig" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <br />
+
+                </td>
+            </tr>
+        </table>
+    </div>
+}
+
+

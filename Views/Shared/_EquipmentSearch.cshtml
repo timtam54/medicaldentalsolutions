@@ -1,0 +1,452 @@
+﻿@model MDS.Models.EquipmentSearch
+
+<h2 style="text-align: center;">Equipment Search</h2>
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+</style>
+@using (Html.BeginForm("SearchEquipment", "Repair", FormMethod.Post, new { id = "eqForm" }))
+{
+    <div class="contact-info">
+        <div class="content">
+            <table width="100%">
+                <tr>
+                    <td>
+                        Search(in MDS, Serial)
+                    </td>
+                    <td>
+                        @(Html.Kendo().TextBoxFor(m => m.SerachMDS)
+                                .Name("SerachMDS")
+                                .HtmlAttributes(new { style = "width: 150px " })
+                    )
+                </td>
+                <td></td>
+                <td>
+                    @Html.EditorFor(m => m.DisplayEquip)<span> Only display Equipment in service (not retired)</span>
+                </td>
+                <td></td>
+                <td>@Html.EditorFor(m => m.ServiceMDS)<span> Only display Equipment currently service by @MDS.Controllers.LoginController.CompanyName</span></td>
+            </tr>
+        </table>
+            <table width="100%">
+
+                <tr>
+                    <td width="100">
+                        Customer:
+                    </td>
+                    <td>
+                        @(Html.Kendo().DropDownListFor(m => m.Customerid)
+                     .Filter(MDS.Controllers.LoginController.SearchType)
+                          .Name("Customerid")
+                          .Enable(MDS.Controllers.LoginController.AllCustomers(User.Identity.Name))
+
+                          .DataTextField("CompanyName")
+                          .DataValueField("CustomerCode")
+                          .BindTo(Model.CustomerList)
+                          .HtmlAttributes(new { style = "width:200px", data_required_msg = "Customer is required." })
+                        )
+
+                    </td>
+                    <td width="100">
+                        Customer Site:
+                    </td>
+                    <td>
+                        @(Html.Kendo().ComboBoxFor(m => m.Department)
+        .Placeholder("--Select Customer Site--")
+                          .Name("Department")
+//                           .Enable(MDS.Controllers.LoginController.AllCustomers(User.Identity.Name))
+
+                          .DataTextField("Department")
+                          .DataValueField("DepartmentID")
+                               .DataSource(dataSource =>
+                               {
+                                   dataSource.Read(read =>
+                                   {
+                                       read.Action("GetCustomerSite", "Service")
+                                          .Data("CustomerSiteData");
+                                   })
+                                   .ServerFiltering(true);
+                               })
+                                       .AutoBind(false)
+                               .CascadeFrom("Customerid")
+                          .HtmlAttributes(new { style = "width:300px", data_required_msg = "Customer Site is required." })
+                        )
+
+                    </td>
+                    <td>
+                        Location:
+                    </td>
+                    <td>
+                        @(Html.Kendo().ComboBoxFor(m => m.Locationid)
+        .Placeholder("--Select Customer Location--")
+
+                                .Name("Locationid")
+                                .DataTextField("Location")
+                                .DataValueField("Locationid")
+                                .DataSource(dataSource =>
+                                {
+                                    dataSource.Read(read =>
+                                    {
+                                        read.Action("GetCustomerLocation", "Service")
+                                           .Data("CustomerSiteData");
+                                    })
+                                    .ServerFiltering(true);
+                                })
+                                  .AutoBind(false)
+                                 .CascadeFrom("Customerid")
+                                .HtmlAttributes(new { style = "width:300px" })
+                        )
+                    </td>
+
+                    <td colspan="2">
+                        <table>
+                            <tr style="color:navy">
+                                <td>
+                                    Max Records:
+                                </td>
+                                <td>
+                                    @(Html.Kendo().DropDownListFor(m => m.SelCnt)
+                          .Name("SelCnt")
+                          .BindTo(Model.Cnt)
+                          .HtmlAttributes(new { style = "width:100%", data_required_msg = "Records is required." })
+                                    )
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <table width="100%">
+                <tr>
+                    <td width="100">
+                        Equip Type:
+                    </td>
+                    <td>
+                        @if (MDS.Controllers.LoginController.AllCustomers(User.Identity.Name))
+                {
+                            @(Html.Kendo().DropDownListFor(m => m.Equiptype)
+                          .Name("Equiptype")
+                          .DataTextField("Name")
+                          .DataValueField("EquipTypeCode")
+                          .BindTo(Model.EquipTypeList)
+                          .Filter("StartsWith")
+                        .HtmlAttributes(new { style = "width:200px", data_required_msg = "Equip Type is required." })
+                            )
+
+                        }
+                        else
+                        {
+
+                            @(Html.Kendo().DropDownListFor(m => m.Equiptype)
+
+                          .Name("Equiptype")
+                          .DataTextField("Name")
+                          .DataValueField("EquipTypeCode")
+                          .Filter("StartsWith")
+
+                         .DataSource(dataSource =>
+                         {
+                             dataSource.Read(read =>
+                             {
+                                 read.Action("GetEquipmentTypeSite", "Service")
+                                    .Data("CustomerSiteData");
+                             })
+                             .ServerFiltering(true);
+                         })
+
+                                  .AutoBind(false)
+                                 .CascadeFrom("Customerid")
+                          .HtmlAttributes(new { style = "width:200px", data_required_msg = "Equip Type is required." })
+                            )
+                        }
+                    </td>
+
+
+                    <td>
+                        Model:
+                    </td>
+                    <td>
+                        @(Html.Kendo().DropDownListFor(m => m.ModelID)
+                    .Filter("startswith")
+                                .Name("ModelID")
+                                .DataTextField("Model")
+                                .DataValueField("ModelUID")
+                                .DataSource(dataSource =>
+                                  {
+                                      dataSource.Read(read =>
+                                      {
+                                          read.Action("GetModelFromEquipType", "Equipment")
+                                             .Data("EquipTypeData");
+                                      })
+                                      .ServerFiltering(true);
+                                  })
+                                  .AutoBind(false)
+                                 .CascadeFrom("Equiptype")
+                                .HtmlAttributes(new { style = "width:150px" })
+                        )
+                    </td>
+
+
+
+
+                    <td>
+                        Branch :
+                    </td>
+                    <td>
+                        @(Html.Kendo().DropDownListFor(m => m.Branchid)
+
+                          .Name("Branchid")
+                          .DataTextField("BranchName")
+                           .Enable(MDS.Controllers.LoginController.AllCustomers(User.Identity.Name))
+
+                          .DataValueField("BranchID")
+                          .BindTo(Model.BranchList)
+                          .HtmlAttributes(new { style = "width:130px", data_required_msg = "Branch is required." })
+                        )
+                    </td>
+                    <td></td>
+                    <td>
+                        <a class="button" onclick="$('#eqForm').submit(); return false;"><span>Search</span></a>
+                    </td>
+                </tr>
+            </table>
+            <table width="100%">
+
+                <tr>
+                    <td colspan="6">
+                        &nbsp;
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <a onclick="pick();" class="button"><span>Pick</span></a>
+                        <a onclick="cancel();" class="button"><span>Cancel</span></a>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6">
+                        @if (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin)
+                {
+                            <input type="button" class="inputbuttonbg inputbig" value="Add New Equipment" onclick="window.location.href = '@Url.Action("AddPopUp", "Equipment")'">
+
+                            <input type="button" class="inputbuttonbg inputbig" value="Add New Equipment from Currently Selected" onclick="AddNEWFromExisting();">
+                        }
+                    </td>
+                </tr>
+            </table>
+
+            <table width="100%">
+                <tr>
+                    <td colspan="6">
+                        @* <div style="overflow:scroll;width:65%">*@
+                        @(Html.Kendo().Grid<MDS.Models.EquipmentSearchList>()
+.Name("eqGrid")
+.Columns(columns =>
+{
+
+    columns.Bound(p => p.Customer).Title("Customer").ClientTemplate(@Html.ActionLink("#=Customer#", "EditPopUpDialog", "Equipment", new { id = "#=EquipID#" }, null).ToHtmlString());
+    columns.Bound(p => p.EquipID).Title("EquipID").Visible(false);
+    columns.Bound(p => p.MDSItemNo).Title("MDSItemNo");
+    columns.Bound(p => p.SerialNumber).Title("SerialNumber");
+    columns.Bound(p => p.CustomerSite).Title("CustomerSite");
+    columns.Bound(p => p.Location).Title("Location");
+    columns.Bound(p => p.EquipDesc).Title("EquipDesc");
+    columns.Bound(p => p.EquipementType).Title("EquipementType");
+    columns.Bound(p => p.Manufacturer).Title("Manufacturer");
+    columns.Bound(p => p.Model).Title("Model");
+    columns.Bound(p => p.VendorName).Title("VendorName");
+    columns.Bound(p => p.CurrentlyServicedByMDS).Title("CurrentlyServicedByMDS");
+    columns.Bound(p => p.InService).Title("InService");
+   
+})
+.Pageable()
+.Sortable()
+.Filterable()
+.Selectable(s => s.Mode(GridSelectionMode.Single))
+ .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(200)
+        .Read(read => read.Action("Get", "Equipment").Data("getFilterCriteria"))
+        .ServerOperation(true)
+     )
+)
+                        @*</div>*@
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <a onclick="pick();" class="button"><span>Pick</span></a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+      @(Html.Kendo().Window()
+                            .Name("EquipmentWindow")
+                            .Title("Equipment Details")
+                            .Width(900)
+                            .Height(600)
+                            .Visible(false)
+                            .Draggable(true)
+                            .Iframe(true)
+                            .Modal(true)
+                            )
+}
+<script>
+    function CustomerSiteData() {
+        return {
+            Customerid: $("#Customerid").val(),
+            Branchid: $("#Branchid").val(),
+            userFilter: $("#Department").data("kendoComboBox").input.val(),
+        };
+    }
+    function EquipTypeData() {
+        return {
+            Equiptype: $("#Equiptype").val(),
+            Branchid: $("#Branchid").val()
+        };
+    }
+
+    function getFilterCriteria() {
+        return {
+            Customerid: $("#Customerid").val(),
+            Equiptype: $("#Equiptype").val(),
+            Locationid: $("#Locationid").val(),
+            Department: $("#Department").val(),
+            SerachMDS: $("#SerachMDS").val(),
+            DisplayEquip: $("#DisplayEquip").is(":checked"),
+            ServiceMDS: $("#ServiceMDS").is(":checked"),
+            ModelID:$("#ModelID").val(),
+            Cnt:$("#SelCnt").val(),
+
+
+        }; 
+    }
+    function pick() {
+        try {
+            var entityGrid = $("#eqGrid").data("kendoGrid");
+            var selectedItem = entityGrid.dataItem(entityGrid.select());
+
+            if (selectedItem == undefined) {
+                alert("Please select the row first");
+            }
+            else {
+
+                try {
+                    //alert(selectedItem.EquipDesc);
+                    parent.$("#SelectedEquipment").val(selectedItem.EquipID);
+                    //alert('qw');
+                    try {
+                        CloseEquipmentWindow();
+                        closeDiv();
+                        try {
+                            parent.$("#window1").data("kendoWindow").close();
+                        }
+                        catch (ex) {
+                            ;
+                        }                        return;
+
+                    }
+                    catch (ex) {
+                        ;
+                    }
+                    try {
+                        parent.CloseEquipmentWindow();
+                        closeDiv();
+                        try {
+                            parent.$("#window1").data("kendoWindow").close();
+                        }
+                        catch (ex) {
+                            ;
+                        }
+                        return;
+                    }
+                    catch (ex) {
+                        ;
+                    }
+
+                    try {
+                        closeDiv();
+                    }
+                    catch (ex) {
+                        ;
+                    }
+                    try {
+                        parent.$("#window1").data("kendoWindow").close();
+                    }
+                    catch (ex) {
+                        ;
+                    }
+                }
+                catch (ex) {
+                    alert(ex.message);
+                }
+            }
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+
+    }
+
+
+
+    function cancel()
+    {
+        parent.$("#window1").data("kendoWindow").close();
+    }
+
+    function AddNEWFromExisting()
+    {
+        var entityGrid = $("#eqGrid").data("kendoGrid");
+        var selectedItem = entityGrid.dataItem(entityGrid.select());
+        if (selectedItem == undefined) {
+            ShowAlert("You have specified that you want the new item to be based on the currently-selected item. However you must first find and select the equipment item you wish to copy from, from the list");
+            return false;
+        }
+        else {
+            swal({
+                title: "Are you sure?",
+                text: "Do you wish to create a new item based on the currently-selected item of equipment?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "green",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+ function (isConfirm) {
+     if (isConfirm) {
+         $.ajax({
+             url: '@Url.Action("AddNEWEquipmentExisting", "Equipment")',
+             type: 'POST',
+             datatype: "json",
+             data: { equipmentID: selectedItem.EquipID },
+             success: function (response) {
+                 var window = $("#EquipmentWindow").data("kendoWindow");
+                 window.Visible = true;
+                 var actionURL = '@Url.Action("EditPopUpNew", "Equipment")' + '/' + response.EquipmentID;
+                 window.refresh({
+                     url: actionURL
+                 });
+                 var width95 = (screen.width) * 85 / 100;
+                 var height75 = (screen.height) * 65 / 100;
+                 window.setOptions({ width: width95, height: height75 });
+                 window.center();
+                 window.open();
+             },
+             error: function (req, status, error) {
+                 //  alert("R: " + req + " S: " + status + " E: " + error);
+             }
+         });
+     }
+     else{
+
+     }
+ });
+        
+}
+}
+</script>

@@ -1,0 +1,465 @@
+﻿@model MDS.Models.MobRep
+@{
+    ViewBag.Title = "Repairs";
+    Layout = null;
+}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+<style>
+    a.my-class {
+        color: #333333
+    }
+
+        a.my-class:active {
+            color: #666666
+        }
+
+        a.my-class:link {
+            color: #999999
+        }
+
+        a.my-class:visited {
+            color: #CCCCCC
+        }
+
+    body {
+        font-family: Arial;
+    }
+</style>
+
+<script type="text/javascript">
+
+    function selectx(num,ord) {
+        try {
+            $('#RepairUID').val(num);
+            document.forms[0].submit();
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+        return false;
+    }
+
+    function autosearch() {
+        try {
+            var searchString = $('#YourSearchElementID').val();// $(this).val(); //Get the value from this TextBox
+            var data = { searchString: searchString }
+            $.post('@Url.Action("EquipSearch","Mobile")', data,
+                function (data) {
+                    if (data.results == null)
+                        alert('no results');
+                    else {
+                        var divstring = '';
+                        divstring = ''
+                        for (var i = 0; i < data.results.length; i++) {
+                            divstring = divstring + "<a id='" + data.results[i].ID + "' href='' onclick='selectx(" + data.results[i].ID + ","+data.results[i].Ord+");return false;'>" + data.results[i].Desc + "</a><br/>"
+                        }
+                        $("#searchresults").html(divstring);
+                    }
+                });
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+
+</script>
+
+<body>
+    @using (Html.BeginForm("Equipment", "Mobile", FormMethod.Post, new { id = "Equipment" }))
+    {
+        <table cellpadding="0" cellspacing="0" style="width:100%" align="center">
+                            <tr style="width:100%" >
+                                        <td style="background-color:white"><img alt="@MDS.Controllers.LoginController.CompanyName" title="@MDS.Controllers.LoginController.CompanyName" class="logo-image" src="@Url.Action("../images/logo.png")"></td>
+                                        <td >@Html.ActionLink("Repairs", "DashboardRepairs"@* , null, new { @class = "my-class" }*@)</td>
+                                        <td >@Html.ActionLink("Log Off", "LogOff", "Login", null, new { @class = "my-class" })</td>
+                            <td>
+                                <h4>@MDS.Controllers.LoginController.RepairLabel</h4>
+                            </td>
+                            <td>
+                                <h4>@MDS.Controllers.MobileController.EngineerName(User.Identity.Name)</h4>
+                            </td>
+                        </tr>
+        </table>
+        <table cellspacing="0" style="width:100%" align="center">
+            <tr>
+                <td><b>Repair ID</b></td>
+                <td>
+                    @Model.rep.RepairUID
+                </td>
+            </tr>
+            <tr style="background-color:silver">
+                <td><b>Accessories</b></td>
+                <td>
+                    @Model.rep.Accessories
+                </td>
+            </tr>
+            <tr>
+                <td><b>Amount</b></td>
+                <td>
+                    @Convert.ToDecimal(Model.rep.Amount).ToString("c")
+                </td>
+            </tr>
+            <tr style="background-color:silver">
+                <td><b>Approval Contact</b></td>
+                <td>
+                    @Model.rep.ApprovalContact
+                </td>
+            </tr>
+            <tr>
+                <td><b>Approval Required</b></td>
+                <td>
+                    @Html.CheckBoxFor(model => model.rep.ApprovalRequired, new { style = "width:20px;height:20px" })
+                </td>
+            </tr>
+            <tr style="background-color:silver">
+                <td><b>Approved By</b></td>
+                <td>
+                    @Model.rep.ApprovedBy
+                </td>
+            </tr>
+
+
+            <tr>
+                <td><b>Location Code</b></td>
+                <td>
+                    @Model.rep.BNQLocationCode
+                </td>
+            </tr>
+            <tr style="background-color:silver">
+                <td><b>Charge</b></td>
+                <td>
+                    @Html.CheckBoxFor(model => model.rep.Charge, new { style = "width:20px;height:20px" })
+                </td>
+            </tr>
+
+            <tr>
+                <td><b>Charge Parts Only</b></td>
+                <td>
+                    @Html.CheckBoxFor(model => model.rep.ChargePartsOnly, new { style = "width:20px;height:20px" })
+                </td>
+            </tr>
+            <tr style="background-color:silver">
+                <td><b>Charge Rate</b></td>
+                <td>
+                    @Model.rep.ChargeRate
+                </td>
+            </tr>
+
+            <tr>
+                <td><b>Charge Type Code</b></td>
+                <td>
+                    @Model.rep.ChargeTypecode
+                </td>
+            </tr>
+
+            <tr style="background-color:silver">
+                <td><b>Date Call Recieved</b></td>
+                <td>
+                    @Convert.ToDateTime(Model.rep.DateCallReceived).ToString("dd-MMM-yyyy")
+                </td>
+            </tr>
+
+            <tr>
+                <td><b>Date In</b></td>
+                <td>
+                    @Convert.ToDateTime(Model.rep.DateIn).ToString("dd-MMM-yyyy")
+                </td>
+            </tr>
+
+            <tr style="background-color:silver">
+                <td><b>Date Out</b></td>
+                <td>
+                    @Convert.ToDateTime(Model.rep.DateOut).ToString("dd-MMM-yyyy")
+                </td>
+            </tr>
+            <tr>
+                <td><b>Date Repair Finished</b></td>
+                <td>
+                    @Convert.ToDateTime(Model.rep.DateRepairFinished).ToString("dd-MMM-yyyy")
+                </td>
+            </tr>
+
+            <tr style="background-color:silver">
+                <td><b>Earth Resistance</b></td>
+                <td>
+                    @Model.rep.EarthResistance
+                </td>
+            </tr>
+
+            <tr>
+                <td><b>Equipment</b></td>
+                <td>
+                    @Html.ActionLink(MDS.Controllers.MobileController.EquipmentDesc(Convert.ToInt32(Model.rep.EquipUID)), "Equipment", new { EquipmentID = Model.rep.EquipUID })
+                </td>
+            </tr>
+
+            <tr style="background-color:silver">
+                <td><b>Expenses Proportion</b></td>
+                <td>
+                    @Model.rep.ExpensesProportion
+                </td>
+            </tr>
+
+
+            <tr>
+                <td><b>Fault Details</b></td>
+                <td>
+                    @Model.rep.FaultDetails
+                </td>
+            </tr>
+
+
+            <tr style="background-color:silver">
+                <td><b>Handover Completed</b></td>
+                <td>
+                    @Html.CheckBoxFor(model => model.rep.HandoverCompleted, new { style = "width:20px;height:20px" })
+                </td>
+            </tr>
+            <tr>
+                <td><b>Has Been Invoiced</b></td>
+                <td>
+                    @Html.CheckBoxFor(model => model.rep.HasBeenInvoiced, new { style = "width:20px;height:20px" })
+                </td>
+            </tr>
+
+            <tr style="background-color:silver">
+                <td><b>Insulation Resistance</b></td>
+                <td>
+                    @Model.rep.InsulationResistance
+                </td>
+            </tr>
+            <tr>
+                <td><b>Invoiced Date</b></td>
+                <td>
+                    @Convert.ToDateTime(Model.rep.InvoiceDate).ToString("dd-MMM-yyyy")
+                </td>
+            </tr>
+
+            <tr style="background-color:silver">
+                <td><b>Invoice Number</b></td>
+                <td>
+                    @Model.rep.InvoiceNumber
+                </td>
+            </tr>
+            <tr>
+                <td><b>Invoice Thru Service Job</b></td>
+                <td>
+                    @Html.CheckBoxFor(model => model.rep.InvoiceThruServiceJob, new { style = "width:20px;height:20px" })
+                </td>
+            </tr>
+
+            <tr style="background-color:silver">
+                <td><b>Leakage Current</b></td>
+                <td>
+                    @Model.rep.LeakageCurrent
+                </td>
+            </tr>
+            <tr>
+                <td><b>Invoice Thru Service Job</b></td>
+                <td>
+                    @Html.CheckBoxFor(model => model.rep.NoCharge, new { style = "width:20px;height:20px" })
+                </td>
+            </tr>
+
+            <tr style="background-color:silver">
+                <td><b>Notes</b></td>
+                <td>
+                    @Model.rep.Notes
+                </td>
+            </tr>
+            <tr>
+                <td><b>Not Repaired</b></td>
+                <td>
+                    @Html.CheckBoxFor(model => model.rep.NotRepaired, new { style = "width:20px;height:20px" })
+                </td>
+            </tr>
+
+            <tr style="background-color:silver">
+                <td><b>Order Number</b></td>
+                <td>
+                    @Model.rep.OrderNumber
+                </td>
+            </tr>
+            <tr>
+                <td><b>Order Number Required</b></td>
+                <td>
+                    @Html.CheckBoxFor(model => model.rep.OrderNumberRequired, new { style = "width:20px;height:20px" })
+                </td>
+            </tr>
+
+            @{
+                int iiy = 0;
+                foreach (var item in Model.parts)
+                {
+                    <tr style="background-color:silver">
+
+                        @if (iiy == 0)
+                        {
+                            iiy++;
+
+                            <td><b>Parts</b></td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                        <td>
+                            @item.Descrip @Convert.ToDecimal(item.Cost).ToString("c")
+
+                        </td>
+                    </tr>
+
+                }
+            }
+
+
+            <tr>
+                <td><b>Receipt Comments</b></td>
+                <td>
+                    @Model.rep.ReceiptComments
+                </td>
+            </tr>
+            <tr  style="background-color:silver">
+                <td><b>Receipt Date</b></td>
+                <td>
+                    @Convert.ToDateTime(Model.rep.ReceiptDate).ToString("dd-MMM-yyyy")
+                </td>
+            </tr>
+
+
+            <tr>
+                <td><b>Receipt Handover</b></td>
+                <td>
+                    @if (Model.rep.ReceiptHandover != null)
+                    {
+                        @Html.CheckBox("model.ReceiptHandover", Model.rep.ReceiptHandover ?? false, new { style = "width:20px;height:20px" })
+                    }
+                </td>
+            </tr>
+            <tr style="background-color:silver">
+                <td><b>Receipt Tested</b></td>
+                <td>
+                    @if (Model.rep.ReceiptTested != null)
+                    {
+                        @Html.CheckBox("model.ReceiptTested", Model.rep.ReceiptTested ?? false, new { style = "width:20px;height:20px" })
+                    }
+                </td>
+            </tr>
+
+            <tr>
+                <td><b>Receiver Name</b></td>
+                <td>
+                    @Model.rep.ReceiverName
+                </td>
+            </tr>
+            <tr style="background-color:silver">
+                <td><b>Repair Completed</b></td>
+                <td>
+                    @Html.CheckBoxFor(model => model.rep.RepairCompleted, new { style = "width:20px;height:20px" })
+                </td>
+            </tr>
+
+            <tr>
+                <td><b>Repair Hours</b></td>
+                <td>
+                    @Model.rep.RepairHours
+                </td>
+            </tr>
+            <tr style="background-color:silver">
+                <td><b>Resulted In Retirement</b></td>
+                <td>
+                    @Html.CheckBoxFor(model => model.rep.ResultedInRetirement, new { style = "width:20px;height:20px" })
+                </td>
+            </tr>
+
+
+            <tr>
+                <td><b>Retirement Report Printed</b></td>
+                <td>
+                    @Html.CheckBoxFor(model => model.rep.RetirementReportPrinted, new { style = "width:20px;height:20px" })
+                </td>
+            </tr>
+            <tr style="background-color:silver">
+                <td><b>Safety Test Done</b></td>
+                <td>
+                    @Html.CheckBoxFor(model => model.rep.SafetyTestDone, new { style = "width:20px;height:20px" })
+                </td>
+            </tr>
+
+            <tr>
+                <td><b>Tech Contact</b></td>
+                <td>
+                    @Model.rep.TechContact
+                </td>
+            </tr>
+            <tr style="background-color:silver">
+                <td><b>Time Call Received</b></td>
+                <td>
+                    @Convert.ToDateTime(Model.rep.TimeCallReceived).ToString("dd-MMM-yy HH:mm")
+                </td>
+            </tr>
+
+            <tr>
+                <td><b>Travel Charge Rate</b></td>
+                <td>
+                    @Convert.ToDecimal(Model.rep.TravelChargeRate).ToString("c")
+                </td>
+            </tr>
+            <tr style="background-color:silver">
+                <td><b>Travel Hours</b></td>
+                <td>
+                    @Model.rep.TravelHours
+                </td>
+            </tr>
+
+            <tr>
+                <td><b>Travel Type</b></td>
+                <td>
+                    @Model.rep.TravelType
+                </td>
+            </tr>
+            <tr style="background-color:silver">
+                <td><b>Travel Type Code</b></td>
+                <td>
+                    @Model.rep.TravelTypecode
+                </td>
+            </tr>
+
+            <tr>
+                <td><b>Verbal Approval Obtained</b></td>
+                <td>
+                    @Html.CheckBoxFor(model => model.rep.VerbalApprovalObtained, new { style = "width:20px;height:20px" })
+                </td>
+            </tr>
+            <tr style="background-color:silver">
+                <td><b>Travel Type Code</b></td>
+                <td>
+                    @Model.rep.TravelTypecode
+                </td>
+            </tr>
+
+            <tr>
+                <td><b>Work Done</b></td>
+                <td>
+                    @Model.rep.WorkDone
+                </td>
+            </tr>
+
+        </table>
+        <table>
+            <tr>
+                <td>
+                    @Html.EditorFor(m => m.rep.RepairUID, new { htmlAttributes = new {id= "RepairUID", style = "border:none;color:white", width = "0px" } })
+                </td>
+            </tr>
+        </table>
+
+    }
+</body>

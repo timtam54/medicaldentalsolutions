@@ -1,0 +1,127 @@
+﻿@model MDS.Models.Login
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@using (Html.BeginForm("Index", "Login", FormMethod.Post, new { id = "login" }))
+{
+    @Html.AntiForgeryToken()
+<div id="box2">
+
+    @Html.HiddenFor(i=>i.ReturnUrl)
+
+
+    <div class="content logincontent2">
+        <p style="color:red;">@Html.ValidationSummary(true, "Error:") </p>
+        <p><strong>Login</strong></p>
+        <b>User Name:</b><br>
+        @*@Html.EditorFor(m => m.UserName, new { style = "width:300px", /*required = "required",*/ data_required_msg = "User Name is required." })*@
+        @(Html.Kendo().TextBoxFor(m => m.UserName)
+                                                       .Name("UserName")
+                                                       .HtmlAttributes(new { style = "width:300px", /*required = "required",*/ data_required_msg = "User Name is required." })
+        )
+        <br>
+        <br>
+        <b>Password:</b><br>
+        @(Html.Kendo().TextBoxFor(m => m.Password)
+                                                       .Name("Password")
+                                                       .HtmlAttributes(new { style = "width:300px", /*required = "required",*/ data_required_msg = "Password is required.", type = "Password" })
+        )
+        <br>
+        <br />
+        <a onclick="$('#login').submit();" id="btnLogin" class="button"><span>Login</span></a>
+        <br />
+        <br />
+        
+        <!-- @Html.ActionLink("retrieve password", "RetrievePassword", "Login")<br/> -->
+        <a href="https://white-field-099b39e10.5.azurestaticapps.net/password" target="other">Get my password</a>
+    </div>
+            <br/>
+        <br/>
+         <div class="content logincontent2">
+        <a href="https://white-field-099b39e10.5.azurestaticapps.net/"><h1>New Tech Site Here</h1></a>
+        </div>
+</div>
+
+
+
+    @*var loginProviders = Context.GetOwinContext().Authentication.GetAuthenticationTypes();
+        if (loginProviders.Count() == 0)
+        {
+            <div>
+                <p>
+                    There are no external authentication services configured.
+                </p>
+            </div>
+        }
+        else
+        {
+            using (Html.BeginForm("ExternalLogin", "Account", new { ReturnUrl = "Model.ReturnUrl" }))
+            {
+                @Html.AntiForgeryToken()
+                <div id="socialLoginList">
+                    <p>
+                        @foreach (Microsoft.Owin.Security.AuthenticationDescription p in loginProviders)
+                        {
+                            <button type="submit" /*class="btn btn-default"*/ id="@p.AuthenticationType" name="provider" value="@p.AuthenticationType" title="Continue with @p.Caption account">@p.AuthenticationType</button>
+                        }
+                    </p>
+                </div>
+            }
+
+        }*@
+
+
+    @*<section class="social" id="socialLoginForm">
+        <h2>Use another service to log in.</h2>
+
+        @if (Microsoft.Web.WebPages.OAuth.OAuthWebSecurity.RegisteredClientData.Count == 0)
+    {
+        <div class="message-info">
+            <p>
+                There are no external authentication services configured. See <a href="https://go.microsoft.com/fwlink/?LinkId=226949">this article</a>
+                for details on setting up this ASP.NET application to support logging in via external services.
+            </p>
+        </div>
+}
+else
+{
+    <form method="post">
+        @AntiForgery.GetHtml()
+        <fieldset id="socialLoginList">
+            <legend>Log in using another service</legend>
+            <p>
+                @foreach (var client in Microsoft.Web.WebPages.OAuth.OAuthWebSecurity.RegisteredClientData)
+            {
+                <button type="submit" name="provider" value="@client.AuthenticationClient.ProviderName"
+                        title="Log in using your @client.DisplayName account">
+                    @client.DisplayName
+                </button>
+        }
+            </p>
+        </fieldset>
+    </form>
+}
+
+
+    </section>*@
+
+}
+<script>
+    $("#login").kendoValidator({
+    });
+</script>
+<script type="text/javascript">
+    var ButtonKeys = { "EnterKey": 13 };
+    $(function () {
+        $("#login").keypress(function (e) {
+            if (e.which == ButtonKeys.EnterKey) {
+                var defaultButtonId = "btnLogin";
+                $("#" + defaultButtonId).click();
+                return false;
+            }
+        });
+    });
+</script>

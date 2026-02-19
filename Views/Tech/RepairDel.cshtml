@@ -1,0 +1,986 @@
+﻿@model MDS.Models.RepairEquip
+@{
+    ViewBag.Title = "Add Repair";
+    Layout = "~/Views/Shared/_LayoutTech.cshtml";
+}
+
+<script src="https://cdn.WebRTC-Experiment.com/MediaStreamRecorder.js"></script>
+
+
+<link href="~/CSS/style.css" rel="stylesheet" />
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
+<script type="text/javascript">
+
+    var mediaConstraints = {
+                audio: true
+    };
+
+    function Start() {
+                alert('start');
+
+          captureUserMedia(mediaConstraints, onMediaSuccess, onMediaError);
+    }
+
+     function captureUserMedia(mediaConstraints, successCallback, errorCallback) {
+                navigator.mediaDevices.getUserMedia(mediaConstraints).then(successCallback).catch(errorCallback);
+    }
+
+    var mediaRecorder;
+
+    function onMediaSuccess(stream) {
+        alert('onMediaSuccess');
+    var mediaRecorder = new MediaStreamRecorder(stream);
+    mediaRecorder.mimeType = 'audio/webm'; // audio/webm or audio/ogg or audio/wav
+    mediaRecorder.ondataavailable = function (blob) {
+        // POST/PUT "Blob" using FormData/XHR2
+        var blobURL = URL.createObjectURL(blob);
+        document.write('<a href="' + blobURL + '">' + blobURL + '</a>');
+    };
+    mediaRecorder.start(3000);
+}
+            //function onMediaSuccess(stream) {
+            //    var audio = document.createElement('audio');
+            //    audio = mergeProps(audio, {
+            //        controls: true,
+            //        muted: true
+            //    });
+            //    audio.srcObject = stream;
+            //    audio.play();
+            //    audiosContainer.appendChild(audio);
+            //    audiosContainer.appendChild(document.createElement('hr'));
+            //    mediaRecorder = new MediaStreamRecorder(stream);
+            //    mediaRecorder.stream = stream;
+            //    var recorderType = document.getElementById('audio-recorderType').value;
+            //    if (recorderType === 'MediaRecorder API') {
+            //        mediaRecorder.recorderType = MediaRecorderWrapper;
+            //    }
+            //    if (recorderType === 'WebAudio API (WAV)') {
+            //        mediaRecorder.recorderType = StereoAudioRecorder;
+            //        mediaRecorder.mimeType = 'audio/wav';
+            //    }
+            //    if (recorderType === 'WebAudio API (PCM)') {
+            //        mediaRecorder.recorderType = StereoAudioRecorder;
+            //        mediaRecorder.mimeType = 'audio/pcm';
+            //    }
+            //    // don't force any mimeType; use above "recorderType" instead.
+            //    // mediaRecorder.mimeType = 'audio/webm'; // audio/ogg or audio/wav or audio/webm
+            //    mediaRecorder.audioChannels = !!document.getElementById('left-channel').checked ? 1 : 2;
+            //    mediaRecorder.ondataavailable = function(blob) {
+            //        var a = document.createElement('a');
+            //        a.target = '_blank';
+            //        a.innerHTML = 'Open Recorded Audio No. ' + (index++) + ' (Size: ' + bytesToSize(blob.size) + ') Time Length: ' + getTimeLength(timeInterval);
+            //        a.href = URL.createObjectURL(blob);
+            //        audiosContainer.appendChild(a);
+            //        audiosContainer.appendChild(document.createElement('hr'));
+            //    };
+            //    var timeInterval = document.querySelector('#time-interval').value;
+            //    if (timeInterval) timeInterval = parseInt(timeInterval);
+            //    else timeInterval = 5 * 1000;
+            //    // get blob after specific time interval
+            //    mediaRecorder.start(timeInterval);
+            //    document.querySelector('#stop-recording').disabled = false;
+            //    document.querySelector('#pause-recording').disabled = false;
+            //    document.querySelector('#save-recording').disabled = false;
+            //}
+            //function onMediaError(e) {
+            //    console.error('media error', e);
+            //}
+            //var audiosContainer = document.getElementById('audios-container');
+            //var index = 1;
+            //// below function via: http://goo.gl/B3ae8c
+            //function bytesToSize(bytes) {
+            //    var k = 1000;
+            //    var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            //    if (bytes === 0) return '0 Bytes';
+            //    var i = parseInt(Math.floor(Math.log(bytes) / Math.log(k)), 10);
+            //    return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
+            //}
+            //// below function via: http://goo.gl/6QNDcI
+            //function getTimeLength(milliseconds) {
+            //    var data = new Date(milliseconds);
+            //    return data.getUTCHours() + " hours, " + data.getUTCMinutes() + " minutes and " + data.getUTCSeconds() + " second(s)";
+            //}
+            //window.onbeforeunload = function() {
+            //    document.querySelector('#start-recording').disabled = false;
+            //};
+</script>
+
+<div id="repair" style="width:100%;height:auto;position:relative;">
+    <h1 style="padding-left:30px">Repair Detail</h1>
+    <div id="dialog"></div>
+    <div class="contact-info">
+        <div class="content">
+            <table width="100%" align="center" cellspacing="0" cellpadding="2">
+                <tr>
+                    <td>
+                        <button id="start-recording" onclick="Start(); return false;">Start</button>
+                        <button id="stop-recording" onclick="Stop(); return false;">Stop</button>
+                        <button id="save-recording">Save</button>
+                    </td>
+                </tr>
+                @using (Html.BeginForm("Repair", "Tech", FormMethod.Post, new { id = "Repair" }))
+                {
+                    @Html.ValidationSummary()
+                    @Html.HiddenFor(m => m.Repair.EquipUID)
+                    @Html.HiddenFor(m => m.Repair.BranchID)
+                    @Html.HiddenFor(m => m.Repair.TravelChargeRate)
+                    @Html.HiddenFor(m => m.Repair.RepairUID)
+                    @Html.HiddenFor(m => m.Command)
+                    <tr width="100%" align="center">
+                        <td style="font-size:16px">
+                            <b>Repair No</b>
+                        </td>
+                        <td style="font-size:16px;text-align:left">
+                            @MDS.Helper.Utility.GetBranchCode()R @Model.Repair.JobCode
+                        </td>
+                        <td style="font-size:16px"><b>Date call received</b></td>
+                        <td style="font-size:16px;text-align:left">
+                            @MDS.Controllers.TechController.FormatDate(Model.Repair.DateCallReceived)
+                        </td>
+                    </tr>
+                    <tr width="100%" align="center">
+                        <td style="font-size:16px">
+                            <b>Customer Name</b>
+                        </td>
+                        <td style="font-size:16px;text-align:left" colspan="3">
+                            @MDS.Controllers.TechController.GetCustomer(Model.Repair.EquipUID, MDS.Controllers.LoginController.BranchID(User.Identity.Name))
+                        </td>
+                    </tr>
+                    <tr width="100%" align="center">
+                        <td style="font-size:16px">
+                            <b>Address</b>
+                        </td>
+                        <td style="font-size:16px;text-align:left" colspan="3">
+                            <table>
+                                <tr>
+                                    <td id="Address">
+                                        <a style="font-size:16px;" href="@Url.Action( "Maps", new { EquipUID = Model.Repair.EquipUID,BranchID=Model.Repair.BranchID })"
+                                           type="submit"
+                                           id="runReport"
+                                           target="_blank">
+                                            @MDS.Controllers.TechController.GetAddress(Model.Repair.EquipUID, Model.Repair.BranchID)
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <img src="~/Images/googlemaps.png" onclick="GoogleMaps();" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr width="100%" align="center">
+                        <td style="font-size:16px">
+                            <b>Location</b>
+                        </td>
+                        <td style="font-size:16px;text-align:left" colspan="3">
+                            @Html.DropDownListFor(m => m.Equipment.LocationID, new SelectList(ViewBag.LocationIDX, "LocationID", "Location"), "-Select One-", new { @style = "font-size:16px;text-align:left" })
+                        </td>
+                    </tr>
+                    <tr width="100%" align="center">
+                        <td style="font-size:16px">
+                            <b>Technician Name</b>
+                        </td>
+                        <td style="font-size:16px;text-align:left">
+                            @Html.DropDownListFor(m => m.Repair.EngineerID, new SelectList(ViewBag.EngineerIDX, "EngineerID", "EngineerName"), "-Select One-", new { @style = "font-size:16px;text-align:left" })
+                        </td>
+                        <td style="font-size:16px">
+                            <b>On Site Contact</b>
+                        </td>
+                        <td style="font-size:16px">
+                            @MDS.Controllers.TechController.GetCustomerContact(Model.Repair.EquipUID, MDS.Controllers.LoginController.BranchID(User.Identity.Name))
+                        </td>
+                    </tr>
+                    /* equipment */
+                    if (!Model.Repair.TechConfirmedEquipDetails)
+                    {
+                        <tbody style="border-color:black;color:red">
+                            <tr width="100%" align="center">
+                                <td style="font-size:16px">
+                                    <b>Equipment Serial No</b>
+                                </td>
+                                <td style="font-size:16px;text-align:left" colspan="3">
+                                    @Html.TextBoxFor(m => m.Equipment.SerialNumber, new { @style = "font-size:16px;text-align:left" })
+                                </td>
+                            </tr>
+                            <tr width="100%" align="center">
+                                <td style="font-size:16px">
+                                    <b>MDS Equipment No</b>
+                                </td>
+                                <td style="font-size:16px;text-align:left">
+                                    @Html.TextBoxFor(m => m.Equipment.BNQItemCode, new { @style = "font-size:16px;text-align:left" })
+                                </td>
+                                <td style="font-size:16px">
+                                    <b>Equip Details Verified by Tech</b>
+                                </td>
+                                <td style="font-size:16px;text-align:left">
+                                    @Html.CheckBoxFor(m => m.Repair.TechConfirmedEquipDetails, new { @style = "font-size:16px;text-align:left", @id = "TechConfirmedEquipDetails" })
+                                </td>
+                            </tr>
+                            <tr width="100%" align="center">
+                                <td style="font-size:16px">
+                                    <b>Model / Manufacturer</b>
+                                </td>
+                                <td style="font-size:16px;text-align:left" colspan="3">
+                                    @Html.DropDownListFor(m => m.Equipment.ModelUID, new SelectList(Model.MakeModels, "Id", "Text"), "-Select One-", new
+                               {
+                                   //@id = string.Format("ModelUID{0}", Model.Services[i].Service.ServiceUID),
+                                   @style = "font-size:16px;text-align:left"
+                               })
+
+                                </td>
+                            </tr>
+                        </tbody>
+                        @Html.HiddenFor(i => i.Repair.TimeIn)
+                        @Html.HiddenFor(m => m.Repair.SafetyTestDone)
+                        @Html.HiddenFor(m => m.Repair.FaultDetails)
+                        @Html.HiddenFor(m => m.Repair.WorkDone)
+                        @Html.HiddenFor(m => m.Repair.ConditionID)
+                        @Html.HiddenFor(m => m.Repair.TravelTypecode)
+                        @Html.HiddenFor(m => m.Repair.TravelChargeRate)
+                        @Html.HiddenFor(m => m.Repair.TravelHours)
+                        @Html.HiddenFor(m => m.Repair.CustomerSignature)
+                        @Html.HiddenFor(m => m.Repair.Notes)
+                        @Html.HiddenFor(m => m.Repair.TimeOut)
+                        @Html.HiddenFor(m => m.Status)
+                    }
+                    else
+                    {
+                        /* equipment */
+
+                        @*<tr width="100%" align="center">
+                                <td style="font-size:16px">
+                                    <b>Equipment</b>
+                                </td>
+                                <td style="font-size:16px;text-align:left" colspan="3">
+                                    @Html.DropDownListFor(m => m.Repair.EquipUID, new SelectList(ViewBag.EquipUIDX, "ID", "Desc"), "-Select One-", new { @style = "font-size:16px;text-align:left", @onchange = "EquipChange();return false;" })
+                                </td>
+                            </tr>*@
+
+                        <tbody style="background-color:lightgray">
+                            <tr width="100%" align="center">
+                                <td style="font-size:16px">
+                                    <b>Equipment Serial No</b>
+                                </td>
+                                <td style="font-size:16px;text-align:left" colspan="3">
+                                    @Html.TextBoxFor(m => m.Equipment.SerialNumber, new { @style = "font-size:16px;text-align:left" })
+                                </td>
+                            </tr>
+                            <tr width="100%" align="center">
+                                <td style="font-size:16px">
+                                    <b>MDS Equipment No</b>
+                                </td>
+                                <td style="font-size:16px;text-align:left">
+                                    @Html.TextBoxFor(m => m.Equipment.BNQItemCode, new { @style = "font-size:16px;text-align:left" })
+                                </td>
+                                @Html.HiddenFor(m => m.Repair.TechConfirmedEquipDetails)
+
+                                <td colspan="2">
+                                </td>
+                            </tr>
+                            <tr width="100%" align="center">
+                                <td style="font-size:16px">
+                                    <b>Model / Manufacturer</b>
+                                </td>
+
+                                <td style="font-size:16px;text-align:left" colspan="3">
+                                    @Html.DropDownListFor(m => m.Equipment.ModelUID, new SelectList(Model.MakeModels, "Id", "Text"), "-Select One-", new
+                               {
+                                   //@id = string.Format("ModelUID{0}", Model.Services[i].Service.ServiceUID),
+                                   @style = "font-size:16px;text-align:left"
+                               })
+
+                                </td>
+                            </tr>
+                            <tr width="100%" align="center">
+                                <td style="font-size:16px">
+                                    <b>Warranty Expires</b>
+                                </td>
+                                <td style="font-size:16px;text-align:left">
+                                    @MDS.Controllers.TechController.FormatDate(Model.Equipment.WarrantyExpirationDate)
+                                </td>
+                                <td style="font-size:16px">
+                                    <b>History of Repairs</b>
+                                </td>
+                                <td style="font-size:16px;text-align:left">
+                                    <a href="../RepairSearch?BranchID=@Model.Repair.BranchID&EquipID=@Model.Equipment.EquipUID&Resolved=E" style="font-size:16px" target="_blank">History</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                        if (Model.Repair.TimeIn == null)
+                        {
+                            <tr width="100%" align="center">
+                                <td style="font-size:16px;color:red">
+                                    <b>Start Time</b>
+                                </td>
+                                <td style="font-size:16px;text-align:left;color:red" colspan="3">
+                                    @Html.TextBoxFor(i => i.Repair.TimeIn, new { @id = "TimeIn", @readonly = "readonly", @style = "font-size:16px;text-align:left" }) <button onclick="SetTimeInRepairNow(); return false;" class="inputbuttonbg inputbig">Start</button>
+                                    Please enter start time
+                                </td>
+                            </tr>
+                            @Html.HiddenFor(m => m.Repair.SafetyTestDone)
+                            @Html.HiddenFor(m => m.Repair.FaultDetails)
+                            @Html.HiddenFor(m => m.Repair.WorkDone)
+                            @Html.HiddenFor(m => m.Repair.ConditionID)
+                            @Html.HiddenFor(m => m.Repair.TravelTypecode)
+                            @Html.HiddenFor(m => m.Repair.TravelChargeRate)
+                            @Html.HiddenFor(m => m.Repair.TravelHours)
+                            @Html.HiddenFor(m => m.Repair.CustomerSignature)
+                            @Html.HiddenFor(m => m.Repair.Notes)
+                            @Html.HiddenFor(m => m.Repair.TimeOut)
+                            @Html.HiddenFor(m => m.Status)
+
+                        }
+                        else
+                        {
+                            @Html.HiddenFor(i => i.Repair.TimeIn)
+                            <tr width="100%" align="center">
+                                <td style="font-size:16px">
+                                    <b>Start Time</b>
+                                </td>
+                                <td style="font-size:16px;text-align:left" colspan="3">
+                                    @Html.DisplayFor(i => i.Repair.TimeIn, new { @id = "TimeIn", @readonly = "readonly", @style = "font-size:16px;text-align:left" }) @*<button onclick="SetTimeInRepairNow(); return false;" class="inputbuttonbg inputbig">Start</button>*@
+                                </td>
+                            </tr>
+                            if (!Model.Repair.SafetyTestDone)
+                            {
+
+                                <tr width="100%" align="center">
+                                    <td style="font-size:16px;color:red">
+                                        <b>Safety Check</b>
+                                    </td>
+                                    <td style="font-size:16px;text-align:left;color:red" colspan="3">
+                                        <b>
+                                            @Html.CheckBoxFor(m => m.Repair.SafetyTestDone, new { @id = "SafetyTestDone" }) I have ensured that I have assessed and removed or minimized all hazards to a safe working level as per MDS WHS Policy, Risk Management Procedures, Safety Take 5, JSA’s and relevant electrical legislation/regulations
+                                        </b>
+                                    </td>
+                                </tr>
+                                @Html.HiddenFor(m => m.Repair.FaultDetails)
+                                @Html.HiddenFor(m => m.Repair.WorkDone)
+                                @Html.HiddenFor(m => m.Repair.ConditionID)
+                                @Html.HiddenFor(m => m.Repair.TravelTypecode)
+                                @Html.HiddenFor(m => m.Repair.TravelChargeRate)
+                                @Html.HiddenFor(m => m.Repair.TravelHours)
+                                @Html.HiddenFor(m => m.Repair.CustomerSignature)
+                                @Html.HiddenFor(m => m.Repair.Notes)
+                                @Html.HiddenFor(m => m.Repair.TimeOut)
+                                @Html.HiddenFor(m => m.Status)
+
+                            }
+                            else
+                            {
+                                @Html.HiddenFor(m => m.Repair.SafetyTestDone)
+                                <tr width="100%" align="center">
+                                    <td style="font-size:16px">
+                                        <b>Safety Test done</b>
+                                    </td>
+                                    <td style="font-size:16px;text-align:left" colspan="3">
+                                        @Html.DisplayFor(i => i.Repair.SafetyTestDone, new { @id = "SafetyTestDone", @readonly = "readonly", @style = "font-size:16px;text-align:left" }) @*<button onclick ="SetTimeInRepairNow(); return false;" class="inputbuttonbg inputbig">Start</button>*@
+                                    </td>
+                                </tr>
+
+                                <tr width="100%" align="center">
+                                    <td style="font-size:16px">
+                                        <b>Fault Find</b>
+                                    </td>
+                                    <td style="font-size:16px;text-align:left" colspan="3">
+                                        @Html.TextAreaFor(m => m.Repair.FaultDetails, 2, 10, new { @style = "width:100%;font-size:16px  " })
+                                    </td>
+                                </tr>
+                                <tr width="100%" align="center">
+                                    <td style="font-size:16px">
+                                        <b>Work Done</b>
+                                    </td>
+                                    <td style="font-size:16px" colspan="3">
+                                        @Html.TextAreaFor(m => m.Repair.WorkDone, 2, 10, new { @style = "width:100%;font-size:16px" })
+                                    </td>
+                                </tr>
+                                <tr width="100%" align="center">
+                                    <td style="font-size:16px">
+                                        <b>Overall condition of unit</b>
+                                    </td>
+                                    <td style="font-size:16px;text-align:left" colspan="3">
+                                        @Html.DropDownListFor(m => m.Repair.ConditionID, new SelectList(ViewBag.ConditionIDX, "ConditionID", "ConditionDesc"), "-Select One-", new { @id = "ConditionID", @style = "font-size:16px;text-align:left" })
+                                        @Html.ValidationMessageFor(m => m.Repair.ConditionID)
+                                    </td>
+                                </tr>
+                                <tr width="100%" align="center">
+                                    <td style="font-size:16px">
+                                        <b>Travel charge</b>
+                                    </td>
+                                    <td style="font-size:16px;text-align:left" colspan="3">
+                                        @Html.DropDownListFor(m => m.Repair.TravelTypecode, new SelectList(ViewBag.TravelTypecodeX, "ChargeTypeCode", "ChargeType"), "-Select One-", new { @style = "font-size:16px;text-align:left;width:200px", @onchange = "travelrate();", @id = "TravelTypecode" })
+                                        <b>Rate</b>
+                                        @Html.TextBoxFor(i => i.Repair.TravelChargeRate, new { @style = "font-size:16px;text-align:left;width:90px", @id = "TravelChargeRate" })
+                                        <b>Qty</b>
+                                        @Html.TextBoxFor(i => i.Repair.TravelHours, new { @style = "font-size:16px;text-align:left;width:90px", @onchange = "travelhours();", @id = "TravelHours" })
+                                        <b>Total</b>
+                                        <input type="text" id="TravelCharge" style="font-size:16px;width:90px" />
+                                    </td>
+                                </tr>
+                                @Html.CheckBoxFor(m => m.Repair.CustomerSignature, new { @id = "CustomerSignature", @style = "display:none" })
+
+
+                                <tr width="100%" align="center">
+                                    <td style="font-size:16px">
+                                        <b>Notes</b>
+                                    </td>
+                                    <td style="font-size:16px" colspan="3">
+                                        @Html.TextAreaFor(i => i.Repair.Notes, 2, 10, new { @style = "width:100%;font-size:16px;text-align:left" })
+                                        @Html.HiddenFor(i => i.Repair.TimeOut, new { @id = "TimeOut" })
+                                        @Html.HiddenFor(i => i.Status, new { @id = "Status" })
+
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    }
+                }
+                @if ((Model.Repair.TechConfirmedEquipDetails) && (Model.Repair.SafetyTestDone) && (Model.Repair.TimeIn != null))
+                {
+
+                    <tr width="100%" align="center">
+                        <td style="font-size:16px">
+                            <b>Parts Used</b>
+                        </td>
+                        <td style="font-size:16px" colspan="3">
+                            <div id="PartsX" />
+                        </td>
+                    </tr>
+
+                    <tr width="100%" align="center">
+                        <td style="font-size:16px">
+                            <b>Attachments</b>
+                        </td>
+                        <td colspan="3">
+                            <div id="PhotosX" />
+                        </td>
+                    </tr>
+                }
+                @if ((Model.Repair.TechConfirmedEquipDetails) && (Model.Repair.SafetyTestDone) && (Model.Repair.TimeIn != null))
+                {
+                    <tr width="100%" align="center" id="StatusLine">
+                        <td style="font-size:16px">
+                            <b>Status</b>
+                        </td>
+
+                        <td style="font-size:16px;" colspan="3">
+                            @Html.RadioButtonFor(i => i.Status, "Ongoing", new { @id = "rbOngoing", onchange = "setStatus('Ongoing');" }) Ongoing
+                            @Html.RadioButtonFor(i => i.Status, "Complete", new { onchange = "setStatus('Complete');" }) Complete
+                            @Html.RadioButtonFor(i => i.Status, "Retired", new { onchange = "setStatus('Retired');" }) Retired
+                            @Html.RadioButtonFor(i => i.Status, "NotRepaired", new { onchange = "setStatus('NotRepaired');" }) Complete / Not Repairable
+                        </td>
+                    </tr>
+                    <tr width="100%" align="center" id="TimeOutLine">
+                        <td style="font-size:16px">
+                            <b>End Time</b>
+                        </td>
+                        <td style="font-size:16px;text-align:left" colspan="3">
+                            @Html.TextBoxFor(i => i.Repair.TimeOut, new { @id = "TimeOutX", @readonly = "readonly", @style = "font-size:16px;text-align:left" }) <button onclick="SetTimeOutRepairNow(); return false;" class="inputbuttonbg inputbig">End</button>
+                        </td>
+                    </tr>
+                    <tr width="100%" align="center" id="CustSignLine">
+                        <td style="font-size:16px">
+                            <b>Customer Signature</b>
+                        </td>
+                        <td style="font-size:16px;text-align:left" colspan="3">
+                            @Html.CheckBoxFor(m => m.Repair.CustomerSignature, new { @id = "CustomerSignatureX", @onclick = "CustomerSignatureSet();" }) Customer confirms that equipment has TGA approval and has read and accepted all information provided in the report
+                        </td>
+                    </tr>
+
+                }
+            </table>
+            <table width="100%" align="right">
+                <tr width="100%" align="right">
+                    <td align="left">
+                        <input type="button" id="btnSaveExit" onclick="SaveDetailsSoFar();return false;" value="Save (without submit) & Exit" class="inputbuttonbg inputbig" />
+                    </td>
+                    <td align="right">
+                        <input type="button" id="btnSave" onclick="Save();return false;" value="Next" class="inputbuttonbg inputbig" />
+                    </td>
+                </tr>
+
+            </table>
+        </div>
+    </div>
+</div>
+
+@if (!Model.Repair.TechConfirmedEquipDetails)
+{
+    <script type="text/javascript">
+
+        function Save() {
+            try {
+                var TechConfirmedEquipDetails = document.getElementById('TechConfirmedEquipDetails').checked;
+                //alert(TechConfirmedEquipDetails);
+                if (!TechConfirmedEquipDetails)
+                    alert('Please confirm equipment details');
+                else {
+                    $('#Repair').submit();
+                }
+            }
+            catch (ex) {
+                alert(ex.message);
+            }
+        }
+    </script>
+}
+else if (Model.Repair.TimeIn == null)
+{
+    <script type="text/javascript">
+
+        function Save() {
+            try {
+                var timein = $('#TimeIn').val();
+                if (timein == '')
+                    alert('Please enter start date/time');
+                else {
+                    $('#Repair').submit();
+                }
+            }
+            catch (ex) {
+                alert(ex.message);
+            }
+        }
+    </script>
+}
+else if (!Model.Repair.SafetyTestDone)
+{
+    <script type="text/javascript">
+
+        function Save() {
+            try {
+                var safety = document.getElementById('SafetyTestDone').checked;
+                // alert(safety);
+                if (!safety)
+                    alert('Please confirm safety check');
+                else
+                    $('#Repair').submit();
+            }
+            catch (ex) {
+                alert(ex.message);
+            }
+        }
+
+
+    </script>
+}
+else
+{
+    <script type="text/javascript">
+
+        function Save() {
+            try {
+                //         var safety = document.getElementById('SafetyTestDone').checked;
+                //       alert(safety);
+                //     if (!safety)
+                //       alert('Please confirm safety check');
+                // else
+                var ConditionID = $('#ConditionID').val();
+                if (ConditionID == '') {
+                    alert('select a condition');
+                    return;
+                }
+                var frm = $('#Repair');
+                var xxx = frm.valid();
+                if (!xxx) {
+                    return;
+                }
+                //alert('valid');
+                frm.submit();
+            }
+            catch (ex) {
+                alert(ex.message);
+            }
+        }
+
+
+    </script>
+}
+<script type="text/javascript">
+
+    function SaveDetailsSoFar() {
+                        var frm = $('#Repair');
+                var xxx = frm.valid();
+                if (!xxx) {
+                    return;
+                }
+        $('#Command').val('Dashboard');
+                frm.submit();
+    }
+
+    function setStatus(status) {
+                        var ConditionID = $('#ConditionID').val();
+                if (ConditionID == '') {
+                    alert('select a condition');
+                      $('#rbOngoing').prop('checked', true);
+                    return;
+                }
+
+        $('#Status').val(status);
+        $('#StatusLine').css("color", "black");
+        ShowTimeOut();
+    }
+    ShowTimeOut();
+
+    function ShowTimeOut() {
+        if ($('#Status').val() == 'Ongoing') {
+            $('#TimeOutLine').hide();
+                         $('#StatusLine').css("color", "red");
+
+        }
+        else {
+            $('#TimeOutLine').show();
+            $('#StatusLine').css("color", "black");
+                                     $('#TimeOutLine').css("color", "red");
+
+        }
+    }
+
+    ShowStatusTImeOutCustSign();
+    function ShowStatusTImeOutCustSign() {
+        if ($('#Status').val() == 'Ongoing') {
+            $('#StatusLine').css("color", "red");
+                $('#CustSignLine').hide();
+            $('#TimeOutLine').hide();
+
+        }
+        else {
+            $('#StatusLine').css("color", "black");
+            $('#TimeOutLine').show();
+
+            if ($('#TimeOut').val() == '') {
+
+                $('#TimeOutLine').css("color", "red");
+                $('#CustSignLine').hide();
+                $('#btnSave').prop('value', 'Next');
+
+            }
+            else {
+                $('#CustSignLine').show();
+                $('#TimeOutLine').css("color", "black");
+                $('#CustSignLine').css("color", "red");
+
+                var checked = $('#CustomerSignatureX').prop("checked");
+
+
+                if (checked) {
+                    $('#CustSignLine').css("color", "black");
+                    $('#btnSave').prop('value', 'Submit/Complete');
+                }
+                else {
+                    $('#btnSave').prop('value', 'Next');
+                    $('#CustSignLine').css("color", "red");
+                }
+
+            }
+        }
+    }
+
+
+    function EquipChange() {
+        $('#Repair').submit();
+    }
+
+            function totalcharge() {
+                var rate = parseFloat($('#TravelChargeRate').val());
+                var Qty = parseFloat($("#TravelHours").val());
+                var TravelCharge = rate * Qty;
+                $('#TravelCharge').val('$' + TravelCharge.toString());
+
+            }
+
+            travelrate();
+
+            function travelrate() {
+        try {
+            var vl = $("#TravelTypecode option:selected").text();
+            var amt = vl.substr(vl.indexOf("$") + 1)
+            var ttc = $('#TravelChargeRate').val(amt);
+            totalcharge();
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+    function travelhours() {
+        try {
+            totalcharge();
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+    function SetTimeInRepairNow() {
+        try {
+            var today = new Date();
+            var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + today.getHours() + ":";
+            if (today.getMinutes() < 10)
+                date = date + '0';
+            date = date + today.getMinutes();
+            $('#TimeIn').val(date);
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+    function SetTimeOutRepairNow() {
+        try {
+            var today = new Date();
+            var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + today.getHours() + ":";
+            if (today.getMinutes() < 10)
+            date = date + '0';
+            date = date + today.getMinutes();
+            $('#TimeOut').val(date);
+            $('#TimeOutX').val(date);
+            ShowStatusTImeOutCustSign();
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+            //function checkboxcheck() {
+            //    alert('poop');
+            //}
+            function CustomerSignatureSet() {
+                var checked = $('#CustomerSignatureX').prop("checked");
+
+
+                if (checked) {
+                    $('#CustomerSignature').prop("checked", true);
+                }
+                else {
+                    $('#CustomerSignature').prop("checked", false);
+                }
+                ShowStatusTImeOutCustSign();
+            }
+
+            var div = $("#dialog");
+
+            function RefreshPhoto() {
+                try {
+
+                    var RepairID = '@Model.Repair.RepairUID';
+
+                    $.ajax({
+                    url: '@Url.Content("~/Repair/Photos")',
+                    type: 'POST',
+                    data: { RepairID: RepairID },
+                    success: doSubmitSuccess
+                    });
+                    }
+                    catch (ex) {
+                    alert('Error in init():' + ex.message);
+                    }
+                    }
+                    function doSubmitSuccess(result) {
+                    try {
+                    $('#PhotosX').html(result);
+                    }
+                    catch (ex) {
+                    alert('Error in doSubmitSuccess():'+ex.message);
+                    }
+
+                    }
+
+                    function savedataforphotos() {
+                    $.post('@Url.Action("SaveUpdateRepair", "Repair")', $("#AddForm").serialize(), function (data) {
+                    var RepairId = data.id;
+                    //alert(RepairId);
+                    var url = '@Url.Action("Edit", "Repair")' + "?id=" + data.id;
+                    window.location.href = url;
+
+                    }
+                    );
+                    }
+
+                    function uploadfileforQuestion(id,Attach_Audio,Title,field) {
+                    try {
+                    div.dialog({
+                    closeOnEscape: false,
+                    open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("UploadFile", "Repair")?RepairID=' + id + '&Attach_Audio='+Attach_Audio+ '&field='+field;
+                    $(this).load(url); @*'@Url.Action("UploadFile", "Applications")');*@
+
+                    },
+                    modal: true,
+                    resizable: false,
+
+                    width: 800,
+                    height: 500,
+                    title: "Upload File",
+                    buttons: {
+                    Close: function () {
+                            RefreshPhoto();
+                            div.remove(); div.dialog("close");
+                    }
+                    },
+                    });
+                    }
+                    catch (ex) {
+                    alert('catchall:' + ex.message);
+                    }
+                    return false;
+
+                    }
+
+                    function deletefile(PhotosID, url) {
+                    if (confirm("Do you want to remove this document / photo?")) {
+                    var data = { PhotosID: PhotosID, url: url }
+                    $.post('@Url.Action("DocumentDelete", "Repair")', data,
+                    function (data) {
+                    if (data.Error == '') {
+                    RefreshPhoto();
+                    }
+                    else
+                    alert("Could not delete");
+                    }
+                    , 'json');
+                    }
+                    }
+
+                    function deletePart(RepairPartId, BranchID) {
+                    if (confirm("Do you want to remove this part?")) {
+                   // alert('del');
+                    var data = { RepairPartId: RepairPartId, BranchID: BranchID }
+                    $.post('@Url.Action("DeletePart", "Tech")', data,
+                    function (data) {
+                    if (data.Error == '') {
+                    RefreshParts();
+                    }
+                    else
+                    alert("Could not delete");
+                    }
+                    , 'json');
+                    }
+                    }
+
+                    function editPart(RepairPartId, BranchID) {
+
+                    div.dialog({
+                    closeOnEscape: false,
+                    open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("EditParts", "Tech")?RepairPartId=' + RepairPartId + '&BranchID=' + BranchID;
+                    $(this).load(url); @*'@Url.Action("UploadFile", "Applications")');*@
+
+                    },
+                    modal: true,
+                    resizable: false,
+
+                    width: 800,
+                    height: 500,
+                    title: "Edit Parts",
+                    buttons: {
+                    Close: function () {
+                    $(this).dialog("close");
+                    }
+                    },
+                    });
+                    }
+
+
+                    RefreshPhoto();
+
+                    RefreshParts();
+                    function CreateParts() {
+                    var RepairID = '@Model.Repair.RepairUID';
+                    var BranchID = '@Model.Repair.BranchID';
+                    try {
+                    div.dialog({
+                    closeOnEscape: false,
+                    open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("CreateParts", "Tech")?RepairID=' + RepairID + '&BranchID=' + BranchID;
+                    $(this).load(url); @*'@Url.Action("UploadFile", "Applications")');*@
+
+                    },
+                    modal: true,
+                    resizable: false,
+
+                    width: 800,
+                    height: 500,
+                    title: "Create Parts",
+                    buttons: {
+                    Close: function () {
+                    $(this).dialog("close");
+                    }
+                    },
+                    });
+                    }
+                    catch (ex) {
+                    alert('catchall:' + ex.message);
+                    }
+                    return false;
+                    }
+
+                    function RefreshParts() {
+                    try {
+
+                    var RepairID = '@Model.Repair.RepairUID';
+                    var BranchID = '@Model.Repair.BranchID';
+
+                    $.ajax({
+                    url: '@Url.Content("~/Tech/RepairParts")',
+                    type: 'POST',
+                    data: { RepairID: RepairID, BranchID: BranchID },
+                    success: doSubmitSuccessParts
+                    });
+                    }
+                    catch (ex) {
+                    alert('Error in init():' + ex.message);
+                    }
+                    }
+
+                    function doSubmitSuccessParts(result) {
+                    try {
+                    //alert(result);
+                    $('#PartsX').html(result);
+                    }
+                    catch (ex) {
+                    alert('Error in doSubmitSuccessParts():'+ex.message);
+                    }
+
+                    }
+
+    function GoogleMaps() {
+        var Loc = $('#Address').text();
+        alert(Loc);
+        @*try {
+            div.dialog({
+                closeOnEscape: false,
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("Maps", "Tech")?Address=1';// + Loc;
+                    $(this).load(url); '@Url.Action("UploadFile", "Applications")');
+
+                },
+                modal: true,
+                resizable: false,
+
+                width: 800,
+                height: 800,
+                title: "Map",
+                buttons: {
+                    Close: function () {
+                        $(this).dialog("close");
+                    }
+                },
+            });
+        }
+        catch (ex) {
+            alert('catchall:' + ex.message);
+        }*@
+        return false;
+
+    }
+
+</script>

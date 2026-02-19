@@ -1,0 +1,785 @@
+﻿@{
+    Layout = "~/Views/Shared/_IFrameLayout.cshtml";
+}
+@model MDS.Models.ServiceWorkOderSearch
+
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
+
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+</style>
+<table align="center" width="100%">
+    <tr>
+        <td align="left">
+            <b>
+                @Html.ActionLink("<- Return to Service Job", "Edit", new { id = Model.ServiceJobID }, new { style = "font-size:16px" })
+            </b>
+        </td>
+        <td>
+            <h2 style="text-align: left;">Service Work Order Search</h2>
+        </td>
+    </tr>
+</table>
+@using (Html.BeginForm("GetWOForService", "Service", FormMethod.Post, new { id = "SWOForm" }))
+{
+
+    <div id="dialog"></div>
+    @Html.HiddenFor(m => m.SelectedEquipment)
+    <div class="contact-info">
+        <div class="content">
+            <table width="100%">
+                <tr>
+                    <td>
+                        <b>Equip Type</b>
+                    </td>
+                    <td>
+                        @Html.DropDownListFor(i => i.Equiptype, new SelectList(@Model.EquipTypeList, "EquipTypeCode", "Name"))
+                    </td>
+                    <td>
+                        <b>Customer</b>
+                        @Html.HiddenFor(i => i.ServiceJobID)
+                    </td>
+                    <td>
+                        @Html.DropDownListFor(i => i.Customerid, new SelectList(@Model.CustomerList, "CustomerCode", "CompanyName"))
+                    </td>
+                    <td>
+                        <b>Engineer</b>
+                    </td>
+                    <td>
+                        @Html.DropDownListFor(i => i.EngineerID, new SelectList(@Model.EngineerList, "EngineerID", "EngineerName"))
+                    </td>
+                    <td>
+                        <input type="submit" value="Search" />
+                    </td>
+                </tr>
+                </table>
+            <table width="100%">
+                @if (MDS.Controllers.LoginController.IsAdmin(User.Identity.Name) != MDS.Controllers.ATC.Customer)
+                {
+
+                    <tr>
+                        <td colspan="6">
+
+                            <a class="button" id="btnCreateRepairJobForWorkOrdersNotServiceable" style="display: none;"><span>Create a Repair Job For all the listed Work Orders Not marked as Serviceable</span></a>
+
+                            <input type="button" class="inputbuttonbg inputbig" value="Add New Work Order" onclick="AddWorkOrder()">
+                            @*<input type="button" class="inputbuttonbg inputbig" value="Delete Service Work Order" id="btnDelete">*@
+                        </td>
+                    </tr>
+                }
+                    <tr>
+                        <td colspan="6" width="100%">
+                            <table border="1" width="100%">
+                                <tr>
+                                    @if (ViewBag.SortOrder == "Equipment")
+                                    {
+                                        <th style="background-color:yellow"><b><a href="" onclick="Sort('Equipment');return false">Equipment</a></b></th>
+
+                                    }
+                                    else
+                                    {
+                                        <th><b><a href="" onclick="Sort('Equipment');return false">Equipment</a></b></th>
+
+                                    }
+                                    @if (ViewBag.SortOrder == "CompanyName")
+                                    {
+                                        <th style="background-color:yellow"><b><a href="" onclick="Sort('CompanyName');return false">Company Name</a></b></th>
+
+                                    }
+                                    else
+                                    {
+                                        <th><b><a href="" onclick="Sort('CompanyName');return false">Company Name</a></b></th>
+
+                                    }
+                                    @if (ViewBag.SortOrder == "ServiceArea")
+                                    {
+                                        <th style="background-color:yellow"><b><a href="" onclick="Sort('ServiceArea');return false">Service Area</a></b></th>
+                                    }
+                                    else
+                                    {
+                                        <th><b><a href="" onclick="Sort('ServiceArea');return false">Service Area</a></b></th>
+                                    }
+                                    @if (ViewBag.SortOrder == "WorkDone")
+                                    {
+
+                                        <th style="background-color:yellow"><b><a href="" onclick="Sort('WorkDone');return false">Work Done</a></b></th>
+                                    }
+                                    else
+                                    {
+                                        <th><b><a href="" onclick="Sort('WorkDone');return false">Work Done</a></b></th>
+                                    }
+                                    @if (ViewBag.SortOrder == "Notes")
+                                    {
+
+                                        <th style="background-color:yellow"><b><a href="" onclick="Sort('Notes');return false">Notes</a></b></th>
+                                    }
+                                    else
+                                    {
+                                        <th><b><a href="" onclick="Sort('Notes');return false">Notes</a></b></th>
+                                    }
+                                    @if (ViewBag.SortOrder == "DateServiced")
+                                    {
+
+                                        <th style="background-color:yellow"><b><a href="" onclick="Sort('DateServiced');return false">Date Serviced</a></b></th>
+                                    }
+                                    else
+                                    {
+                                        <th><b><a href="" onclick="Sort('DateServiced');return false">Date Serviced</a></b></th>
+
+                                    }
+                                    @if (ViewBag.SortOrder == "EngineerName")
+                                    {
+
+                                        <th style="background-color:yellow"><b><a href="" onclick="Sort('EngineerName');return false">Engineer Name</a></b></th>
+                                    }
+                                    else
+                                    {
+                                        <th><b><a href="" onclick="Sort('EngineerName');return false">Engineer Name</a></b></th>
+                                    }
+                                    @if (ViewBag.SortOrder == "PartsUsed")
+                                    {
+                                        <th style="background-color:yellow"><b><a href="" onclick="Sort('PartsUsed');return false">Parts Used</a></b></th>
+                                    }
+                                    else
+                                    {
+                                        <th><b><a href="" onclick="Sort('PartsUsed');return false">Parts Used</a></b></th>
+
+                                    }
+                                    @if (MDS.Controllers.LoginController.IsAdmin(User.Identity.Name) != MDS.Controllers.ATC.Customer)
+                                    {
+
+                                        <th></th>
+                                    }
+                                    </tr>
+                                @foreach (var item in Model.ServiceWorkOrder)
+                                {
+                            <tr>
+                                <td>@Html.ActionLink(item.Equipment, "EditPopUpService", "ServiceWorkOrder", new { id = item.ServiceId }, null)  </td>
+                                <td>@item.CompanyName</td>
+                                <td>@item.ServiceArea</td>
+                                <td>@item.WorkDone</td>
+                                <td>@item.NotesForThisService</td>
+                                @if (item.DateServiced == null)
+                                {
+                                    <td></td>
+                                }
+                                else
+                                {
+                                    <td>@item.DateServiced.Value.ToString("dd-MMM-yyyy")</td>
+                                }
+                                <td>@item.EngineerName</td>
+                                <td>@item.Parts</td>
+                                @if (MDS.Controllers.LoginController.IsAdmin(User.Identity.Name) != MDS.Controllers.ATC.Customer)
+                                {
+
+                                    <td><button onclick="Delete(@item.ServiceId); return false;" value="Delete">Delete</button></td>
+                                }
+                                </tr>
+                                }
+                            </table>
+                        </td>
+                    </tr>
+                    @Html.HiddenFor(i => i.Sort)
+                    <script type="text/javascript">
+                        function Sort(srt) {
+                            $('#Sort').val(srt);
+                            $('#SWOForm').submit();
+                        }
+
+                    </script>
+
+                    @*<tr>
+                                <td colspan="6">
+                                    @(Html.Kendo().Grid(Model.ServiceWorkOrder)
+            .Name("swoGrid")
+            .Columns(columns =>
+            {
+                if (ViewBag.PopUpService != null) { columns.Bound(p => p.Equipment).Title("Equipment").ClientTemplate(@Html.ActionLink("#=Equipment#", "EditPopUpService", "ServiceWorkOrder", new { id = "#=ServiceId#" }, null).ToHtmlString()); }
+                else { columns.Bound(p => p.Equipment).Title("Equipment").ClientTemplate(@Html.ActionLink("#=Equipment#", "Edit", "ServiceWorkOrder", new { id = "#=ServiceId#" }, null).ToHtmlString()); }
+
+                columns.Bound(p => p.ServiceId).Visible(false);
+                columns.Bound(p => p.CompanyName).Title("Company Name");
+                columns.Bound(p => p.ServiceArea).Title("Service Area");
+                columns.Bound(p => p.WorkDone).Title("Work Done");
+                columns.Bound(p => p.NotesForThisService).Title("Notes");
+                columns.Bound(p => p.DateServiced).Title("Date Serviced").ClientTemplate("#= (DateServiced == null) ? ' ' : kendo.toString(DateServiced, 'dd/MM/yyyy') #");
+                columns.Bound(p => p.EngineerName).Title("Engineer Name");
+                columns.Bound(p => p.Parts).Title("Parts Used");
+
+            })
+            .Pageable()
+            .Sortable()
+            .Filterable()
+            .Selectable(s => s.Mode(GridSelectionMode.Single))
+             .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .PageSize(200)
+                    .ServerOperation(false)
+                 )
+            )
+                                </td>
+                            </tr>*@
+                </table>
+                @if (MDS.Controllers.LoginController.AttachSigWorkOrder)
+                {
+                    <table cellspacing="3" cellpadding="0" width="100%" border="0">
+                        <tbody>
+                            <tr>
+                                <td height="19">
+                                    <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                        <tbody>
+                                            <tr>
+                                                <td height="30" class="text maintexttop">
+                                                    Attachments
+                                                </td>
+
+                                                <td width="100%">
+                                                    @if (Model.ServiceJobID == "0")
+                                                    {
+                                                        <button onclick="savedataforphotos();" class="inputbuttonbg inputbig">Add Attachments</button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div id="PhotosX" />
+                                                    }
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table cellspacing="1" cellpadding="0" width="100%" border="0">
+                        <tr>
+                            <td colspan="6">
+                                <div id="ServiceWorkTimesX"></div>
+                            </td>
+                        </tr>
+
+                    </table>
+                    <table cellspacing="1" cellpadding="0" width="100%" border="0">
+                        <tbody style="width:100%">
+
+                            <tr style="width:100%">
+                                <td height="30" class="text maintexttop">
+                                    Customer Signature
+                                </td>
+                                @if (MDS.Controllers.LoginController.CustomerSign_ElseName)
+                                {
+                                    if (Model.CustomerSignatureX)
+                                    {
+                                        <td width="100%">
+                                            <img src="@Url.Content("~/UploadedFiles/Signature_" + Model.ServiceJobID + "-S-" + MDS.Controllers.LoginController.BranchID(User.Identity.Name).ToString() + ".png")" height="500" width="500" />
+
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td width="100%">
+                                            Not signed
+                                        </td>
+                                    }
+                                }
+                                else
+                                {
+                                    <td width="90%">
+                                        @Model.CustName
+                                    </td>
+                                }
+                            </tr>
+                        </tbody>
+                    </table>
+                }
+        </div>
+    </div>
+
+    @*@Html.HiddenFor(m => m.ServiceJobID)
+        @Html.HiddenFor(m => m.ServiceData)
+        @Html.HiddenFor(m => m.ServiceClear)
+        @Html.HiddenFor(m => m.EquipmentClear)
+        @Html.HiddenFor(m => m.ServicesAfterDateFilter)
+        <input id="hdServiceId" type="hidden" />
+        @(Html.Kendo().Window()
+                                                .Name("serviceworkorderwindow")
+                                                .Title("Service Workorder Detail")
+                                                .Width(1000)
+                                                .Height(600)
+                                                .Visible(false)
+                                                .Iframe(true)
+                                                 .Modal(true)
+                                                   .Events(e => e.Close("CloseWoWindow"))
+                                                )*@
+
+
+}
+
+<script type="text/javascript">
+
+    function ParentRefreshWO() {
+        ;//  alert('ParentRefreshWO();');
+        var url = '@Url.Action("GetWOForServicenew", "Service")?Id=' + @Model.ServiceJobID;
+        window.location = url;
+
+    }
+    function CloseEquipmentWindow() {
+
+
+        var ServiceId = '@Model.ServiceJobID';
+        $.ajax({
+            url: '@Url.Action("CreateWOfromJobAssociated", "ServiceWorkOrder")',
+            type: 'POST',
+            datatype: "json",
+            data: { ID: ServiceId, EquipUID: $("#SelectedEquipment").val() },
+            success: function (response) {
+                //window.location.href =  '@Url.Action("EditPopupService", "ServiceWorkOrder")';
+                window.location.href =  '@Url.Action("EditPopupAssociated", "ServiceWorkOrder")';
+                return;
+                var width95 = (screen.width) * 85 / 100;
+                var height95 = (screen.height) * 85 / 100;
+
+                div.dialog({
+                    closeOnEscape: false,
+                    open: function (event, ui) {
+                        $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                        var url = '@Url.Action("EditPopupAssociated", "ServiceWorkOrder")';
+
+                        $(this).load(url); @*'@Url.Action("UploadFile", "Applications")');*@
+
+                    },
+                    modal: true,
+                    resizable: false,
+
+                    width: width95/*1300*/,
+                    height: height95/*800*/,
+                    title: "WorkOrder",
+                    buttons:
+                    {
+                        Close: function () {
+                            div.remove(); div.dialog("close");
+                        }
+                    },
+                });
+
+            },
+            error: function (req, status, error) {
+                //  alert("R: " + req + " S: " + status + " E: " + error);
+            }
+        });
+    }
+
+    function closeDiv() {
+        try {
+            div.remove();
+            //            div.remove(); div.dialog("close");
+        }
+        catch (ex) {
+            ;//alert(ex.message);
+        }
+        try {
+            div.dialog("close");
+        }
+        catch (ex) {
+            ;//alert(ex.message);
+        }
+
+    }
+
+
+   function RefreshServiceWorkTimes() {
+        try {
+            var ServiceJobID = '@Model.ServiceJobID';
+            if (ServiceJobID == 0)
+                return;
+            var BranchID='@MDS.Controllers.LoginController.BranchID(User.Identity.Name)';
+            $.ajax({
+                url: '@Url.Content("~/Service/ServiceWorkTimes")',
+                type: 'POST',
+                data: { ServiceJobID: ServiceJobID,BranchID:BranchID,Repair:false },
+                success: doSubmitSuccessServiceWorkTimes
+            });
+        }
+        catch (ex) {
+            alert('Error in init():' + ex.message);
+        }
+    }
+
+    function doSubmitSuccessServiceWorkTimes(result) {
+        try {
+            $('#ServiceWorkTimesX').html(result);
+        }
+        catch (ex) {
+            alert('Error in doSubmitSuccess ServiceWorkTimes():' + ex.message);
+        }
+    }
+
+    RefreshServiceWorkTimes();
+
+    var div = $("#dialog");
+
+    function AddWorkOrder() {
+        var custcode = '@Model.Customerid';
+        custcode = custcode.replace("&amp;", "~~");
+       // alert(custcode);
+
+        try {
+            custcode=custcode.replace(' ', '~~');
+            div.dialog({
+                closeOnEscape: false,
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    //var url = '@Url.Action("SearchEquipmentLoadByCustomerCode", "Repair")' + '/' + custcode;
+                    var url = '@Url.Action("SearchEquipmentMain", "Repair")?CustCode=' + custcode + "&BranchID="+@MDS.Controllers.LoginController.BranchID(User.Identity.Name)+"&CusLock=true";
+
+                    $(this).load(url); @*'@Url.Action("UploadFile", "Applications")');*@
+                },
+                modal: true,
+                resizable: false,
+
+                width: 1300,
+                height: 700,
+                title: "Add Work Order to Service",
+                buttons:
+                {
+                    Close: function () {
+                        div.remove(); div.dialog("close");
+                    }
+                },
+            });
+        }
+        catch (ex) {
+            alert('catchall:' + ex.message);
+        }
+    }
+
+    function Delete(ServiceId) {
+        var isConfirm = confirm('Are you SURE you want to delete this service work order now?');
+        if (isConfirm) {
+            $.ajax({
+                url: '@Url.Action("DeleteServiceWokOrder", "ServiceWorkOrder")',
+                type: 'POST',
+                datatype: "json",
+                data: { ServiceID: ServiceId },
+                success: function (response) {
+                    alert(response.msg);
+                    if (response.msg.indexOf("Successfully") >= 0) {
+                        ParentRefreshWO();//$("#SWOForm").submit();
+                    }
+                },
+                error: function (req, status, error) {
+                }
+            });
+        }
+    }
+
+
+    @*  function OpenWindow2() {
+        var window1 = $("#window1").data("kendoWindow");
+        window1.Visible = true;
+        $.ajax({
+            url: '@Url.Action("GetCustomerCode", "ServiceWorkOrder")',
+            type: 'POST',
+            datatype: "json",
+            data: { id: '@ViewBag.PopUpService' },
+            success: function (response) {
+                //alert(response.CustomerCode);
+                var actionURL = '@Url.Action("SearchEquipmentLoadByCustomerCode", "Repair")' + '/' + response.CustomerCode;
+                window1.refresh({
+                    url: actionURL,
+                    data: {}
+                });
+                var width95 = (screen.width) * 85 / 100;
+                var height75 = (screen.height) * 65 / 100;
+                window1.setOptions({ width: width95, height: height75 });
+                window1.center();
+                window1.open();
+            },
+            error: function (req, status, error) {
+                //  alert("R: " + req + " S: " + status + " E: " + error);
+            }
+        });
+    }*@
+
+
+</script>
+
+@*<script>
+        var flag = 1;
+        $(document).ready(function () {
+
+            $("#spDetails").text('@Model.ServiceData');
+            $("#spDetails1").text('@Model.EquipmentData');
+
+            var EquipClear = '@Model.EquipmentClear';
+            var ServiceClear = '@Model.ServiceClear';
+            var RepairClear = '@Model.RepairClear';
+
+            if (EquipClear == "C")
+            { $("#btnEquipmentClear").show(); }
+            else { $("#btnEquipmentClear").hide(); }
+
+            if (RepairClear == "C")
+            { $("#btnCreateRepairJobForWorkOrdersNotServiceable").show(); }
+            else { $("#btnCreateRepairJobForWorkOrdersNotServiceable").hide(); }
+
+            if (ServiceClear == "C")
+            { $("#btnServiceClear").show(); }
+            else { $("#btnServiceClear").hide(); }
+
+
+            if ($("#spDetails").text() != "") {
+                $("#btnCreateRepairJobForWorkOrdersNotServiceable").show();
+            }
+            $("#chkServicesAfterDateFilter").click(function () {
+                if ($(this).is(":checked")) {
+                    $(".dateout").show();
+                    $("#ServicesAfterDateFilter").val(true);
+                }
+                else {
+                    $(".dateout").hide();
+                    $("#ServicesAfterDateFilter").val(false);
+                }
+            });
+            var ServicesAfterDateFilter = '@Model.ServicesAfterDateFilter';
+            if (ServicesAfterDateFilter == "True") {
+                $(".dateout").show();
+            }
+            else {
+                $(".dateout").hide();
+            }
+
+            $("#btnCreateRepairJobForWorkOrdersNotServiceable").click(function (event) {
+                event.preventDefault();
+                $("#divProgress").show();
+                $.post('@Url.Action("CreateRepairJob", "ServiceWorkOrder")', $("#SWOForm").serialize(), function (data) {
+                    $("#divProgress").hide();
+                    window.location.href = '/repair';
+                });
+        .
+            });
+
+        });
+
+        $("#btnDelete").click(function () {
+            var entityGrid = $("#swoGrid").data("kendoGrid");
+            var selectedItem = entityGrid.dataItem(entityGrid.select());
+            if (selectedItem == undefined) {
+                ShowAlert("Please select the service work order first");
+            }
+            else {
+
+                swal({
+                    title: "",
+                    text: "Are you SURE you want to delete this service work order now?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "green",
+                    confirmButtonText: "Yes",
+                    cancelButtonText: "No",
+                    closeOnConfirm: true,
+                    closeOnCancel: true
+                },
+    function (isConfirm) {
+        if (isConfirm) {
+            var ServiceId = selectedItem.ServiceId;
+            $.ajax({
+                url: '@Url.Action("DeleteServiceWokOrder", "ServiceWorkOrder")',
+                type: 'POST',
+                datatype: "json",
+                data: { ServiceID: ServiceId},
+                success: function (response) {
+                    alert(response.msg);
+                    if (response.msg.indexOf("Successfully") >= 0) {
+                        $("#SWOForm").submit();
+                    }
+                },
+                error: function (req, status, error) {
+                }
+            });
+        }
+        else {
+        }
+    });
+
+    }
+        });
+    function CustomerSiteData() {
+        return {
+            Customerid: $("#Customerid").val(),
+            Branchid: $("#Branchid").val()
+        };
+    }
+
+
+    function ClearEquipment() {
+        $('#EquipmentClear').val("");
+        $("#SelectedEquipment").val("-1");
+        $("#btnEquipmentClear").hide();
+        $("#EquipmentData").val("");
+        $('#spDetails1').text("");
+    }
+
+    function ClearService() {
+        $('#ServiceClear').val("");
+        $("#ServiceJobID").val("-1");
+        $("#btnServiceClear").hide();
+        $('#ServiceData').val("");
+        $('#spDetails').text("");
+        $("#btnCreateRepairJobForWorkOrdersNotServiceable").hide();
+    }
+    function CloseWoWindow(e) {
+        $('#SWOForm').submit();
+    }
+    function OpenWindow() {
+
+        var window = $("#window").data("kendoWindow");
+
+        window.Visible = true;
+        var actionURL = '@Url.Action("SearchServiceJobLoad", "ServiceWorkOrder")';
+        window.refresh({
+            url: actionURL,
+            data: {}
+        });
+        var width95 = (screen.width) * 85 / 100;
+        var height75 = (screen.height) * 65 / 100;
+        window.setOptions({ width: width95, height: height75 });
+        window.center();
+        window.open();
+    }
+
+    function onClose(e) {
+        $.ajax({
+            url: '@Url.Action("GetServiceJobDetails", "ServiceWorkOrder")',
+            type: 'POST',
+            datatype: "json",
+            data: { ServiceJobId: $("#ServiceJobID").val() },
+            success: function (response) {
+                $('#spDetails').text(response.ServiceInfo);
+                $('#ServiceData').val(response.ServiceInfo);
+                $("#btnCreateRepairJobForWorkOrdersNotServiceable").show();
+                $('#ServiceClear').val("C");
+                $('#RepairClear').val("C");
+                $('#SWOForm').submit();
+            },
+            error: function (req, status, error) {
+                //  alert("R: " + req + " S: " + status + " E: " + error);
+            }
+        });
+    }
+
+    function openEquipmemtWindow() {
+        flag = 1;
+        OpenWindow1();
+    }
+
+    function OpenWindow1() {
+
+        var window1 = $("#window1").data("kendoWindow");
+
+        window1.Visible = true;
+        var actionURL = '@Url.Action("SearchEquipmentLoad", "Repair")';
+        window1.refresh({
+            url: actionURL,
+            data: {}
+        });
+        var width95 = (screen.width) * 85 / 100;
+        var height75 = (screen.height) * 65 / 100;
+        window1.setOptions({ width: width95, height: height75 });
+        window1.center();
+        window1.open();
+    }
+
+
+
+        function onClose1(e) {
+            if (flag == 1) {
+                $.ajax({
+                    url: '@Url.Action("GetEquipInfomationData", "Repair")',
+                type: 'POST',
+                datatype: "json",
+                data: { EquipUID: $("#SelectedEquipment").val() },
+                success: function (response) {
+                    $('#spDetails1').text(response.CustomerInfo);
+                    $('#EquipmentData').val(response.CustomerInfo);
+                    $("#btnEquipmentClear").show();
+                    $('#EquipmentClear').val("C");
+                },
+                error: function (req, status, error) {
+                    //  alert("R: " + req + " S: " + status + " E: " + error);
+                }
+            });
+        }
+        else {
+
+            $("#divProgress").show();
+            var ServiceId = '@ViewBag.PopUpService';
+                $.ajax({
+                    url: '@Url.Action("CreateWOfromJobAssociated", "ServiceWorkOrder")',
+                    type: 'POST',
+                    datatype: "json",
+                    data: { ID: ServiceId, EquipUID: $("#SelectedEquipment").val() },
+                    success: function (response) {
+                        $("#divProgress").hide();
+
+                            var window = $("#serviceworkorderwindow").data("kendoWindow");
+                            window.Visible = true;
+                            var actionURL = '@Url.Action("EditPopupAssociated", "ServiceWorkOrder")';
+                            window.refresh({
+                                url: actionURL
+                            });
+                            var width95 = (screen.width) * 85 / 100;
+                            var height75 = (screen.height) * 65 / 100;
+                            window.setOptions({ width: width95, height: height75 });
+                            window.center();
+                            window.open();
+
+                    },
+                    error: function (req, status, error) {
+                        //  alert("R: " + req + " S: " + status + " E: " + error);
+                    }
+                });
+            }
+        }
+
+        function createWO() {
+            var entityGrid = $("#swoGrid").data("kendoGrid");
+            var selectedItem = entityGrid.dataItem(entityGrid.select());
+            if (selectedItem == undefined) {
+                alert("Please select existing from which to Equipment, customer, engineer will be copied to new require");
+            }
+            else {
+                var r = confirm("Are you sure you wish to create new Service work order based on existing?");
+                if (r) {
+                    $("#divProgress").show();
+                    var ServiceId = selectedItem.ServiceId;
+                    $.ajax({
+                        url: '@Url.Action("CreateWO", "ServiceWorkOrder")',
+                        type: 'POST',
+                        datatype: "json",
+                        data: { ID: ServiceId },
+                        success: function (response) {
+                            $("#divProgress").hide();
+                            window.location.href = "ServiceWorkOrder/Edit/" + response.NewServiceID;
+                        },
+                        error: function (req, status, error) {
+                            //  alert("R: " + req + " S: " + status + " E: " + error);
+                        }
+                    });
+                }
+
+            }
+        }
+
+        function cancel() {
+            parent.$("#WOwindow").data("kendoWindow").close();
+        }
+    </script>*@
+
+
+
+
+

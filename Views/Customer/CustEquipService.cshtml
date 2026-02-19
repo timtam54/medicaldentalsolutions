@@ -1,0 +1,105 @@
+﻿@model List<MDS.Controllers.CustomerController.EquipRpt>
+@{
+    Layout = null;
+}
+<table border="1" width="100%">
+    <tr style="color:white;background-color:black">
+        <th>
+            <b>
+                Customer
+            </b>
+        </th>
+        <th>
+            <b>
+                Description
+            </b>
+        </th>
+        <th>
+            <b>
+                Serial
+            </b>
+        </th>
+        <th>
+            <b>
+                Date
+            </b>
+        </th>
+
+        <th>
+            <b>
+                Recommendations
+            </b>
+        </th>
+        <th>
+            <b>
+                Job Complete
+            </b>
+        </th>
+        <th>
+            <b>
+                Invoice No
+            </b>
+        </th>
+        <th>
+            <b>
+                Invoice Amount
+            </b>
+        </th>
+
+    </tr>
+    @{ string LastCust = "";
+    foreach (MDS.Controllers.CustomerController.EquipRpt item in Model.OrderBy(i=>i.Customer))
+    {
+        <tr>
+            @if (item.Customer == LastCust)
+            {
+                <td></td>
+            }
+            else
+            {
+                <td>
+                    @item.Customer
+                </td>
+            }
+            @if (item.Service)
+            {
+                <td>
+                    <a href="" onclick="ServiceLink('@item.ServiceID'); return false;">
+                        @item.EquipDesc
+                    </a>
+                </td>
+            }
+            else
+            {
+                <td>
+                    <a href="" onclick="RepairLink('@item.ServiceID'); return false;">
+                        @item.EquipDesc
+                    </a>
+                </td>
+
+            }
+            <td>
+                @item.Serial
+            </td>
+            <td>
+                @item.ServicedDate.ToString("dd-MMM-yyyy")
+            </td>
+
+            <td>
+                @item.Recommendations
+            </td>
+            <td>
+                @item.JobComplete
+            </td>
+            <td width="9%">
+                @item.InvoiceNo
+            </td>
+            <td>
+                @item.InvoiceAmount.ToString("c")
+            </td>
+        </tr>
+    { LastCust = item.Customer;}
+        }
+        }
+</table>
+

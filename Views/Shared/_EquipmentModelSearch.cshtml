@@ -1,0 +1,156 @@
+﻿@model MDS.Models.EquipmentModel
+
+<h2 style="text-align: center;">Equipment Models</h2>
+
+@using (Html.BeginForm("SearchEquipmentModel", "Equipment", FormMethod.Post, new { id = "eqForm" }))
+{
+    <div class="contact-info">
+        <div class="content">
+            <table style="margin-left: 10px; margin-top: 10px; width: 100%">
+
+                <tr>
+                    <td width="150">Manufacturer :
+                    </td>
+                    <td>
+                        @(Html.Kendo().DropDownListFor(m => m.ManufactureId)
+                        .Filter("startswith")
+                          .Name("ManufactureId")
+                          .DataTextField("Manufacture")
+                          .DataValueField("ManufactureId")
+                          .BindTo(Model.ManufactureList)
+                          .HtmlAttributes(new { style = "width:200px", data_required_msg = "Equip Type is required." })
+                        )
+                    </td>
+                    <td width="150">Equipment Type :
+                    </td>
+                    <td>
+                                            @if (MDS.Controllers.LoginController.AllCustomers(User.Identity.Name))
+                    {
+                          @(Html.Kendo().DropDownListFor(m => m.Equiptype)
+                          .Name("Equiptype")
+                          .DataTextField("Name")
+                          .DataValueField("EquipTypeCode")
+                          .BindTo(Model.EquipTypeList)
+                          .Filter("StartsWith")
+                        .HtmlAttributes(new { style = "width:150px", data_required_msg = "Equip Type is required." })
+                        )
+
+                    }
+                    else
+                    {
+                        
+                    @(Html.Kendo().DropDownListFor(m => m.Equiptype)
+                    
+                          .Name("Equiptype")
+                          .DataTextField("Name")
+                          .DataValueField("EquipTypeCode")
+                          .Filter("StartsWith")
+
+                         .DataSource(dataSource =>
+                          {
+                              dataSource.Read(read =>
+                              {
+                                  read.Action("GetEquipmentTypeSite", "Service")
+                                     .Data("CustomerSiteData");
+                              })
+                              .ServerFiltering(true);
+                          })
+
+                                  .AutoBind(false)
+                                 .CascadeFrom("Customerid")
+                          .HtmlAttributes(new { style = "width:150px", data_required_msg = "Equip Type is required." })
+                        )
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td>Model Contains this :
+                    </td>
+                    <td>
+                        @(Html.Kendo().TextBoxFor(m => m.ModelContain)
+                                .Name("ModelContain")
+                                .HtmlAttributes(new { style = "width: 200px " })
+                            )
+                    </td>
+                    <td></td>
+                    <td>
+                        <a class="button" onclick="$('#eqForm').submit();"><span>Search</span></a>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td colspan="4">
+                         @if (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin)
+                    {
+                        <input type="button" class="inputbuttonbg inputbig" value="Add New Equipment Model" onclick="window.location.href = '@Url.Action("Add", "EquipModel")    '">
+                         }
+                                   </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <a onclick="pick();" class="button"><span>Pick</span></a>
+                          <a onclick="cancel();" class="button"><span>Cancel</span></a>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+
+                        @(Html.Kendo().Grid(Model.EquipmentModelList)
+                            .Name("emGrid")
+                            .Columns(columns =>
+                            {
+                                columns.Bound(p => p.EquipType).Title("Equipment Type").ClientTemplate(@Html.ActionLink("#=EquipType#", "Edit", "EquipModel", new { id = "#=ModelUID#" }, null).ToHtmlString());
+                                columns.Bound(p => p.Manufacture).Title("Manufacture");
+                                columns.Bound(p => p.Model).Title("Model");
+                                columns.Bound(p => p.Notes).Title("Notes");
+                                columns.Bound(p => p.ModelUID).Title("ModelUID").Visible(false);
+                            })
+                            .Pageable()
+                            .Sortable()
+                            .Filterable()
+                            .Selectable(s => s.Mode(GridSelectionMode.Single))
+                             .DataSource(dataSource => dataSource
+                                    .Ajax()
+                                    .PageSize(200)
+                                    .ServerOperation(false)
+                                 )
+                            )
+
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <a onclick="pick();" class="button"><span>Pick</span></a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+}
+<script>
+    function EquiptypeData() {
+        return {
+            ManufactureId: $("#ManufactureId").val()
+        };
+    }
+    function cancel()
+    {
+        parent.$("#window").data("kendoWindow").close();
+    }
+    function pick() {
+        var entityGrid = $("#emGrid").data("kendoGrid");
+        var selectedItem = entityGrid.dataItem(entityGrid.select());
+
+        if (selectedItem == undefined) {
+            alert("Please select the row first");
+        }
+        else {
+            // alert(selectedItem.Customer);
+            parent.$("#Equiptype").val(selectedItem.EquipType);
+            parent.$("#Manufacturer").val(selectedItem.Manufacture);
+            parent.$("#EquipModel").val(selectedItem.Model);
+            parent.$("#ModelUID").val(selectedItem.ModelUID);
+            parent.$("#window").data("kendoWindow").close();
+        }
+    }
+</script>

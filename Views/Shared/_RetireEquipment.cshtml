@@ -1,0 +1,116 @@
+﻿@model MDS.Models.Retirement
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+</style>
+<h2 style="text-align: center;">Retirement Details</h2>
+@using (Html.BeginForm("RetirementPost", "Repair", FormMethod.Post, new { id = "reForm" }))
+{   @Html.HiddenFor(m => m.EquipID)
+    <div class="contact-info" style="margin: 25px;">
+        <div class="content">
+            <table width="100%">
+                <tr>
+                    <td>Retirement Reason:
+                    </td>
+                    <td>
+                        @Html.EditorFor(m => m.Obselete)
+                        The Equipment Item is Obselete
+                    </td>
+                    <td>
+                        @Html.EditorFor(m => m.NoLongerRequired)
+                        No Longer Required by the Customer
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>&nbsp;
+                    </td>
+                    <td>
+                        @Html.EditorFor(m => m.BERDisposal)
+                        BER Disposal
+                    </td>
+                    <td>
+                        @Html.EditorFor(m => m.PartsNotAvailable)
+                        Parts are no longer available
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Date Retired:
+                    </td>
+                    <td>
+                        @(Html.Kendo().DatePickerFor(m => m.DateRetired)
+                                                                   .Name("DateRetired")
+                                                   .HtmlAttributes(new { style = "width:120px", type = "text", data_type = "date" })
+                                                                )
+                    </td>
+                    <td>Retirement Comments:
+                    </td>
+                    <td>
+                        @(Html.TextAreaFor(m => m.RetirementComment, new { style = "width: 250px;height:80px" })
+                                                            )
+
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td width="2%">&nbsp;
+                    </td>
+                    <td width="10%" rowspan="3">
+                        <input type="button" class="inputbuttonbg inputbig" value="Cancel" id="btnCancel">
+                    </td>
+                    <td width="12%">&nbsp;
+                    </td>
+                    <td width="30%" rowspan="3"></td>
+                    <td width="7%">&nbsp;
+                    </td>
+                    <td width="22%" rowspan="3"></td>
+                    <td width="7%">&nbsp;
+                    </td>
+                    <td width="7%" rowspan="3">
+                        <input class="inputbuttonbg inputbig" type="submit" id="btnSubmit" value="Save">
+                    </td>
+                    <td width="3%">&nbsp;
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#btnSubmit").click(function (event) {
+            event.preventDefault();
+            $.post('@Url.Action("RetirementPost", "Repair")', $("#reForm").serialize(), function (data) {
+                parent.$('#hdRetirementDone').val("1");
+                //parent.$("#Rewindow").data("kendoWindow").close();
+                try {
+                        onClose1();
+                    }
+                    catch (ex) {
+                        ;
+                    }
+                    try {
+                        parent.onClose1();
+                    }
+                    catch (ex) {
+                        ;
+                    }
+                closeDiv();
+    
+            });
+        });
+        $("#btnCancel").click(function (event) {
+            event.preventDefault();
+            $('#hdRetirementDone').val("0");
+             closeDiv();
+            //parent.$("#Rewindow").data("kendoWindow").close();
+        });
+    });
+
+
+</script>

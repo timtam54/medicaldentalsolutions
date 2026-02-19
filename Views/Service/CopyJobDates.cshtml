@@ -1,0 +1,121 @@
+﻿@model MDS.Models.JobsCreate
+@{
+    Layout = null;// "~/Views/Shared/_Layout.cshtml";
+}
+@*<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+<script src="~/Scripts/jquery.validate.js"></script>*@
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+
+    #rpGrid tbody tr:hover {
+        cursor: pointer !important;
+    }
+</style>
+@using (Html.BeginForm("CopyJob", "Service", FormMethod.Post, new { id = "CopyJob" }))
+{
+    <table border="1" cellpadding="0" cellspacing="0" width="100%">
+        <tr style="background-color:black;color:white">
+            <th align="center">
+                <b>
+                    Programmed
+                </b>
+            </th>
+            <th align="center">
+                <b>
+                    To
+                </b>
+            </th>
+            @if (Model.Create == 1)
+            {
+                <th align="center">
+                    <b>
+                        Job
+                    </b>
+                </th>
+                <th align="center">
+                    <b>
+                        Status
+                    </b>
+                </th>
+
+            }
+        </tr>
+@foreach (MDS.Models.JobsDateIDStatus jdis in Model.sjs)
+
+{
+    <tr>
+        <td align="center">
+            @jdis.ProgrammedDate.ToString("dd-MMM-yyyy")
+        </td>
+        <td align="center">
+            @jdis.ProgrammedDateEnd.ToString("dd-MMM-yyyy")
+        </td>
+        @if (Model.Create == 1)
+        {
+            <td align="center">
+                <a target="_blank" href="../Edit?id=@jdis.JobID&BranchID=@jdis.BranchID">@jdis.JobCode</a>
+            </td>
+            <td align="center">
+                @jdis.Status
+            </td>
+        }
+    </tr>
+}
+
+    </table>
+@*<script type="text/javascript">
+    function showDates() {
+        var CopyInterval = $('#CopyInterval').val();
+        alert(CopyInterval);
+    }
+</script>*@
+ 
+}
+
+<script type="text/javascript">
+
+
+    @*function Save() {
+            try {
+                var myData = $('#xNotes')
+                try {
+                    var xxx = myData.valid();
+                    if (!xxx) {
+                        alert('form is not valid');
+                        return;
+                    }
+                }
+                catch (ex) {
+                    ;
+                }
+                $.post('@Url.Action("Notes", "Repair")', myData.serialize(),
+                    function (data) {
+                        if (data.Error == '') {
+                            try {
+                                setNotes(data.Data);
+                                closeDiv();
+                                $("#dialog").remove();
+                                openNotes();
+                            }
+                            catch (ex) {
+                                alert(ex.message);
+                            }
+                        }
+                        else
+                            alert(data.Error);
+                    }
+                    , 'json');
+            }
+            catch (ex) {
+                alert(ex.message);
+            }
+
+        }*@
+
+
+</script>

@@ -1,0 +1,156 @@
+﻿@model MDS.Models.EquipmentModel
+@{
+    ViewBag.Title = "Equipment Model Search";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<div class="breadcrumb">
+    @Html.ActionLink("Home", "Index", "Dashboard")
+    » @Html.ActionLink("Equipment Models", "Index", "EquipModel")
+</div>*@
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+
+    #rpGrid tbody tr:hover {
+        cursor: pointer !important;
+    }
+</style>
+<h1>Equipment Model Search</h1>
+@using (Html.BeginForm("Index", "EquipModel", FormMethod.Post, new { id = "eqForm" }))
+{
+    <div class="contact-info">
+        <div class="content">
+            <table style="margin-left: 10px; margin-top: 10px" width="100%">
+
+                <tr>
+                    <td width="150">Manufacturer :
+                    </td>
+                    <td>
+                        @(Html.Kendo().DropDownListFor(m => m.ManufactureId)
+                        
+                          .Name("ManufactureId")
+                          .DataTextField("Manufacture")
+                          .DataValueField("ManufactureId")
+                          .BindTo(Model.ManufactureList)
+                          .HtmlAttributes(new { style = "width:200px", data_required_msg = "Equip Type is required." })
+                          .Filter("startswith")
+                        )
+                    </td>
+                    <td width="150">Equipment Type :
+                    </td>
+                    <td>@(Html.Kendo().DropDownListFor(m => m.Equiptype)
+                          .Name("Equiptype")
+                         
+                          .DataTextField("Name")
+                          .DataValueField("EquipTypeCode")
+                          .BindTo(Model.EquipTypeList)
+                          .DataSource(dataSource =>
+                                {
+                                    dataSource.Read(read =>
+                                    {
+                                        read.Action("GetEquiptype", "Equipment")
+                                            .Data("EquiptypeData");
+                                    })
+                                    .ServerFiltering(true);
+                                })
+                            .AutoBind(false)
+                            .CascadeFrom("ManufactureId")
+
+                        .HtmlAttributes(new { style = "width:250px", data_required_msg = "Equipment Type is required." })
+                        )
+                    </td>
+                </tr>
+                <tr>
+                    <td>Model Contains this :
+                    </td>
+                    <td>
+                        @(Html.Kendo().TextBoxFor(m => m.ModelContain)
+                                .Name("ModelContain")
+                                .HtmlAttributes(new { style = "width: 200px " })
+                            )
+                    </td>
+                    <td></td>
+                    <td>
+                        <a class="button" onclick="$('#eqForm').submit();"><span>Search</span></a>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td colspan="4">&nbsp;
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="4">
+
+                        @(Html.Kendo().Grid(Model.EquipmentModelList)
+                            .Name("emGrid")
+                            .Columns(columns =>
+                            {
+                                //columns.Bound(p => p.EquipType).Title("EquipType");
+                                columns.Bound(p => p.EquipType).Title("Equipment Type").ClientTemplate(@Html.ActionLink("#=EquipType#", "Edit", new { id = "#=ModelUID#" }).ToHtmlString());
+                                columns.Bound(p => p.Manufacture).Title("Manufacture");
+                                columns.Bound(p => p.Model).Title("Model");
+                                columns.Bound(p => p.Notes).Title("Notes");
+                                columns.Bound(p => p.ModelUID).Title("ModelUID").Visible(false);
+                            })
+                            .Pageable()
+                            .Sortable()
+                            .Filterable()
+                            .Selectable(s => s.Mode(GridSelectionMode.Single))
+                             .DataSource(dataSource => dataSource
+                                    .Ajax()
+                                    .PageSize(200)
+                                    .ServerOperation(false)
+                                 )
+                            )
+
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="button" class="inputbuttonbg inputbig" value="Add New Equipment Model" onclick="window.location.href = '@Url.Action("Add", "EquipModel")'"></td>
+
+                </tr>
+            </table>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+
+    $('input').keypress(function (e) {
+        {
+            if (event.which == 13) {
+//                alert('w');
+                //alert('search');
+                //$(this).closest('form').submit();
+                $('#eqForm').submit();
+                return false;
+            }
+        }
+    });
+
+    function EquiptypeData() {
+        return {
+            ManufactureId: $("#ManufactureId").val()
+        };
+    }
+
+</script>
+
+@*<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>*@
+

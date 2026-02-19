@@ -1,0 +1,218 @@
+﻿@model MDS.Models.TechDashboard
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_LayoutTech.cshtml";
+}
+
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+
+<script type="text/javascript">
+    function ShowAllClick() {
+        try {
+            var ShowAll = $('#ShowAll').prop('checked');
+            window.location.href = '@Url.Action("Dashboard", "Tech")' + "?ShowAll=" + ShowAll;
+
+            //alert(xx);
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+</script>
+<br />
+<br />
+<br />
+<br />
+<br />
+<div class="contact-info">
+    <div class="content">
+        <table width="100%" align="center">
+            <tr>
+                <td width="50%" valign="top">
+                    <table align="center">
+                        <tr align="center">
+                            <td>
+                                <b>Show All</b>
+                                @Html.CheckBoxFor(i => i.ShowAll, new { @onclick = "ShowAllClick();" })
+                            </td>
+                            <td colspan="3">
+                                <h1>My @MDS.Controllers.LoginController.RepairLabel Appointments</h1>
+                            </td>
+                        </tr>
+                        <tr align="center">
+                            <th style="font-size:18px" align="left">Programmed</th>
+                            <th style="font-size:18px" align="left"></th>
+                            <th style="font-size:18px" colspan="1" align="left">
+                                <a style="font-size:18px;" href="@Url.Action( "Map", new { Address = MDS.Controllers.TechController.GetAddressForDate(null,Model.RepairSummary) })"
+                                   type="submit"
+                                   id="runReport"
+                                   title="@MDS.Controllers.TechController.GetAddressForDate(null,Model.RepairSummary)"
+                                   target="_blank">
+                                    Customer
+                                </a>
+                            </th>
+                            <th style="font-size:18px" colspan="1" align="left">Job</th>
+
+                        </tr>
+                        @{DateTime LastScheduledDate = DateTime.MinValue;}
+                        @foreach (MDS.Models.CustomerCount item in Model.RepairSummary.OrderBy(i => i.ScheduledDate))
+                        {
+                            <tr align="center">
+                                @if (Convert.ToDateTime(item.ScheduledDate).Date != LastScheduledDate.Date)
+                                {
+                                    LastScheduledDate = Convert.ToDateTime(item.ScheduledDate);
+                                    <td align="left" style="font-size:16px">
+                                        <a style="font-size:16px;" href="@Url.Action( "Map", new { Address = MDS.Controllers.TechController.GetAddressForDate(item.ScheduledDate.Value,Model.RepairSummary) })"
+                                           type="submit"
+                                           id="runReport"
+                                           title="@MDS.Controllers.TechController.GetAddressForDate(item.ScheduledDate.Value,Model.RepairSummary)"
+                                           target="_blank">
+                                            @item.ScheduledDate.GetValueOrDefault(DateTime.Now).ToString("dd/MM/yyyy")
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a style="font-size:16px;" href="@Url.Action( "Map", new { Address = MDS.Controllers.TechController.GetAddressForDate(item.ScheduledDate.Value,Model.RepairSummary) })"
+                                           type="submit"
+                                           id="runReport"
+                                           title="@MDS.Controllers.TechController.GetAddressForDate(item.ScheduledDate.Value,Model.RepairSummary)"
+                                           target="_blank">
+                                            <img src="~/Images/googlemaps.png" height="30" width="30" />
+                                        </a>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td colspan="2"></td>
+                                }
+                                <td align="left">
+                                    <a style="font-size:16px;" href="@Url.Action( "Map", new { Address= item.MapAddress})"
+                                       type="submit"
+                                       id="runReport"
+                                       title="@item.MapAddress"
+                                       target="_blank">
+                                        @item.Customer - @item.Location
+                                    </a>
+                                </td>
+                                <td align="left">@Html.ActionLink(@item.JobNo, "Repair", "Tech", new { BranchID = item.BranchID, id = item.ID }, new { @style = "font-size:16px" })</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                </td>
+                                <td colspan="2" align="left">
+                                    @item.Desc
+                                </td>
+                            </tr>
+                            if (item.MoreInfo != null)
+                            {
+                                for (int mm = 0; mm < item.MoreInfo.Count(); mm++)
+                                {
+                                    var mi = item.MoreInfo[mm];
+                                    string colour = "green";
+                                    if (mm == 0)
+                                    {
+                                        colour = "red";
+                                    }
+                                    <tr>
+                                        <td colspan="2">
+                                        <td colspan="2" align="left" style="color:@colour">
+                                            @mi
+                                        </td>
+                                    </tr>
+                                }
+
+                            }
+                        }
+                    </table>
+                </td>
+                <td width="50%" valign="top">
+
+                    <table align="center">
+                        <tr align="center">
+                            <td colspan="4" align="center">
+                                <h1>My Services Outstanding</h1>
+                            </td>
+                        </tr>
+                        <tr align="center">
+                            <th style="font-size:18px" colspan="2" align="left">Programmed</th>
+                            <th style="font-size:18px" colspan="1" align="left"><a style="font-size:18px;" href="@Url.Action( "Map", new { Address = MDS.Controllers.TechController.GetAddressForDate(null,Model.ServiceSummary) })"
+   type="submit"
+   id="runReport"
+   title="@MDS.Controllers.TechController.GetAddressForDate(null,Model.ServiceSummary)"
+   target="_blank">
+    Customer
+</a></th>
+                            <th style="font-size:18px" colspan="1" align="left">Job</th>
+                        </tr>
+                        @{DateTime LastScheduledDateService = DateTime.MinValue;}
+
+                        @foreach (MDS.Models.CustomerCount item in Model.ServiceSummary.OrderBy(i => i.ScheduledDate))
+                        {
+                            <tr align="center" style="font-size:16px">
+                                @if (item.ScheduledDate.Value.Date != LastScheduledDateService.Date)
+                                {
+                                    LastScheduledDateService = Convert.ToDateTime(item.ScheduledDate);
+                                    <td align="left" style="font-size:16px">@item.ScheduledDate.GetValueOrDefault(DateTime.Now).ToString("dd/MM/yyyy")</td>
+                                    <td align="left">
+                                        <a style="font-size:16px;" href="@Url.Action( "Map", new { Address=MDS.Controllers.TechController.GetAddressForDate(item.ScheduledDate.Value,Model.ServiceSummary)})"
+                                           type="submit"
+                                           id="runReport"
+                                           title="@MDS.Controllers.TechController.GetAddressForDate(item.ScheduledDate.Value,Model.ServiceSummary)"
+                                           target="_blank">
+                                            <img src="~/Images/googlemaps.png" height="30" width="30" />
+                                        </a>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td colspan="2"></td>
+                                }
+                                <td style="font-size:16px" align="left">
+                                    <a style="font-size:16px;" href="@Url.Action( "Map", new { Address = item.MapAddress})"
+                                       type="submit"
+                                       title="@item.MapAddress"
+                                       id="runReport"
+                                       target="_blank">
+                                        @item.Customer
+                                    </a>
+                                </td>
+                                <td>@Html.ActionLink(item.JobNo, "Service", "Tech", new { BranchID = item.BranchID, ServiceJobUID = item.ID }, new { @style = "font-size:16px" })</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" style="color:green">
+                                    @item.ScheduledDate.GetValueOrDefault(DateTime.Now).ToString("HH:mm tt")
+                                    -
+                                    @item.ScheduledEnd.GetValueOrDefault(DateTime.Now).ToString("HH:mm tt")
+
+                                </td>
+                                <td colspan="2" align="left">
+                                    @item.Desc
+                                </td>
+                            </tr>
+                            if (item.MoreInfo != null)
+                            {
+                                for (int mm = 0; mm < item.MoreInfo.Count(); mm++)
+                                {
+                                    var mi = item.MoreInfo[mm];
+                                    string colour = "green";
+                                    if (mm == 0)
+                                    {
+                                        colour = "red";
+                                    }
+                                    <tr>
+                                        <td colspan="2">
+                                        <td colspan="2" align="left" style="color:@colour">
+                                            @mi
+                                        </td>
+                                    </tr>
+                                }
+
+                            }
+                        }
+                    </table>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

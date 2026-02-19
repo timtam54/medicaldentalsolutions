@@ -1,0 +1,78 @@
+﻿@model List<MDS.Models.EquipmentSearchList>
+@{
+    ViewBag.Title = "";
+}
+@{
+    Layout = "~/Views/Shared/_IFrameLayout.cshtml";
+}
+@using (Html.BeginForm("SearchEquipmentLoad", "Repair", FormMethod.Post, new { id = "SearchEquipmentLoad" }))
+{
+    @Html.AntiForgeryToken()
+    <table cellspacing="1" width="100%" border="0">
+
+        <tbody style="width:100%">
+            <tr style="width:100%">
+                <th>Customer</th>
+                <th>Site</th>
+                <th>Location</th>
+                <th>Equipment Item</th>
+                <th>
+                    Manufacturer
+                </th>
+                <th>Serviced by US</th>
+            </tr>
+            @{
+                int ii = 0;
+            }
+            @foreach (MDS.Models.EquipmentSearchList eq in Model)
+            {
+                if (ii == 1)
+                {
+                    ii = 0;
+                }
+                else
+                {
+                    ii++;
+                }
+                <tr style="background-color:@MDS.Controllers.TechController.Colour(ii);width:100%" align="center">
+                    <td>
+                        @eq.Customer
+                    </td>
+                    <td>
+                        @eq.CustomerSite
+                    </td>
+                    <td>
+                        @eq.Location
+                    </td>
+                    <td>
+                        <a href="" onclick="Pick(@eq.EquipID); return false;">@eq.EquipDesc</a>
+</td>
+                    <td>
+                        @eq.Manufacturer
+                    </td>
+                    <td>
+                        @eq.CurrentlyServicedByMDS
+                    </td>
+                    <td>
+                        @*<a href="" onclick="EditEquip('@eq.EquipID'); return false;" target="_blank">Edit</a>*@
+                        <a href="@Url.Action("Edit","Equipment", new { id = eq.EquipID})" target="_blank">Edit</a>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@*<script type="text/javascript">
+    $('input').keypress(function (e) {
+        {
+            if (event.which == 13) {
+                //alert('search');
+                //$(this).closest('form').submit();
+                $('#SearchEquipmentLoad').submit();
+                return false;
+            }
+        }
+    });
+</script>*@

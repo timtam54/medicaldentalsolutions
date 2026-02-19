@@ -1,0 +1,292 @@
+﻿@model MDS.Models.AddEquipment
+
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    td {
+        padding: 2px;
+    }
+
+    body {
+        -moz-transform: scale(0.92, 0.92); /* Moz-browsers */
+        zoom: 0.92; /* Other non-webkit browsers */
+        zoom: 92%; /* Webkit browsers */
+    }
+</style>
+<script type="text/javascript">
+    function EquipModel(EquipTypeCode) {
+                try {
+            var url = '@Url.Action("ModelList", "Tech")';
+
+            //var Permit = $('#Permit_ID');
+            //try {
+            //    var pid = $("#PERMIT_ID option:selected").val();
+            //}
+            //catch (ex) {
+            //    alert(ex.message);
+            //}
+
+            //var saveselect = $('#saveselect');
+            //saveselect.hide();
+            var op = $("#ModelUID");
+                    $.getJSON(url, { EquipTypeCode: EquipTypeCode, BranchID:'@Model.Branchid' }, function (response) {
+                op.empty(); // remove any existing options
+                $.each(response, function (index, item) {
+                    var p = new Option(item.Model, item.ModelUID);
+                    op.append(p);
+//                    if (index > 0)
+  //                      saveselect.show();
+                });
+    //            opsSelected();
+            });
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+
+    }
+</script>
+<h1>Equipment Detail</h1>
+@using (Html.BeginForm("AddEquipment", "Tech", FormMethod.Post, new { id = "AddEquipment" }))
+{
+
+    @Html.HiddenFor(m => m.EquipIDEdit)
+    @Html.HiddenFor(m => m.JobCode)
+    @Html.HiddenFor(m => m.ServiceJobID)
+    <input id="hdPopUp" type="hidden" />
+    <!-- box2 start -->
+    <div id="box2">
+        <table cellspacing="8" cellpadding="0" width="100%" border="0">
+            <tbody>
+                <tr>
+                    <td align="center">
+                        @Html.ValidationSummary(true)
+                    </td>
+                </tr>
+                <tr>
+                    <td width="54%">
+                        <table cellspacing="3" width="100%" border="0">
+                            <tbody>
+                                <tr>
+                                    <td width="70" class="text">
+                                        Customer:
+                                    </td>
+                                    <td>
+                                        @Html.HiddenFor(m => m.Customerid)
+                                        @Html.DropDownListFor(m => m.Customerid, new SelectList(Model.CustomerList, "CustomerCode", "CompanyName"), new { style = "width:200px", data_required_msg = "Required.", required = "required", disabled="disabled" })
+                                    </td>
+                                    <td width="140">
+                                        Equip Type:
+                                    </td>
+                                    <td>
+                                        @Html.DropDownListFor(m => m.EquipTypeCode, new SelectList(Model.EquipTypeList, "EquipTypeCode", "Name"), new { style = "width:200px", data_required_msg = "Required.", required = "required", onchange = "EquipModel(this.value);" })
+                                    </td>
+                                </tr>
+                                <tr>
+
+                                    <td width="140">
+                                        Location:
+                                    </td>
+                                    <td>
+                                        @Html.DropDownListFor(m => m.LocationID, new SelectList(Model.LocationList, "LocationID", "Location"), new { style = "width:200px" })
+                                    </td>
+                                    <td width="140">
+                                        Equip Model:
+                                    </td>
+                                    <td>
+                                        @Html.DropDownListFor(m => m.ModelUID, new SelectList(Model.ModelList, "Id", "Text"))
+                                    </td>
+                                </tr>
+                                <tr>
+
+                                    <td width="140">
+                                        Customer Site:
+                                    </td>
+                                    <td>
+                                        @Html.DropDownListFor(m => m.DeptID, new SelectList(Model.CustomerSiteList, "DeptID", "Department"), new { style = "width:200px"})
+                                    </td>
+                                    </tr>
+                                    @*<tr>
+                                                <td colspan="2"><span id="spSince"></span>
+                                                </td>
+                                                <td>Model
+                                                </td>
+                                                <td>
+                                                    @(Html.Kendo().TextBoxFor(m => m.EquipModel)
+                                                         .Name("EquipModel")
+                                                         .Enable(false)
+                                                         .HtmlAttributes(new { style = "width: 200px " })
+                                                      )
+                                                    @Html.HiddenFor(m => m.ModelUID)
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="100" class="text">Customer Site :
+                                                </td>
+                                                <td>
+                                                    @if (Model.DeptID != null)
+                    {
+                                                        @(Html.Kendo().DropDownListFor(m => m.DeptID)
+                                                          .Name("DeptID")
+                                                          .DataTextField("Department")
+                                                          .DataValueField("DeptID")
+                                                          .DataSource(dataSource =>
+                                                          {
+                                                              dataSource.Read(read =>
+                                                              {
+                                                                  read.Action("GetCustomerSiteX", "Service")
+                                                                     .Data("CustomerBranchData");
+                                                              })
+                                                              .ServerFiltering(true);
+                                                          })
+                                                           .AutoBind(false)
+                                                           .CascadeFrom("Customerid")
+                                                           .HtmlAttributes(new { style = "width:300px", data_required_msg = "Customer Site is required." })
+                                                        )
+
+                                                    }
+                                                    else
+                                                    {
+
+                                                        @(Html.Kendo().ComboBoxFor(m => m.DeptID).Placeholder("--Select Customer Site--")
+                                                        .Name("DeptID")
+                                                        .DataTextField("Department")
+                                                        .DataValueField("DeptID")
+                                                        .DataSource(dataSource =>
+                                                        {
+                        dataSource.Read(read =>
+                        {
+                            read.Action("GetCustomerSite", "Service")
+                                .Data("CustomerSiteData");
+                        })
+                        .ServerFiltering(true);
+                    })
+                                                              .BindTo(Model.DeptID)
+
+                                                                //.AutoBind(false)
+                                                                .CascadeFrom("Customerid")
+                                                         .HtmlAttributes(new { style = "width:300px" })
+                                                        )
+                                                    }
+            @if (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin)
+            {
+                                                        <a onclick="OpenSiteWindow();" class="button"><span style="font-weight: bold">Add / Edit</span></a>
+                                                    }
+                                                </td>
+
+                                                <td>Manufacturer
+                                                </td>
+
+                                                <td>
+                                                    @(Html.Kendo().TextBoxFor(m => m.Manufacturer)
+                                                         .Name("Manufacturer")
+                                                         .Enable(false)
+                                                         .HtmlAttributes(new { style = "width: 200px " })
+                                                      )
+                                                </td>
+                                            </tr>*@
+
+                                <tr>
+                                    <td width="70" class="text">
+                                        Location (within Site):
+                                    </td>
+                                    <td>
+                                    </td>
+                                    <td>
+                                        Serial Number :
+                                    </td>
+                                    <td>
+                                        @Html.TextBoxFor(m => m.SerialNo, new { style = "width: 200px " })
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        General Notes :
+                                    </td>
+                                    <td>
+                                        @(Html.TextAreaFor(m => m.GeneralNotes, new { style = "width: 200px;height:70px" }))
+                                    </td>
+                                    <td colspan="2">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td width="140">
+                                                        @MDS.Controllers.LoginController.CompanyName Item Code
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.MDSQNItem, new { style = "width: 200px ", @maxlength = "10" })
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    Customer Item Code
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.CustomerCodeEuip, new { style = "width: 200px ", @maxlength = "10" })
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    Alternative Item Code
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.AlternativeItem, new { style = "width: 200px " })
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text">Branch</td>
+                                <td>
+                                    @Html.DropDownListFor(m => m.Branchid, new SelectList(Model.BranchList, "BranchID", "BranchName"), new { style = "width:150px", data_required_msg = "Branch is required." })
+                            </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <table>
+
+        <tr>
+            <td width="2%">&nbsp;
+            </td>
+            <td width="10%" rowspan="3">
+                @if (ViewBag.AddNew == null)
+                {
+                   <input type="button" class="inputbuttonbg inputbig" value="Cancel / Back" onclick="cancel()" id="btnCancel">
+                }
+                
+            </td>
+           
+           <td width="7%" rowspan="3">
+                <input type="submit" class="inputbuttonbg inputbig" value="Submit" id="btnOK">
+            </td>
+        </tr>
+    </table>
+
+}
+<script type="text/javascript">
+    function cancel() {
+        var BranchID = '@Model.Branchid';
+        var ServiceJobID = '@Model.ServiceJobID';
+        var url = '@Url.Action("Service", "Tech")?BranchID=' + BranchID + '&ServiceJobUID='+ServiceJobID;
+        window.location = url;
+        ;//goto page Tech/Service?BranchID=2&ServiceJobUID=19
+    }
+</script>
+@*<script>
+
+    $("#AddForm").kendoValidator({
+});
+</script>*@
+
+

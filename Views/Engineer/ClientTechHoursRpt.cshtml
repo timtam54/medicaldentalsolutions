@@ -1,0 +1,214 @@
+﻿@model MDS.Models.Rpt
+@{
+    Layout = null;
+}
+    @foreach (var Crg in Model.Charge)
+    {
+        List<MDS.Models.KeyDouble> iddbs = new List<MDS.Models.KeyDouble>();
+        int cs = Model.Engs.Count() + 4;
+<table>
+    <tr>
+        <td>
+            <table border="1">
+                <tr>
+                    <th colspan="@cs">
+                        <h3>@Crg.Text - Billable</h3>
+                    </th>
+                </tr>
+                <tr>
+                    <td width="350px"></td>
+                    @foreach (var ee in Model.Engs)
+                    {
+                        string cliname;
+                        if (ee.Text.Length > 50)
+                        {
+                            cliname = ee.Text.Substring(0, 49);
+                        }
+                        else
+                        {
+                            cliname = ee.Text;
+                        }
+                        <th align="center" style="color:white;background-color:black">
+                            @cliname
+                        </th>
+                    }
+                    <th align="center">
+                        <b>Total</b>
+                    </th>
+                </tr>
+                @foreach (var cc in Model.Cust)
+                {
+                    double tot = 0;
+                    string custname;
+                    if (cc.Text.Length > 50)
+                    {
+                        custname = cc.Text.Substring(0, 49);
+                    }
+                    else
+                    {
+                        custname = cc.Text;
+                    }
+
+                    <tr>
+                        <td align="center">
+                            @custname
+                        </td>
+                        @foreach (var ee in Model.Engs)
+                        {
+                            double ff = MDS.Controllers.EngineerController.Tots(Model.ETC, @cc.Key, @ee.Id, @Crg.Key, false);
+                            tot += ff;
+                            <td align="center">
+                                <a href="" onclick="TechClientCosts('@cc.Key', '@ee.Id', '@Crg.Key',false); return false;">
+                                    @ff.ToString("0.00")
+                                </a>
+                            </td>
+                        }
+                        @{
+                            MDS.Models.KeyDouble iddbp = new MDS.Models.KeyDouble();
+                            iddbp.Key = cc.Key;
+                            iddbp.Double = tot;
+                            iddbs.Add(iddbp);
+
+                        }
+                        <td align="center"><b>@tot.ToString("0.00")</b></td>
+                    </tr>
+                }
+                @{
+                    double gtot = 0;
+                    <tr>
+                        <th align="center"><b>Total</b></th>
+
+                        @foreach (var ee in Model.Engs)
+                        {
+                            double gff = MDS.Controllers.EngineerController.Tots(Model.ETC, "", @ee.Id, @Crg.Key, false);
+                            gtot += gff;
+                            <th align="center">
+                                @gff.ToString("0.00")
+                            </th>
+                        }
+                        @{
+                            MDS.Models.KeyDouble iddb = new MDS.Models.KeyDouble();
+                            iddb.Key = "Total";
+                            iddb.Double = gtot;
+                            iddbs.Add(iddb);
+
+                        }
+                        <th align="center">
+                            <b>@gtot.ToString("0.00")</b>
+                        </th>
+                    </tr>
+                }
+                @if (MDS.Controllers.LoginController.Warranty)
+                {
+                    <tr>
+                        <td align="center"><b>Warranty vs Total</b></td>
+                    </tr>
+                }
+                </table>
+        </td>
+        @if (MDS.Controllers.LoginController.Warranty)
+        {
+        <td>
+            <table border="1">
+                <tr>
+                    <th colspan="@(cs + 1)"><h3>@Crg.Text - Warranty Fix</h3></th>
+
+                </tr>
+                <tr>
+                    @foreach (var ee in Model.Engs)
+                    {
+                        <th align="center" style="color:white;background-color:black">
+                            @ee.Text
+                        </th>
+                    }
+                    <th align="center">
+                        <b>Total</b>
+                    </th>
+                    <th align="center">
+                        <b>Warranty vs Total</b>
+                    </th>
+
+                </tr>
+                @foreach (var cc in Model.Cust)
+                {
+                    double tot = 0;
+            <tr>
+                @foreach (var ee in Model.Engs)
+                {
+                    double ff = MDS.Controllers.EngineerController.Tots(Model.ETC, @cc.Key, @ee.Id, @Crg.Key, true);
+                    tot += ff;
+                    <td align="center">
+                        <a href="" onclick="TechClientCosts('@cc.Key', '@ee.Id', '@Crg.Key',true); return false;">
+                            @ff.ToString("0.00")
+                        </a>
+                    </td>
+                }
+                @{
+                    MDS.Models.KeyDouble iddbt = iddbs.Where(i => i.Key == cc.Key).FirstOrDefault();
+
+                }
+                <td align="center"><b>@tot.ToString("0.00")</b></td>
+                <td align="center"><b>@((tot / (tot + iddbt.Double)).ToString("0.0%"))</b></td>
+            </tr>
+                    }
+                @{
+                    double gtotx = 0;
+                    <tr>
+
+                        @foreach (var ee in Model.Engs)
+                        {
+                            double gff = MDS.Controllers.EngineerController.Tots(Model.ETC, "", @ee.Id, @Crg.Key, true);
+                            gtotx += gff;
+                            <th align="center">
+                                @gff.ToString("0.00")
+                            </th>
+                        }
+                        <th align="center">
+                            <b>@gtotx.ToString("0.00")</b>
+                        </th>
+                        @{ 
+                            MDS.Models.KeyDouble kddd = iddbs.Where(i => i.Key == "Total").FirstOrDefault();
+                        }
+                        <th  align="center"><b>
+                    @((gtotx / (kddd.Double + gtotx)).ToString("0.0%"))
+</b>
+                        </th>
+                    </tr>
+                }
+                @{
+                    double wgtotx = 0;
+                    double wtotx = 0;
+                    <tr>
+
+                        @foreach (var ee in Model.Engs)
+                        {
+                            double gff = MDS.Controllers.EngineerController.Tots(Model.ETC, "", @ee.Id, @Crg.Key, true);
+                            wgtotx += gff;
+                            double wgff = MDS.Controllers.EngineerController.Tots(Model.ETC, "", @ee.Id, @Crg.Key, false);
+                            wtotx += wgff;
+                            double ratio;
+                            if (wgff == 0)
+                            {
+                                ratio = 0;
+                            }
+                            else
+                            {
+                                ratio = (double)gff / (double)(gff + wgff);
+                            }
+                            <th align="center">
+                                @ratio.ToString("0.0%")
+                            </th>
+                        }
+                        <th align="center">
+                            <b>@((wgtotx / wtotx).ToString("0.0%"))</b>
+                        </th>
+                    </tr>
+                }
+
+            </table>
+        </td>
+                    }
+    </tr>
+</table>
+
+}

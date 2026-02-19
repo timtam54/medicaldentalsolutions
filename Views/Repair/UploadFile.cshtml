@@ -1,0 +1,391 @@
+﻿@model MDS.DB.Photo
+
+<script src="https://cdn.webrtc-experiment.com/commits.js"></script>
+<script src="https://cdn.WebRTC-Experiment.com/MediaStreamRecorder.js"></script>
+<script src="https://cdn.WebRTC-Experiment.com/gumadapter.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<style>
+    video, img {
+        max-width: 100%;
+    }
+</style>
+
+@using (Html.BeginForm("UploadFile", "Repair", FormMethod.Post, new { id = "UploadFile", enctype = "multipart/form-data" }))
+{
+    if (ViewBag.Attach_Audio == "Audio")
+    {
+        <h1>Attach Audio File</h1>
+        <button class="btn btn-primary" id="start-recording" onclick="startRecording(); return false;">Recording Start</button>
+        <button class="btn btn-default" id="stop-recording" onclick="stopRecording(); return false;">Stop</button>
+        <button class="btn btn-default" id="save-recording" onclick="saveRecording(); return false;">Save</button>
+        <div id="record-audio"></div>
+        <span id="clicks"></span>
+        <br />
+        <b>Title:</b>
+        @Html.TextBoxFor(i => i.Title, new { @style = "width:600px" })
+    }
+    else if (ViewBag.Attach_Audio == "Photo")
+    {
+        <h1>Attach Photo</h1>
+        <div class="camera" id="cam" style="vertical-align:top">
+            <video id="video" height="800" width="800" style="vertical-align:top">Video stream not available.</video>
+            <button id="startbutton" onclick="takepicture(); return false;" style="vertical-align:top">Take photo</button>
+        </div>
+        <canvas id="canvas">
+        </canvas>
+        <div class="output" id="out" style="vertical-align:top">
+            <img id="photo" alt="The screen capture will appear in this box.">
+            <button id="clearbutton" onclick="clearphoto(); return false;" style="vertical-align:top">Clear photo</button>
+            <button id="savePic" onclick="savePicture(); return false;" style="vertical-align:top">Keep</button>
+        </div>
+    }
+    else
+    {
+        <h1>Select file from folder</h1>
+        <label for="file">Filename (15MB Max):</label>
+        @*<input id="File" type="file" name="File" accept="*/*">*@
+        <input id="File" type="file" name="File" accept="image/*" @*class="btn-gbrmpa"*@>
+        @Html.HiddenFor(m => m.RepairID)
+        @Html.HiddenFor(m => m.ServiceID)
+        @Html.HiddenFor(m => m.BranchID)
+        <span style="text-align: right;" id="btnUploadFile">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="button" style="text-decoration:underline" class="inputbuttonbg inputbig" onclick="SubmitButtonOnclick(); return false;" value="Save" />
+        </span>
+    }
+}
+<script type="text/javascript">
+
+    var ServiceID= '@Model.ServiceID';
+
+    var RepairID = '@Model.RepairID';
+    var BranchID='@Model.BranchID';
+
+    function SubmitButtonOnclick() {
+        try {
+            document.getElementById('btnUploadFile').innerHTML="Uploading";
+        }
+        catch (ex) {
+            ;
+        }
+        try {
+            if (document.getElementById("File").files.length == 0) {
+                alert("Please select a file to upload");
+            }
+            else {
+                //alert('w');
+                var formData = new FormData();
+                var urlu = '@Url.Action("UploadFileSave", "Repair")';
+                var allfile = document.getElementById("File").files[0];
+                formData.append("File", allfile);
+                formData.append("RepairID", RepairID);
+                formData.append("ServiceID", ServiceID);
+                formData.append("BranchID", BranchID);
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", urlu, true);
+                xhr.addEventListener("load", function (evt) { UploadComplete(evt); }, false);
+                xhr.addEventListener("error", function (evt) { UploadFailed(evt); }, false);
+                xhr.send(formData);
+            }
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+    function UploadComplete(evt) {
+        var Response = evt.target.responseText;
+        var Error = Response.replace('{"Error":', '');
+        Error = Error.replace('"}', '');
+        Error = Error.replace('"', '');
+        if (Error != '')
+            alert(Error);
+        alert('file uploaded');
+        document.getElementById('btnUploadFile').innerHTML = "Upload complete";
+
+    }
+
+    function UploadFailed(evt) {
+        alert("There was an error attempting to upload the file.");
+
+    }
+</script>
+
+<script type="text/javascript">
+    // The width and height of the captured photo. We will set the
+    // width to the value defined here, but the height will be
+    // calculated based on the aspect ratio of the input stream.
+
+    var width = 800;// 320;    // We will scale the photo width to this
+    var height = 0;     // This will be computed based on the input stream
+    var streaming = false;
+    var video = null;
+    var canvas = null;
+    var photo = null;
+    var startbutton = null;
+
+    function startup() {
+        try {
+            video = document.getElementById('video');
+            canvas = document.getElementById('canvas');
+            photo = document.getElementById('photo');
+            startbutton = document.getElementById('startbutton');
+            var constraints = {
+                audio: false,
+                video: {
+
+                    facingMode: "environment"
+                }
+            }
+            navigator.mediaDevices.getUserMedia(constraints)
+            //navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+                .then(function (stream) {
+                    video.srcObject = stream;
+                    video.play();
+                })
+                .catch(function (err) {
+                    console.log("An error occurred: " + err);
+                });
+
+            video.addEventListener('canplay', function (ev) {
+                if (!streaming) {
+                    height = video.videoHeight / (video.videoWidth / width);
+
+                    // Firefox currently has a bug where the height can't be read from
+                    // the video, so we will make assumptions if this happens.
+
+                    if (isNaN(height)) {
+                        height = width / (4 / 3);
+                    }
+                    video.setAttribute('width', width);
+                    video.setAttribute('height', height);
+                    canvas.setAttribute('width', width);
+                    canvas.setAttribute('height', height);
+                    streaming = true;
+                }
+            }, false);
+
+            //startbutton.addEventListener('click', function (ev) {
+            //    takepicture();
+            //    ev.preventDefault();
+            //}, false);
+
+            clearphoto();
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+    // Fill the photo with an indication that none has been
+    // captured.
+
+    function clearphoto() {
+        var context = canvas.getContext('2d');
+        context.fillStyle = "#AAA";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        var data = canvas.toDataURL('image/png');
+        photo.setAttribute('src', data);
+        $('#cam').show();
+        $('#canvas').hide();
+        $('#out').hide();
+    }
+
+    // Capture a photo by fetching the current contents of the video
+    // and drawing it into a canvas, then converting that to a PNG
+    // format data URL. By drawing it on an offscreen canvas and then
+    // drawing that to the screen, we can change its size and/or apply
+    // other changes before drawing it.
+
+    function takepicture() {
+        try {
+            var context = canvas.getContext('2d');
+            if (width && height) {
+                canvas.width = width;
+                canvas.height = height;
+                context.drawImage(video, 0, 0, width, height);
+
+                var data = canvas.toDataURL('image/png');
+                photo.setAttribute('src', data);
+
+                $('#cam').hide();
+               // $('#canvas').show();
+                $('#out').show();
+
+
+                //////////////
+
+                 fd = new FormData();
+                 fd.append("blob", data);
+                 fd.append("RepairID", '@Model.RepairID');//,int ,string
+                 fd.append("ServiceID", '@Model.ServiceID');//,int ,string
+                 fd.append("BranchID", '@Model.BranchID');
+                 fd.append("Field", '@Model.Title');
+                /////////////////
+
+            } else {
+                clearphoto();
+            }
+        }
+        catch (ex) {
+            message.show(ex.message);
+        }
+    }
+
+        function savePicture() {
+        try {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/Tech/PicProcess", true);
+            xhr.send(fd);
+            alert('picture saved');
+
+            video.srcObject.stop();
+
+            try {
+                RefreshPhoto();
+                redosignature();
+                div.remove(); div.dialog("close");
+            }
+            catch (ex) {
+                ;
+            }
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    };
+
+
+</script>
+@if (ViewBag.Attach_Audio == "Photo")
+{
+    <script type="text/javascript">
+        // Set up our event listener to run the startup process
+        // once loading is complete.
+        //window.addEventListener('load', startup, false);
+        startup();
+
+    </script>
+}
+<script>
+
+    function captureUserMedia(mediaConstraints, successCallback, errorCallback) {
+        navigator.mediaDevices.getUserMedia(mediaConstraints).then(successCallback).catch(errorCallback);
+    }
+
+    var mediaConstraints = {
+        audio: true
+    };
+
+    function startRecording(idx) {
+        $('#start-recording').disabled = true;
+        audiosContainer = document.getElementById('audios-container');
+        document.getElementById("clicks").innerHTML = "Recording Started";
+
+        var f = document.getElementById('clicks');
+        setInterval(function () {
+            f.style.display = (f.style.display == 'none' ? '' : 'none');
+        }, 1000);
+        captureUserMedia(mediaConstraints, onMediaSuccess, onMediaError);
+    };
+
+    function stopRecording() {
+        $('#stop-recording').disabled = true;
+        document.getElementById("clicks").innerHTML = "Recording Stopped";
+        var f = document.getElementById('clicks');
+        setInterval(function () {
+            f.style.display = (f.style.display == 'none' ? '' : 'none');
+        }, 1000);
+        mediaRecorder.stop();
+        mediaRecorder.stream.stop();
+        $('.start-recording').disabled = false;
+    };
+
+    var fd;
+
+
+    function saveRecording() {
+        try {
+                             fd.append("Field", $('#Title').val());
+
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/Tech/AudioProcess", true);
+            xhr.send(fd);
+            alert('audio saved');
+
+            try {
+                RefreshPhoto();
+                redosignature();
+                div.remove(); div.dialog("close");
+            }
+            catch (ex) {
+                ;
+            }
+
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    };
+
+    var mediaRecorder;
+
+    var URLcreateObjectURL = "";
+    function onMediaSuccess(stream) {
+        try {
+            mediaRecorder = new MediaStreamRecorder(stream);
+            mediaRecorder.stream = stream;
+            mediaRecorder.mimeType = 'audio/wav';
+            mediaRecorder.audioChannels = 1;
+            mediaRecorder.ondataavailable = function (blob) {
+                $('#record-audio').html("<audio controls=''><source src=" + URL.createObjectURL(blob) + "></source></audio>");
+                fd = new FormData();
+                 fd.append("blob", blob);
+                 fd.append("RepairID", '@Model.RepairID');//,int ,string
+                 fd.append("ServiceID", '@Model.ServiceID');//,int ,string
+                 fd.append("BranchID", '@Model.BranchID');
+//                 fd.append("Field", $('#Title').val());
+
+
+
+            };
+
+            var timeInterval = 360 * 1000;
+
+            mediaRecorder.start(timeInterval);
+
+            $('#stop-recording').disabled = false;
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+    function onMediaError(e) {
+        console.error('media error', e);
+    }
+
+    function bytesToSize(bytes) {
+        var k = 1000;
+        var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        if (bytes === 0) return '0 Bytes';
+        var i = parseInt(Math.floor(Math.log(bytes) / Math.log(k)), 10);
+        return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
+    }
+
+    function getTimeLength(milliseconds) {
+        var data = new Date(milliseconds);
+        return data.getUTCHours() + " hours, " + data.getUTCMinutes() + " minutes and " + data.getUTCSeconds() + " second(s)";
+    }
+
+    window.onbeforeunload = function () {
+        $('#start-recording').disabled = false;
+    };
+
+
+
+</script>
+
+

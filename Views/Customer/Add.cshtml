@@ -1,0 +1,466 @@
+﻿@model MDS.Models.CustomerForm
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<div class="breadcrumb">
+     @Html.ActionLink("Home", "Index", "Dashboard")
+    » @Html.ActionLink("Customers", "Index", "Customer")
+
+</div>*@
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+</style>
+<h1>Customer Detail</h1>
+@using (Html.BeginForm("Add", "Customer", FormMethod.Post, new { id = "AddForm" }))
+{
+    @Html.HiddenFor(mbox => mbox.Code)
+
+<div id="box2">
+    <table cellspacing="8" cellpadding="0" width="100%" border="0">
+        <tr>
+            <td colspan="2">
+                @Html.ValidationSummary(true)
+            </td>
+        </tr>
+        <tr>
+            <td width="50%">
+
+                <table width="100%">
+                    @* <tr>
+            <td class="text" colspan="2" style="height: 75px;">All these fields are regularly imported from MYOB - if you edit them here, you should ensure that MYOB is changed as well, otherwise they will be overwritten during next import operation
+            </td>
+        </tr>*@
+                    <tr>
+                        <td class="text">Company/Person Name <span style="color: red;">*</span></td>
+                        <td>
+                            @(Html.Kendo().TextBoxFor(mbox => mbox.CompanyName)
+                                            .Name("CompanyName")
+                                            .HtmlAttributes(new { data_required_msg = "Company Name is required.", required = "required", style = "width: 240px" , @maxlength = "50" })
+                                            )
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="text">Physical address</td>
+                        <td>
+                            @(Html.TextAreaFor(m => m.PhysicalAddress, new { style = "width: 230px;height:100px" , @maxlength = "80"  })
+
+                                                         )
+                        </td>
+                    </tr>
+
+
+                    <script src="https://maps.googleapis.com/maps/api/js?sensor=false&libraries=places&key=AIzaSyAG6a1wcVG4vCjQATf6g1vP9vn5AeRPjTc&v=3.exp"></script>
+
+                    <script type="text/javascript">
+                        google.maps.event.addDomListener(window, 'load', function () {
+                            var options = {
+                                componentRestrictions: { country: "au" }
+                            };
+                            var places = new google.maps.places.Autocomplete(document.getElementById('PhysicalAddress'), options);
+                            google.maps.event.addListener(places, 'place_changed', function () {
+                                var place = places.getPlace();
+                                var address = place.formatted_address;
+                                var latitude = place.geometry.location.lat();
+                                var longitude = place.geometry.location.lng();
+                                var mesg = "Address: " + address;
+                                mesg += "\nLatitude: " + latitude;
+                                mesg += "\nLongitude: " + longitude;
+                                alert(mesg);
+                            });
+                        });
+                    </script>
+
+
+                    <tr>
+                        <td class="text">Email</td>
+                        <td>
+                            @(Html.Kendo().TextBoxFor(mbox => mbox.Email)
+                                            .Name("Email")
+                                            .HtmlAttributes(new { style = "width: 240px"  , @maxlength = "50" })
+                                            )
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text">Phone</td>
+                        <td>
+                            @(Html.Kendo().TextBoxFor(mbox => mbox.Phone1)
+                                            .Name("Phone1")
+                                            .HtmlAttributes(new { style = "width: 240px"  , @maxlength = "20" })
+                                            )
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text">Alt Phone</td>
+                        <td>
+                            @(Html.Kendo().TextBoxFor(mbox => mbox.Phone2)
+                                            .Name("Phone2")
+                                            .HtmlAttributes(new { style = "width: 240px"  , @maxlength = "20" })
+                                            )
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text">Fax</td>
+                        <td>
+                            @(Html.Kendo().TextBoxFor(mbox => mbox.Fax)
+                                            .Name("Fax")
+                                            .HtmlAttributes(new { style = "width: 240px" , @maxlength = "20" })
+                                            )
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text">Contact Name</td>
+                        <td>
+                            @(Html.Kendo().TextBoxFor(mbox => mbox.ContactName)
+                                            .Name("ContactName")
+                                            .HtmlAttributes(new {  style = "width: 240px" , @maxlength = "50" })
+                                            )
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text">Branch</td>
+                        <td>
+                            @(Html.Kendo().DropDownListFor(m => m.Branchid)
+                          .Name("Branchid")
+                          .DataTextField("BranchName")
+                          .DataValueField("BranchID")
+                          .BindTo(Model.BranchList)
+                          .HtmlAttributes(new { style = "width:150px", data_required_msg = "Branch is required." })
+                        )
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text">Notes</td>
+                        <td>
+                            @(Html.TextAreaFor(m => m.Notes, new { style = "width: 240px;height:100px" })
+
+                                                         )
+                        </td>
+                    </tr>
+
+
+                </table>
+            </td>
+            <td width="50%" style="vertical-align: top;">
+
+                <table>
+                    @*  <tr>
+                            <td class="text" colspan="2" style="height: 75px;">These fields are only stored here and will not be overwritten.
+                            </td>
+                        </tr>*@
+                    <tr>
+                        <td class="text">@MDS.Controllers.LoginController.CompanyName Customer Code<span style="color: red;">*</span></td>
+                        @if (Model.NewRec)
+                        {
+                            <td>
+                                @(Html.Kendo().TextBoxFor(mbox => mbox.CustomerCode)
+                                            .Name("CustomerCode")
+                                            .HtmlAttributes(new { data_required_msg = "Customer Code is required.", required = "required", style = "width: 240px", @maxlength = "10" })
+                                            )
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                                @Model.CustomerCode
+                                @Html.HiddenFor(i => i.CustomerCode)
+                            </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td class="text">Postal address</td>
+                        <td>
+                            @(Html.TextAreaFor(m => m.PostalAddress, new { style = "width: 230px;height:100px"  , @maxlength = "80" })
+
+                                                         )
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text">URL</td>
+                        <td>
+                            @(Html.Kendo().TextBoxFor(mbox => mbox.Url)
+                                            .Name("Url")
+                                            .HtmlAttributes(new { style = "width: 240px"  , @maxlength = "50" })
+                                            )
+                        </td>
+                    </tr>
+
+
+
+                    <tr>
+                        <td class="text">Contract Date</td>
+                        <td>
+                            @(Html.Kendo().DatePickerFor(m => m.ContractDate)
+                                                                    .Name("ContractDate")
+                                        .HtmlAttributes(new { style = "width:120px", type = "text" })
+                                                                )
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text">Contract Renewal Date</td>
+                        <td>
+                            @(Html.Kendo().DatePickerFor(m => m.ContractRenewalDate)
+                                                                    .Name("ContractRenewalDate")
+                                      .HtmlAttributes(new { style = "width:120px", type = "text" })
+                                                                )
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text">Stop Supply</td>
+                        <td>@Html.EditorFor(m => m.StopSupply)</td>
+                    </tr>
+                    <tr>
+                        <td class="text">Stop Date</td>
+                        <td>
+                            @(Html.Kendo().DatePickerFor(m => m.StopDate)
+                                                                    .Name("StopDate")
+                                           .HtmlAttributes(new { style = "width:120px", type = "text" })
+                                                                )
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text">Stop By</td>
+                        <td>
+                            @(Html.Kendo().TextBoxFor(mbox => mbox.StoppedBy)
+                                            .Name("StoppedBy")
+                                            .HtmlAttributes(new { style = "width: 240px"  , @maxlength = "50" })
+                                            )
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <div style="background-color:yellow">
+                                <table style="padding:10px">
+                                    <tr style="text-align:center">
+                                        <td colspan="2">
+
+                                            <h2>Customer Login Details</h2>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td class="text">Usernane</td>
+                                        <td>@Model.CustomerCode@MDS.Controllers.LoginController.BranchID(@User.Identity.Name).ToString() </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text">Password</td>
+                                        <td>
+                                            @(Html.Kendo().TextBoxFor(mbox => mbox.OnLinePassword)
+                                            .Name("OnLinePassword")
+                                            .HtmlAttributes(new { style = "width: 240px"  , @maxlength = "50" })
+                                            )
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="text">Login URL Link (bypass login)</td>
+                                        <td><a href="@MDS.Controllers.LoginController.GetSiteRootUrl(Request)?uid=@Model.CustomerCode@MDS.Controllers.LoginController.BranchID(@User.Identity.Name).ToString()&pwd=@(Model.OnLinePassword)">@MDS.Controllers.LoginController.GetSiteRootUrl(Request)?uid=@Model.CustomerCode@MDS.Controllers.LoginController.BranchID(@User.Identity.Name).ToString()&pwd=@(Model.OnLinePassword)</a></td>
+                                        <td><a class="email" title="Email a friend" href="mailto:@Model.Email?subject=Customer%20Login&body=Customer Login:@MDS.Controllers.LoginController.GetSiteRootUrl(Request)?uid=@Model.CustomerCode@MDS.Controllers.LoginController.BranchID(@User.Identity.Name).ToString()%26pwd=@(Model.OnLinePassword)">Email login Link</a></td>
+
+                                    </tr>
+
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+    <table cellspacing="8" cellpadding="0" width="100%" border="0">
+
+        <tr style="width:100%">
+            <td style="width:100%" colspan="2">
+
+                <table width="100%">
+                    <tr style="width:100%">
+                        @if (MDS.Controllers.LoginController.IsAdmin(User.Identity.Name) != MDS.Controllers.ATC.Customer)
+                        {
+                        <td>
+                            <input type="button" class="inputbuttonbg inputbig" value="Cancel" onclick="cancel()">
+                        </td>
+                        if (Model.Code != "")
+                        {
+                            <td>
+                                <input type="button" class="inputbuttonbg inputbig" value="Delete" onclick="DeleteRecord();">
+                            </td>
+                        }
+
+                        <td>
+                            <button onclick="MergeCust(); return false;" class="inputbuttonbg inputbig">Merge</button>
+                        </td>
+                        <td>
+                            <table id="mergeeq">
+                                <tr>
+                                    <td><b>Merge this customer into selected customer (note this customer will be removed):</b></td>
+                                    <td>
+                                        <input onkeyup="autosearch();" type="text" name="YourSearchElementID" id="YourSearchElementID" value="" size="30" maxlength="30" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>
+                                        <div id="searchresults"></div>
+                                    </td>
+                                </tr>
+                            </table>
+                            @*<input type="button" onclick="autosearch();" value="Search" />*@
+                        </td>
+                        }
+                        <td>
+                            <input type="button" class="inputbuttonbg inputbig" onclick="$('#AddForm').submit();" value="Save">
+                        </td>
+
+                    </tr>
+                </table>
+
+            </td>
+        </tr>
+    </table>
+</div>
+}
+<script>
+
+    $("#AddForm").kendoValidator({
+    });
+</script>
+<script type="text/javascript">
+
+    function MergeCust() {
+        $('#mergeeq').show();
+        //alert('MergeEquip();');
+    }
+
+    $('#mergeeq').hide();
+
+
+    function selectx(num) {
+        try {
+            $("#searchresults").hide();
+            var res = num.split("~");
+            var id=res[0];
+            var nme=res[1];
+            var ths='@Model.CompanyName';
+            var tg = '@Model.CustomerCode';
+            if (confirm('Are you sure you wish to merge this item of equipment '+ths+' into '+nme+' (note this item will be removed)?')) {
+                var data = { SourceID: id, TargetID: tg }
+            $.post('@Url.Action("MergeCust", "Customer")', data,
+                function (data) {
+                    if (data.Success == 'true') {
+                        alert('Merge successful:' + data.message);
+                         window.location.href = '@Url.Action("Index", "Customer")';
+                    }
+                    else
+                        alert('Could not Merge: '+data.Error);
+                }
+                , 'json');
+            }
+        }
+        catch (ex) {
+            alert('Error:'+ex.message);
+        }
+        return false;
+    }
+
+    function autosearch()
+    {
+        try {
+            $("#searchresults").hide();
+            var searchString =  $('#YourSearchElementID').val();// $(this).val(); //Get the value from this TextBox
+            if (searchString == '') return;
+            var CustomerCode = '@Model.Code';
+            var data = { Prefix: searchString, CustomerCode: CustomerCode }
+            $.post('@Url.Action("SearchCust", "Customer")', data,
+                function (data) {
+
+                if (data.results == null)
+                    alert('no results');
+                else {
+                    var divstring = '';
+                    divstring = ''
+                    for (var i = 0; i < data.results.length; i++) {
+                        divstring = divstring + "<a id='" + data.results[i].Key + "' href='' onclick='selectx(\"" + data.results[i].Key + "~" + data.results[i].Name + "\");return false;'>" + data.results[i].Name + "</a><br/>"
+                    }
+                    $("#searchresults").show();
+                    $("#searchresults").html(divstring);
+                }
+            });
+        }
+        catch(ex)
+        {
+            alert(ex.message);
+        }
+    }
+
+
+
+    var somethingChanged = false;
+    $(document).ready(function () {
+        $('input').change(function () {
+            somethingChanged = true;
+        });
+        $('textarea').change(function () {
+            somethingChanged = true;
+        });
+    });
+
+
+    function cancel() {
+        if (somethingChanged) {
+            var r = confirm("Do you wish to discard any changes you have made?");
+            if (r) {
+                window.location.href = '@Url.Action("Index", "Customer")';
+            }
+        }
+        else {
+            window.location.href = '@Url.Action("Index", "Customer")';
+        }
+    }
+
+</script>
+@if (Model.Code != null)
+{
+<script type="text/javascript">
+        function DeleteRecord() {
+
+            var r = confirm("Do you wish to delete this record?");
+        if (r) {
+
+
+            var data = { id: '@Model.Code.ToString()' };
+        $.post('@Url.Action("DeleteRecord", "Customer")', data,
+            function (data) {
+                if (data.Error == '') {
+                    alert('Record Deleted')
+                window.location.href = '@Url.Action("Index", "Customer")';
+                }
+                else
+                    alert(data.Error);
+            }
+            , 'json');
+
+
+            }
+
+    }
+
+</script>
+}
+<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>

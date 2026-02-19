@@ -1,0 +1,121 @@
+﻿@model MDS.Models.ServiceSearch
+
+<div class="contact-info">
+        <div class="content">
+            <table>
+                <tr>
+                    <td width="60">Engineer:
+                    </td>
+                    <td>@(Html.Kendo().DropDownListFor(m => m.EngineerID)
+                            .Name("EngineerID")
+                            .Filter("startswith")
+                            .DataTextField("EngineerName")
+                            .DataValueField("EngineerID")
+                              .BindTo(Model.EngineerList)
+                              .HtmlAttributes(new { style = "width:170px", data_required_msg = "Engineer is required." })
+                            )
+
+                    </td>
+                    <td width="60">Customer:
+                    </td>
+                    <td>@(Html.Kendo().DropDownListFor(m => m.Customerid)
+                          .Name("Customerid")
+                          .DataTextField("CompanyName")
+                          .DataValueField("CustomerCode")
+                          .BindTo(Model.CustomerList)
+                        .Filter(MDS.Controllers.LoginController.SearchType)
+                          .HtmlAttributes(new { style = "width:250px", data_required_msg = "Customer is required." })
+                        )
+
+                    </td>
+                    <td width="100"> Customer-Site:
+                    </td>
+                    <td>@(Html.Kendo().DropDownListFor(m => m.Department)
+                          .Name("Department")
+                   
+                          .DataTextField("Department")
+                            .DataValueField("CustomerCode")
+                          .DataSource(dataSource =>
+                                  {
+                                      dataSource.Read(read =>
+                                      {
+                                          read.Action("GetCustomerSiteX", "Service")
+                                             .Data("CustomerSiteData");
+                                      })
+                                      .ServerFiltering(true);
+                                  })
+                                 // .Enable(false)
+                                  .AutoBind(false)
+                                 .CascadeFrom("Customerid")
+                          .HtmlAttributes(new { style = "width:200px", data_required_msg = "Customer Site is required." })
+                        )
+                    </td>
+                </tr>
+                <tr>
+                    <td>Date In :
+                    </td>
+                    <td>@(Html.Kendo().DatePickerFor(m => m.FromDate)
+                    .Name("FromDate")
+                    .Value(DateTime.Today)
+                    .Format("dd/MM/yyyy")
+                    .ParseFormats(new string[] { "dd/MM/yyyy" })
+                        .HtmlAttributes(new { required = "required", type = "text", data_required_msg = "Date In is required." })
+                    )
+                    </td>
+                    <td>Date Out :
+                    </td>
+                    <td>@(Html.Kendo().DatePickerFor(m => m.ToDate)
+                    .Name("ToDate")
+                    .Value(DateTime.Today)
+                    .Format("dd/MM/yyyy")
+                        .HtmlAttributes(new { required = "required", type = "text", data_required_msg = "Date Out is required." })
+                    )
+                       
+                    </td>
+                    <td> Branch:
+                    </td>
+                    <td>@(Html.Kendo().DropDownListFor(m => m.Branchid)
+                          .Name("Branchid")
+                          .DataTextField("BranchName")
+                          .Filter("startswith")
+                          .DataValueField("BranchID")
+                          .BindTo(Model.BranchList)
+                          .HtmlAttributes(new { style = "width:170px", data_required_msg = "Branch is required." })
+                        )
+
+                         <a class="button" onclick="$('#svForm').submit();"><span>Search</span></a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="6">&nbsp;
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6">
+                        @(Html.Kendo().Grid(Model.Service)
+.Name("svGrid")
+.Columns(columns =>
+{
+    columns.Bound(p => p.JobCode).Title("Job No").ClientTemplate(@Html.ActionLink("#=JobCode#", "Edit", new { id = "#=ServiceJobUID#" }).ToHtmlString());
+    columns.Bound(p => p.Customer).Title("Customer");
+    columns.Bound(p => p.CustomerSite).Title("Customer Site");
+    columns.Bound(p => p.DateProgrammed).Title("Date Programmed");
+    columns.Bound(p => p.DateStart).Title("Date Start");
+    columns.Bound(p => p.EngineerName).Title("Engineer Name");
+})
+.Pageable()
+.Sortable()
+.Filterable()
+ .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+        .ServerOperation(false)
+     )
+)
+                    </td>
+                </tr>
+                
+            </table>
+        </div>
+    </div>

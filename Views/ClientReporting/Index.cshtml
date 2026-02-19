@@ -1,0 +1,77 @@
+﻿@model MDS.Models.ClientReportingSearch
+@{
+    ViewBag.Title = "Equipment Type & Test Scripts - Search";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<div class="breadcrumb">
+     @Html.ActionLink("Home", "Index", "Dashboard")
+    » @Html.ActionLink("Equipment Type and Test Script", "Index", "EquipType")
+</div>*@
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+
+    #rpGrid tbody tr:hover {
+        cursor: pointer !important;
+    }
+</style>
+
+<h1>Client Reporting</h1>
+
+@using (Html.BeginForm("Index", "ClientReporting", FormMethod.Post, new { id = "brForm" }))
+{
+     
+    <div class="contact-info">
+        <div class="content">
+            <table width="100%">
+                <tr>
+                    <td colspan="6">
+                        <input type="button" class="inputbuttonbg inputbig" value="Add New Client Reporting" onclick="add()">
+                    </td>
+
+                </tr>
+                <tr>
+                    <td colspan="6">
+                        @(Html.Kendo().Grid(Model.LoginList)
+.Name("brGrid")
+.Columns(columns =>
+{
+    columns.Bound(p => p.UserName).Title("UserName").ClientTemplate(@Html.ActionLink("#=UserName#", "Edit", new { id = "#=UserName#" }).ToHtmlString());
+    columns.Bound(p => p.Password).Title("Password");
+    columns.Bound(p => p.Customer).Title("Customer");
+})
+.Pageable()
+.Sortable()
+.Filterable()
+.Selectable(s => s.Mode(GridSelectionMode.Single))
+.DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(200)
+        .ServerOperation(false)
+     )
+)
+                    </td>
+                </tr>
+                
+            </table>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+
+    function add() {
+        var popup = '@Model.PopUp';
+
+        if (popup == "True") {
+            var url = '@Url.Action("AddPopUp", "ClientReporting")';
+            window.location.href = url;
+        }
+        else {
+            window.location.href = '@Url.Action("Add", "ClientReporting")';
+        }
+    }
+
+</script>

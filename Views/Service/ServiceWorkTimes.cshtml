@@ -1,0 +1,106 @@
+﻿@model List<MDS.Models.ServiceWorkTime>
+@{
+    ViewBag.Title = "Start End Time";
+}
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+@*<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>*@
+@*<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>*@
+
+@using (Html.BeginForm("ServiceWorkTimes", "Service", FormMethod.Post, new { id = "ServiceWorkTimes" }))
+{
+    <table width="100%" border="1">
+        <tr width="100%">
+            <th>
+                Engineer
+            </th>
+            <th>
+                Start Time
+            </th>
+            <th>
+                End Time
+            </th>
+            <th>
+                Manual
+            </th>
+            <th>
+                Charge Type
+            </th>
+            <th>
+                Total Hours
+            </th>
+
+            @if (MDS.Controllers.LoginController.IsAdmin(User.Identity.Name) != MDS.Controllers.ATC.Customer)
+            {
+
+                <th align="center">
+                    <a href="" onclick="AddEngTime();return false"><img src="~/Images/Add.png" title="Add Tech Actual Start / End Time" height="20" width="20" /></a>
+                </th>
+            }
+        </tr>
+        @foreach (MDS.Models.ServiceWorkTime item in Model)
+        {
+    <tr>
+        <td align="center">
+            <a href="" onclick="EditEngTime('@item.EngineerID', '@item.StartTime.Value.ToString("yyyy/MM/dd")','@item.StartTime.Value.ToString("HH:mm:ss")');return false">@item.Engineer</a>
+        </td>
+        <td align="center">
+            @item.StartTime.Value.ToString("dd/MM/yyyy HH:mm:ss")
+        </td>
+        @if (@item.EndTime == null)
+        {
+            <td align="center">
+                Active
+            </td>
+        }
+        else
+        {
+            <td align="center">
+                @Convert.ToDateTime(item.EndTime).ToString("HH:mm:ss")
+            </td>
+        }
+        @if (@item.ManualTime)
+        {
+            <td align="center">
+                Yes
+            </td>
+        }
+        else
+        {
+            <td align="center">
+                No
+            </td>
+
+        }
+        <td align="center">
+            @item.ChargeType
+        </td>
+
+
+        @if (@item.EndTime == null)
+        {
+            <td align="center">
+                
+            </td>
+        }
+        else
+        {
+            <td align="center">
+                @(item.EndTime.Value.Subtract(item.StartTime.Value).TotalMinutes/60)
+            </td>
+        }
+
+
+        @if (MDS.Controllers.LoginController.IsAdmin(User.Identity.Name) != MDS.Controllers.ATC.Customer)
+        {
+
+            <td align="center">
+                <a href="" onclick="TimeEngDelete('@item.EngineerID','@item.StartTime');return false;"><img src="~/Images/Delete.png" height="20" width="20" /></a>
+            </td>
+        }
+    </tr>
+        }
+    </table>
+
+}

@@ -1,0 +1,115 @@
+﻿@model MDS.Models.AuditSelect
+@{
+    ViewBag.Title = "Branch";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    function PDFAuditDetailBranch(BranchName) {
+        var Period = $('#Period').val();
+        window.location.href = "/Login/PDFAuditDetailBranch" + '?BranchName=' + BranchName + '&Period=' + Period;
+    }
+    function PDFAuditDetail() {
+        var Period = $('#Period').val();
+        window.location.href = '/Login/PDFAuditDetail' + '?Period=' + Period;
+    }
+
+    function PDFReportUserDetails(UserEmail) {
+        var Period = $('#Period').val();
+        window.location.href = '/Login/PDFReportUserDetails' + '?UserEmail=' + UserEmail + '&Period=' + Period;
+    }
+
+    function PDFReportUser(UserEmail) {
+        var Period = $('#Period').val();
+        window.location.href = '/Login/PDFReportUser' + '?UserEmail=' + UserEmail + '&Period=' + Period;
+    }
+
+    function PDFReportBranch(BranchName) {
+        var Period = $('#Period').val();
+        window.location.href = "/Login/PDFReportBranch" + '?BranchName=' + BranchName + '&Period=' + Period;
+    }
+
+
+    function PDFReport() {
+        var Period = $('#Period').val();
+        window.location.href = "/Login/PDFReport" + '?Period=' + Period;
+    }
+</script>
+@using (Html.BeginForm("Audit", "Login", FormMethod.Post, new { id = "Audit" }))
+{
+<div id="box2">
+    <table>
+        <tr>
+            <td>Period</td>
+            <td>
+                <select id="Period">
+                    <option value="1">Last 2 days</option>
+                    <option value="2">last 7 days</option>
+                    <option value="3">Last 24 hours</option>
+                    <option value="4">Last 4 weeks</option>
+                </select>
+            </td>
+            <td>
+                @Html.ActionLink("ClearAudit", "ClearAudit")
+                
+            </td>
+        </tr>
+    </table>
+    <table style="text-align:center;font-size:16px;" align="center" border="1">
+        <tr>
+            <td>
+                <b>
+                    Summary Chart:
+                </b>
+            </td>
+            <td>
+                <b>
+                    Full Detail Table
+                </b>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <a onclick="PDFReport();" target="_blank">All</a>
+            </td>
+
+            <td>
+                <a target="_blank" onclick="PDFAuditDetail();">All</a>
+
+            </td>
+        </tr>
+        @foreach (MDS.DB.Branch item in Model.branches)
+        {
+            <tr>
+                <td>
+                    <a target="_blank" onclick="PDFReportBranch('@item.BranchName');">@item.BranchName</a>
+
+                </td>
+
+                <td>
+                    <a target="_blank" onclick="PDFAuditDetailBranch('@item.BranchName');">@item.BranchName</a>
+                </td>
+            </tr>
+        }
+
+
+
+        @foreach (var Emails in Model.users)
+        {
+            <tr>
+                <td>
+                    <a target="_blank" onclick="PDFReportUser('@Emails');">@Emails</a>
+
+                </td>
+                <td>
+                    <a target="_blank" onclick="PDFReportUserDetails('@Emails');">@Emails</a>
+
+                </td>
+
+            </tr>
+        }
+
+    </table>
+</div>
+}
+

@@ -1,0 +1,203 @@
+﻿@model MDS.DB.RepairPart
+@{
+    ViewBag.Title = "Add";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<h1>Parts Detail</h1>
+@using (Html.BeginForm("CreateParts", "Repairs", FormMethod.Post, new { id = "CreateParts" }))
+{
+    @Html.HiddenFor(mbox => mbox.RepairOrServiceUID)
+    @Html.HiddenFor(mbox => mbox.BranchID)
+    @Html.HiddenFor(m=>m.RepairPartId)
+    <input id="hdPopUp" type="hidden" />
+    <div id="box2">
+        <table cellspacing="8" cellpadding="0" width="100%" border="0">
+            <tr>
+                <td colspan="2">
+                    @Html.ValidationSummary(true)
+                </td>
+            </tr>
+            </table>
+        <table>
+
+            <tr>
+                <td>
+                    <h5>Search</h5>
+                </td>
+                <td>
+                    <input onkeyup="autosearch();" type="text" name="YourSearchElementID" id="YourSearchElementID" value="" size="30" maxlength="30" /><input type="button" @*onclick="autosearch();"*@ value="Search" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" id="results">
+                    <b>Results</b><br />
+                    <div id="searchresults">
+
+                    </div>
+
+                </td>
+
+            </tr>
+        </table>
+
+        <table>
+            @*<tr>
+                <td>
+                    <b>Part ID</b>
+                </td>
+                <td>
+                    @Html.DisplayFor(m => m.PartID)
+                </td>
+            </tr>*@
+            @Html.HiddenFor(m => m.PartID)
+
+            <tr>
+                <td>
+                    <b>Part Number</b>
+                </td>
+                <td>
+                    @Html.EditorFor(m => m.PartNumber)
+                    @Html.ValidationMessageFor(m => m.PartNumber)
+                </td>
+            </tr>
+            <tr>
+
+                <td>
+                    <b>Part Name</b>
+                </td>
+                <td>
+                    @Html.EditorFor(m => m.PartDesc)
+                    @Html.ValidationMessageFor(m => m.PartDesc)
+                </td>
+            </tr>
+            <tr>
+
+                <td>
+                    <b>Qty</b>
+                </td>
+                <td>
+                    @Html.TextBoxFor(m => m.NumberUsed, new { @onblur = "TotalPrice();" })
+                    @Html.ValidationMessageFor(m => m.NumberUsed)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <b>Price Each</b>
+                </td>
+                <td>
+                    @Html.TextBoxFor(m => m.CostPerUnit, null, new { @onkeyup = "TotalPrice();" })
+                    @Html.ValidationMessageFor(m => m.CostPerUnit)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <b>Total</b>
+                </td>
+                <td>
+                    <label id="TotalCost">.</label>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <button value="Save" onclick="CreatePartsSave(); return false;">Save</button>
+                </td>
+            </tr>
+        </table>
+</div>
+    <script type="text/javascript">
+        TotalPrice();
+        function TotalPrice() {
+            var Qty = $('#NumberUsed').val();
+            var UnitCost = $('#CostPerUnit').val();
+            var total = parseFloat(Qty) * parseFloat(UnitCost);
+            //alert(total);
+            var totalstring = '$'+total.toString()
+            $('#TotalCost').html(totalstring);
+        }
+        function autosearch() {
+            $('#results').show();
+            try {
+                var BranchID =@Model.BranchID;
+                var searchString = $('#YourSearchElementID').val();// $(this).val(); //Get the value from this TextBox
+                var data = { searchString: searchString, BranchID: BranchID };
+                $.post('@Url.Action("PartSearch","Tech")', data,
+                    function (data) {
+                        if (data.results == null)
+                            alert('no results');
+                        else {
+                            var divstring = '';
+                            divstring = ''
+                            for (var i = 0; i < data.results.length; i++) {
+                                divstring = divstring + "<a id='" + data.results[i].ID + "' href='' onclick='selectx(" + data.results[i].ID + ");return false;'>" + data.results[i].ItemNo + "~" + data.results[i].Descrip + "~" + data.results[i].Price + "</a><br/>"
+                            }
+                            $("#searchresults").html(divstring);
+                        }
+                    });
+            }
+            catch (ex) {
+                alert(ex.message);
+            }
+        }
+
+        function selectx(num) {
+        try {
+            var desc = document.getElementById(num).innerText;
+            //alert(desc);
+            $('#PartID').val(num);
+            var parts=desc.split("~")
+            $('#PartNumber').val(parts[0]);
+            $('#PartDesc').val(parts[1]);
+            $('#CostPerUnit').val(parts[2]);
+            $('#results').hide();
+            TotalPrice();
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+        return false;
+    }
+
+
+    $('#results').hide();
+
+
+        function CreatePartsSave() {
+            try {
+                var myData = $('#CreateParts')
+                try {
+                    var xxx = myData.valid();
+                    if (!xxx) {
+                        alert('form is not valid');
+                        return;
+                    }
+                }
+                catch (ex) {
+                    ;
+                }
+                $.post('@Url.Action("CreatePartsSave","Tech")', myData.serialize(),
+                    function (data) {
+                        if (data.Error == '') {
+                            try {
+                                closeDiv();
+                                $("#dialog").remove();
+                                RefreshParts();
+                            }
+                            catch (ex) {
+                                alert(ex.message);
+                            }
+                        }
+                        else
+                            alert(data.Error);
+                    }
+                    , 'json');
+            }
+            catch (ex) {
+                alert(ex.message);
+            }
+
+        }
+
+    </script>
+}

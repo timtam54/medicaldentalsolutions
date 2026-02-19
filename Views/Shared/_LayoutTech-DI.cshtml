@@ -1,0 +1,193 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Dental Installations</title>
+
+    <script src="http://code.jquery.com/jquery-migrate-1.0.0.js"></script>
+
+    <script src="@Url.Content("~/Scripts/superfish.js")"></script>
+    <link href="@Url.Content("~/CSS/stylesheet.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/SweetMaster/sweet-alert.min.js")"></script>
+
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,300' rel='stylesheet' type='text/css'>
+    <style type="text/css">
+        .validation-summary-errors {
+            background-color: #D9FFB2;
+            border: 1px solid #5CBA30;
+            width: 95%;
+            margin: 0 auto;
+        }
+
+        span.validation-summary-errors {
+            border-bottom-color: #D9FFB2;
+            display: block;
+        }
+
+        ul.validation-summary-errors {
+            margin: 0;
+            padding: 0;
+            border-top: none;
+        }
+        div.k-window {
+            border-color:#083f88 !important;
+            border-width:7px !important;
+        }
+    </style>
+    <script language="javascript" type="text/javascript">
+
+        //$(document).ready(function () {
+        //    //$("#NotificationBox").fadeIn(1000);
+        //    //if ($("#NotificationAutoHide").val() == "true") {
+        //    //    //$("#NotificationBox").delay(3000).fadeOut(2000);
+        //    //    $("#NotificationBox").delay(5000).slideUp(1000);
+        //    //}
+
+        //});
+        @*var myWindow;
+        function openCenteredWindow(url) {
+            var width = 800;
+            var height = 600;
+            var left = parseInt((screen.availWidth / 2) - (screen.availHeight / 2));
+            var top = parseInt((screen.availHeight / 2) - (screen.availHeight / 2));
+            //var top = 0;
+            //alert(left);
+            var windowFeatures = "width=" + (screen.availWidth - 80) + ",height=" + (screen.availHeight - 80) + ",status,resizable,scrollbars=0,left=40,top=40";
+            myWindow = window.open(url, "subWind", windowFeatures);
+        };
+        function ShowAlert(errormsg) {
+            swal({ title: "Error!", text: errormsg, type: "error", confirmButtonText: "OK" });
+        }
+        function ShowWarning(errormsg) {
+            swal({ title: "", text: errormsg, type: "warning", confirmButtonText: "OK" });
+        }
+        function ShowSuccess(errormsg) {
+            swal({
+                title: "Successfully Saved Information",
+                text: errormsg,
+                imageUrl: "@Url.Action("../images/1426251824_tick.png")"
+            });
+        }*@
+    </script>
+</head>
+
+<body>
+
+    <div id="divProgress" style="display: none">
+        <div align="center" style="width: 100%; position: fixed; z-index: 100001; top: 0px; left: 0px; vertical-align: middle; text-align: center; _height: expression(document.body.offsetHeight + 'px');">
+            <div style="margin-top: 250px">
+                <img id="imgloading" src="@Url.Action("../images/loading.gif")" />
+            </div>
+        </div>
+        <div id="backgroundElement" style="position: fixed; left: 0px; top: 0px; z-index: 10000; width: 100%; height: 1800px; background-color: #666666; opacity: 0.4; filter: alpha(opacity=40);"></div>
+    </div>
+    <div id="container-all">
+        <div id="container-header">
+            <div id="header" class="clearfloat">
+                <div id="logo">
+                    <a href="/">
+                        <img alt="Dental Installations" title="Dental Installations" class="logo-image" src="@Url.Action("../images/DILogo.png")">
+                    </a>
+                </div>
+                <div id="menu-container">
+                    <div class="clearfloat" id="menu">
+                        @if (@User.Identity.IsAuthenticated)
+                        {
+                            int id = 0;
+                            {
+                        <ul class="sf-js-enabled" style="display: block;">
+                            <li>
+                                @Html.ActionLink("Dashboard", "Dashboard", "Tech")
+                            </li>
+                            <li>
+                                @Html.ActionLink("Diary", "TechScheduler", "Dashboard",new { EngineerID=MDS.Controllers.LoginController.EngineerID(User.Identity.Name)},null)
+                            </li>
+
+                            <li class="">
+                                @Html.ActionLink("Repair", "RepairSearch", "Tech")
+                            </li>
+
+
+                            <li class="">
+                                @Html.ActionLink("Service", "ServiceSearch", "Tech")
+                                @if (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin)
+                                {
+
+                                    <ul style="visibility: hidden; display: none;">
+                                        <li>
+                                            @Html.ActionLink("Search", "Index", "Service")
+                                        </li>
+                                        <li>
+                                            @Html.ActionLink("Add New Service", "Add", "Service")
+                                        </li>
+                                    </ul>
+                                }
+                            </li>
+                        </ul>
+
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="links">
+                    @if (@User.Identity.IsAuthenticated)
+                    {
+                        int id = 0;
+                        if (Int32.TryParse(MDS.Controllers.LoginController.BranchID(@User.Identity.Name).ToString(), out id))
+                        {
+                            Html.RenderAction("Details", "Login");
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+
+        <div class="position-header"></div>
+        <div id="container" class="clearfloat">
+            <div id="notification"></div>
+            <div id="content">
+                @if (TempData["Notification"] != null)
+                {
+                    <script type="text/javascript"> ShowSuccess('@TempData["Notification"]'); </script>
+                }
+                @RenderBody()
+            </div>
+            <div class="position-footer">
+            </div>
+        </div>
+        <div id="footer-container">
+            <div class="clearfloat" id="footer-links">
+                <div id="powered">
+                    <a href="~/Mobile/TechLogin">Dental Installations &copy; 2020</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+@*<script type="text/javascript">
+    $(document).ready(function () {
+        kendo.culture("en-AU");
+    });
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#menu > ul').superfish({
+            hoverClass: 'sfHover',
+            pathClass: 'overideThisToUse',
+            delay: 0,
+            animation: { height: 'show' },
+            speed: 'normal',
+            autoArrows: false,
+            dropShadows: false,
+            disableHI: false, /* set to true to disable hoverIntent detection */
+            onInit: function () { },
+            onBeforeShow: function () { },
+            onShow: function () { },
+            onHide: function () { }
+        });
+
+        $('#menu > ul').css('display', 'block');
+    });
+</script>*@

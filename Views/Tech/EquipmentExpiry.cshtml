@@ -1,0 +1,244 @@
+﻿@model MDS.Models.EquipExpiryHeader
+@{
+    ViewBag.Title = "Equipment Warranty Expiry";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
+
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+
+    #rpGrid tbody tr:hover {
+        cursor: pointer !important;
+        cursor: pointer !important;
+    }
+</style>
+<h1>Equipment Warranty Expiry</h1>
+@using (Html.BeginForm("EquipmentExpiry", "Tech", FormMethod.Post, new { id = "EquipmentExpiry" }))
+{
+    <div id="DatePickerDialog" title="Select Programmed Date">
+        <table>
+            <tr>
+                <td>
+                    <b>Programmed Date</b>
+                </td>
+                <td>
+                    @Html.EditorFor(i => i.ProgrammedDate)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <b>Start Time</b>
+                </td>
+                <td>
+                    @Html.EditorFor(i => i.ProgrammedStartTime)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <b>End Time</b>
+                </td>
+                <td>
+                    @Html.EditorFor(i => i.ProgrammedEndTime)
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2">
+                    <input type="button" value="Create" onclick="CreateServiceJobExpiry();" />
+                </td>
+            </tr>
+        </table>
+    </div>
+    <table>
+        <tr>
+            <td>
+                <b>From Date</b>
+            </td>
+            <td>
+                @Html.EditorFor(i => i.FromDate)
+            </td>
+            <td>
+                <b>To Date</b>
+            </td>
+            <td>
+                @Html.EditorFor(i => i.ToDate)
+            </td>
+            @Html.HiddenFor(i => i.BranchID)
+            <td>
+                <input type="submit" value="Search" />
+            </td>
+        </tr>
+    </table>
+    <div class="contact-info">
+        <div class="content">
+            <table style="width:100%" cellspacing="0" cellpadding="2">
+                <tr style="background-color:lightgray;width:100%" align="center">
+                    <th rowspan="2">Customer</th>
+                    <th rowspan="2">Equip Code</th>
+                    <th rowspan="2">Equip Serial No</th>
+                    <th rowspan="2">Model</th>
+                    <th rowspan="2">Type</th>
+                    <th rowspan="2">Warranty Expiry Date</th>
+                    <th colspan="3">Last Service Job</th>
+                    <th rowspan="2"></th>
+                </tr>
+                <tr style="background-color:lightgray;width:100%" align="center">
+                    <th>Job No</th>
+                    <th>Programmed</th>
+                    <th>Complete</th>
+                </tr>
+                @{
+                    int ii = 0;
+                }
+                @foreach (MDS.Models.EquipExpiry item in Model.Results)
+                {
+                    if (ii == 1)
+                    {
+                        ii = 0;
+                    }
+                    else
+                    {
+                        ii++;
+                    }
+                    @*<tr style="background-color:@MDS.Controllers.TechController.Colour(ii);width:100%" align="center">*@
+                    <tr style="background-color:@((item.ServiceJobComplete==true)?"LightOrange":"LightGreen");width:100%" align="center">
+                        <td>@item.Customer</td>
+                        <td>@item.BNQItemCode</td>
+                        <td>@item.SerialNumber</td>
+                        <td>@item.Model</td>
+                        <td>@item.Type</td>
+                        <td>@item.WarrantyExpirationDate.ToString("dd/MM/yyyy")</td>
+                        @if (item.ServiceJobID == null)
+                        {
+                            <td></td>
+                        }
+                        else
+                        {
+                            <td>@Html.ActionLink(item.ServiceJobNo, "Edit", "Service", new { id = item.ServiceJobID }, null) </td>
+                        }
+                        @if (item.ServiceJobProgrammed == null)
+                        {
+                            <td></td>
+                        }
+                        else
+                        {
+                            <td>@Convert.ToDateTime(item.ServiceJobProgrammed).ToString("dd/MM/yyyy")</td>
+                        }
+                        @if (item.ServiceJobComplete != false)
+                        {
+                            <td>Yes</td>
+                            <td>
+                                <a href="" onclick="ProgrammedDateDialog('@item.EquipID', '@item.CustomerCode'); return false;">Create Service Job</a>
+                            </td>
+                        }
+                        else
+                        {
+                            <td>No</td>
+                            <td>awaiting service</td>
+                        }
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+
+    var DatePickerDialog = $('#DatePickerDialog');
+    DatePickerDialog.hide();
+
+    var EquipID ;
+    var CustomerCode;
+
+    function ProgrammedDateDialog(_EquipID, _CustomerCode) {
+        EquipID = _EquipID;
+        CustomerCode = _CustomerCode;
+        DatePickerDialog.show();
+        DatePickerDialog.dialog({
+            closeOnEscape: false,
+            modal: true,
+            resizable: false,
+            width: 400,
+            height: 300,
+            title: "Programmed Date",
+            buttons: {
+                Close: function () {
+                    div.remove(); div.dialog("close");
+                }
+            },
+        });
+    }
+
+    function CreateServiceJobExpiry() {
+        try {
+            var ProgrammedDate = $('#ProgrammedDate').val();
+            if (ProgrammedDate == null) {
+                alert('enter date');
+                return;
+            }
+            var ProgrammedStartTime = $('#ProgrammedStartTime').val();
+            if ((ProgrammedStartTime == null) || (ProgrammedStartTime == '')) {
+                alert('enter start time');
+                return;
+            }
+            //alert(ProgrammedStartTime);
+            var ProgrammedEndTime = $('#ProgrammedEndTime').val();
+            if ((ProgrammedEndTime == null) || (ProgrammedEndTime=='')) {
+                alert('enter end time');
+                return;
+            }
+            window.location = '@Url.Action("CreateServiceJobExpiry", "ServiceJob")' + '?EquipID=' + EquipID + '&CustomerCode=' + CustomerCode + '&ProgrammedDate=' + ProgrammedDate + '&ProgrammedStartTime=' + ProgrammedStartTime + '&ProgrammedEndTime=' + ProgrammedEndTime;
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+</script>
+
+
+@*<script type="text/javascript">
+
+        function popup(a) {
+            try {
+                var div2 = $('#div2');
+                div2.dialog({
+                    closeOnEscape: false,
+                    open: function (event, ui) {
+                        $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    },
+                    modal: true,
+                    buttons: {
+                        Close: function () {
+                            //$("#dialog").dialog("close");
+                            div2.dialog("close");
+                        }
+                    },
+                    resizable: false,
+
+                    width: 500,
+                    height: 425,
+                    title: "Help",
+                });
+                var theDialog = div2;//$("#dialog");
+                theDialog.html('<p style="font-size:11pt;font-family:Arial;">' + a + '</p>');
+                theDialog.dialog("open");
+                theDialog.width = 1000;
+            }
+            catch (ex) {
+                alert('bb' + ex.message);
+            }
+            return false;
+        }
+    </script>*@
+
+
+

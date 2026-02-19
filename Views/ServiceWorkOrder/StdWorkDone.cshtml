@@ -1,0 +1,35 @@
+﻿@model List<MDS.DB.StdWorkDone>
+@{
+    Layout = "~/Views/Shared/_IFrameLayout.cshtml";
+}
+@using (Html.BeginForm(new { id = "rpForm" }))
+{
+    <div class="contact-info">
+        <div class="content">
+            <table>
+                <tr>
+                    <td>Item</td>
+                    <td>Desc</td>
+                </tr>
+                @foreach (MDS.DB.StdWorkDone item in Model)
+                {
+                    <tr>
+                        <td>
+                            <a href="" onclick="bob('@item.StdWorkDoneDesc');return false;">@item.StdWorkDoneID</a>
+                        </td>
+                        <td>
+                            @item.StdWorkDoneDesc
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+    <script type="text/javascript">
+        function bob(swo) {
+//            alert(swo);
+            parent.$("#WorkDone").val(swo);
+            parent.$("#window").data("kendoWindow").close();
+        }
+    </script>
+}

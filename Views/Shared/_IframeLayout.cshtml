@@ -1,0 +1,57 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>@MDS.Controllers.LoginController.CompanyName</title>
+
+    <script src="@Url.Content("~/Scripts/kendo/jquery.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/kendo/kendo.all.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/kendo.modernizr.custom.js")"></script>
+    <script src="@Url.Content("~/Scripts/kendo/cultures/kendo.culture.en-AU.min.js")"></script>
+    <script src="http://code.jquery.com/jquery-migrate-1.0.0.js"></script>
+
+    <script src="@Url.Content("~/Scripts/kendo/kendo.aspnetmvc.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/superfish.js")"></script>
+    <link href="@Url.Content("~/CSS/Kendo/kendo.bootstrap.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/CSS/Kendo/kendo.common.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/CSS/Kendo/kendo.dataviz.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/CSS/stylesheet.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/CSS/style.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/SweetMaster/sweet-alert.min.js")"></script>
+    <link href="@Url.Content("~/Scripts/SweetMaster/sweet-alert.css")" rel="stylesheet" type="text/css" />
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,300' rel='stylesheet' type='text/css'>
+    <script type="text/javascript">
+        //Used to display and close the system notifications
+        $(document).ready(function () {
+            //$("#NotificationBox").fadeIn(1000);
+            //if ($("#NotificationAutoHide").val() == "true") {
+            //    //$("#NotificationBox").delay(3000).fadeOut(2000);
+            //    $("#NotificationBox").delay(5000).slideUp(1000);
+            //}
+
+        });
+
+        function ShowAlert(errormsg) {
+            swal({ title: "Error!", text: errormsg, type: "error", confirmButtonText: "OK" });
+        }
+        function ShowSuccess(errormsg) {
+            swal({
+                title: "Successfully Saved Information",
+                text: errormsg,
+                imageUrl: "@Url.Action("../images/1426251824_tick.png")"
+            });
+        }
+    </script>
+</head>
+<body>
+    @if (TempData["Notification"] != null)
+    {                   
+        <script type="text/javascript"> ShowSuccess('@TempData["Notification"]'); </script> 
+    }
+    @RenderBody()
+</body>
+</html>

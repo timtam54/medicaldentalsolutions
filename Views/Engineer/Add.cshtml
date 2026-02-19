@@ -1,0 +1,241 @@
+﻿@model MDS.Models.EngineerForm
+@{
+    ViewBag.Title = "Add";
+    Layout =  "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/Scripts/jscolor.js"></script>
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+</style>
+@if (ViewBag.Popup != null && ViewBag.Popup == 1)
+{ 
+    <script type="text/javascript">
+        $("#container-header").hide();
+        $("#hdPopUp").val("1");
+    </script>
+}
+<h1>Engineer Detail</h1>
+@using (Html.BeginForm("Add", "Engineer", FormMethod.Post, new { id = "AddForm" }))
+{
+    @Html.HiddenFor(mbox => mbox.EngineerId)
+    @Html.HiddenFor(m => m.PopUp)
+    <input id="hdPopUp" type="hidden" />
+    <div id="box2">
+        @if (ViewBag.Error != "")
+        {
+                    <table>
+                        <tr>
+                            <td style="color:red"><b>@ViewBag.Error</b></td>
+                        </tr>
+                    </table>
+        }
+        <table cellspacing="8" cellpadding="0" width="100%" border="0">
+            <tr>
+                <td colspan="2">
+                    @Html.ValidationSummary(true)
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="vertical-align: top;">
+                    <table>
+                        <tr>
+                            <td class="text">User Name</td>
+                            @if (Model.UserName == null)
+                            {
+                                <td>
+                                    @Html.DropDownListFor(m => m.UserName, new SelectList(ViewBag.UserNameX, "UserEmail", "UserEmail"), "-Select One-", new { style = "width:350px", data_required_msg = "User name is required.", @onchange = "showhide(this);" })
+                                </td>
+                            }
+                            else if (Model.UserName.Contains(";"))
+                            {
+                                <td colspan="2">
+                                    @Html.TextBoxFor(m => m.UserName, new { style = "width:750px", data_required_msg = "User name is required." })
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    @Html.DropDownListFor(m => m.UserName, new SelectList(ViewBag.UserNameX, "UserEmail", "UserEmail"), "-Select One-", new { style = "width:350px", data_required_msg = "User name is required.", @onchange = "showhide(this);" })
+                                </td>
+                            }
+                            <td>
+                                @Html.ActionLink("Add New", "UserNamePassword", "Login")
+                            </td>
+                            @if (Model.EngineerId != 0)
+                            {
+                                <td>
+                                    @Html.ActionLink("Delete", "DeleteEng", new { EngineerID = Model.EngineerId })
+                                </td>
+                                <td>
+                                    <b>Merge</b>
+                                </td>
+                                <td>
+                                    @Html.DropDownListFor(i => i.MergeEngineerId, new SelectList(ViewBag.MergeEngineerIdX, "EngineerID", "EngineerName"), "-Select One-")
+                                </td>
+                                <td>
+                                    <input type="submit" id="Merge" value="Merge" name="Command" />
+                                </td>
+                            }
+                        </tr>
+
+
+
+                    </table>
+                </td>
+
+            </tr>
+            </table>
+        <table id="rest">
+            <tr>
+                <td width="50%">
+
+                    <table>
+
+                        <tr>
+                            <td class="text">Engineer Name <span style="color: red;">*</span></td>
+                            <td>
+                                @(Html.Kendo().TextBoxFor(mbox => mbox.EngineerName)
+                                        .Name("EngineerName")
+                                        .HtmlAttributes(new { data_required_msg = "Engineer Name is required.", required = "required", style = "width: 240px" })
+                            )
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Colour
+                </td>
+                <td>
+                    @Html.TextBoxFor(m => m.Color, new { type = "color" })
+
+                    </td>
+
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <table>
+                        @for (int iii = 0; iii < Model.branches.Count(); iii++)
+                        {
+                            <tr>
+                                <td>@Model.branches[iii].BranchName</td>
+                                <td>
+                                    @Html.HiddenFor(i => Model.branches[iii].BranchID)
+
+                                    @Html.CheckBoxFor(i => Model.branches[iii].Selected)
+                                    @Html.HiddenFor(i => Model.branches[iii].EngineerID)
+
+                                </td>
+                                @*@if (Model.branches[iii].Selected)
+                            {
+
+                                @Html.DisplayFor(i => Model.branches[iii].UserName)
+                            }*@
+                                  <td>
+                                    Admin Email Addresses
+                                </td>
+                                <td>
+                                    @Html.EditorFor(i => Model.branches[iii].AdminEmail, new
+                                    {
+                                        htmlAttributes = new
+                                        {@*data_required_msg = "Admin Email Name is required.", required = "required",*@ style = "width: 700px"
+                                    }
+                                })
+                                </td>
+                            </tr>
+
+
+                        }
+                    </table>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td align="left">
+                    <input type="button" class="inputbuttonbg inputbig" value="Cancel" onclick="cancel()">
+                </td>
+                <td align="right">
+                    <input type="submit" class="inputbuttonbg inputbig" value="Submit" name="Command"   />
+                    @*<input type="button" class="inputbuttonbg inputbig" onclick="$('#AddForm').submit();" value="Save">*@
+                </td>
+            </tr>
+
+        </table>
+    </div>
+}
+@if (Model.UserName==null)
+            {
+                <script type="text/javascript">
+                    $('#rest').hide();
+
+                </script>
+            }
+<script>
+
+    function showhide() {
+        $('#rest').show();
+
+    }
+
+    $("#AddForm").kendoValidator({
+    });
+
+</script>
+<script type="text/javascript">
+
+    var somethingChanged = false;
+    $(document).ready(function () {
+        $('input').change(function () {
+            somethingChanged = true;
+        });
+        $('textarea').change(function () {
+            somethingChanged = true;
+        });
+    });
+
+    function cancel() {
+        if (somethingChanged) {
+            var r = confirm("Do you wish to discard any changes you have made?");
+            if (r) {
+                back();
+            }
+        }
+        else {
+            back();
+        }
+    }
+
+    function back() {
+        var popup = '@Model.PopUp';
+        if (popup=="True") {
+            var url = '@Url.Action("IndexPopUp", "Engineer")';
+            window.location.href = url;
+        }
+        else {
+            window.location.href = '@Url.Action("Index", "Engineer")';
+        }
+    }
+
+</script>
+<script>
+    $(document).ready(function () {
+        jscolor.installByClassName("jscolor");
+    });
+</script>
+<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>

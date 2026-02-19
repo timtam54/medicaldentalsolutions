@@ -1,0 +1,111 @@
+﻿@model MDS.Models.EquipManufacturerSearch
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<div class="breadcrumb">
+     @Html.ActionLink("Home", "Index", "Dashboard")
+    » @Html.ActionLink("Manufacturer", "Index", "EquipManufacturer")
+</div>*@
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+
+    #rpGrid tbody tr:hover {
+        cursor: pointer !important;
+    }
+</style>
+@if (@Model.PopUp)
+{ 
+    <script type="text/javascript">
+        $("#container-header").hide();
+    </script>
+}
+<h1>Equipment Manufacturer Search</h1>
+@using (Html.BeginForm("Index", "EquipManufacturer", FormMethod.Post, new { id = "mnForm" }))
+{
+    @Html.HiddenFor(m => m.PopUp)
+    <div class="contact-info">
+        <div class="content">
+            <table width="100%">
+                <tr>
+                    <td>EquipManufacturer Name:
+                    </td>
+                    <td>
+                        @(Html.Kendo().TextBoxFor(m => m.EquipManufacturerName)
+                                .Name("EquipManufacturerName")
+                                .HtmlAttributes(new { style = "width: 150px " })
+                            )
+                    </td>
+                    <td>
+                        <a class="button" onclick="$('#mnForm').submit();"><span>Search</span></a>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="button" class="inputbuttonbg inputbig" value="Add New Equip Manufacturer" onclick="add()"></td>
+
+                </tr>
+            </table>
+            <table width="100%">
+
+                <tr>
+                    <td colspan="6">
+                        @(Html.Kendo().Grid(Model.Manufacturer)
+.Name("mnGrid")
+.Columns(columns =>
+{
+
+    if (ViewBag.PopUp != null) { columns.Bound(p => p.EquipManufacturerName).Title("EquipManufacture Name").ClientTemplate(@Html.ActionLink("#=EquipManufacturerName#", "EditPopUp", "EquipManufacturer", new { id = "#=EquipManufacturerName#" }, null).ToHtmlString()); }
+    else { columns.Bound(p => p.EquipManufacturerName).Title("EquipManufacture Name").ClientTemplate(@Html.ActionLink("#=EquipManufacturerName#", "Edit", "EquipManufacturer", new { id = "#=EquipManufacturerName#" }, null).ToHtmlString()); }
+
+
+})
+.Pageable()
+.Sortable()
+.Filterable()
+.Selectable(s => s.Mode(GridSelectionMode.Single))
+.DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(200)
+        .ServerOperation(false)
+     )
+)
+                    </td>
+                </tr>
+
+            </table>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+
+    function add() {
+        var popup = '@Model.PopUp';
+
+        if (popup == "True") {
+            var url = '@Url.Action("AddPopUp", "EquipManufacturer")';
+            window.location.href = url;
+        }
+        else {
+            window.location.href = '@Url.Action("Add", "EquipManufacturer")';
+        }
+    }
+
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>

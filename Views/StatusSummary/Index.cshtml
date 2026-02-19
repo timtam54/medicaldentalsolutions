@@ -1,0 +1,40 @@
+﻿@model MDS.Models.StatusSummary
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+
+    #rpGrid tbody tr:hover {
+        cursor: pointer !important;
+    }
+</style>
+<h1>Contracts Overdue & Unscheduled Services</h1>
+<table width="100%">
+    <tr>
+        <td colspan="6">
+            @(Html.Kendo().Grid(Model.Status)
+.Name("rpCustomer")
+.Columns(columns =>
+{
+    columns.Bound(p => p.InformationTitle).Title("");
+    columns.Bound(p => p.StatusCount).Title("");
+})
+.Pageable()
+.Sortable()
+.Filterable()
+.DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(200)
+        .ServerOperation(false)
+     )
+)
+        </td>
+    </tr>
+
+</table>

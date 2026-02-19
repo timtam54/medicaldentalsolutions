@@ -1,0 +1,279 @@
+﻿@model MDS.Models.EquipModelForm
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<div class="breadcrumb">
+     @Html.ActionLink("Home", "Index", "Dashboard")
+    » @Html.ActionLink("Equipment Models", "Index", "EquipModel")
+</div>*@
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+</style>
+<h1>Equipment Model Detail</h1>
+@using (Html.BeginForm("Add", "EquipModel", FormMethod.Post, new { id = "AddForm" }))
+{
+    @Html.HiddenFor(mbox => mbox.ModelUID)
+
+    <div id="box2">
+        <table cellspacing="8" cellpadding="0" width="100%" border="0">
+            <tr>
+                <td colspan="2">
+                    @Html.ValidationSummary(true)
+                </td>
+            </tr>
+
+            <tr>
+
+                <td class="text">Equipment Type</td>
+                <td>@(Html.Kendo().DropDownListFor(m => m.EquipTypeCode)
+                          .Name("EquipTypeCode")
+                           .Filter("startswith")
+                          .DataTextField("Name")
+                          .DataValueField("EquipTypeCode")
+                          .BindTo(Model.EquipTypeList)
+                          .HtmlAttributes(new { style = "width:200px", data_required_msg = "Required", required = "required" })
+                        )  <a onclick="OpenTypeWindow();" class="button"><span style="font-weight: bold">Add / Edit</span></a></td>
+              
+
+                <td class="text">Manufacturer</td>
+                <td>@(Html.Kendo().DropDownListFor(m => m.Manufacturer)
+                          .Name("Manufacturer")
+                           .Filter("startswith")
+                          .DataTextField("Manufacture")
+                          .DataValueField("ManufactureId")
+                          .BindTo(Model.ManufactureList)
+                          .HtmlAttributes(new { style = "width:200px" })
+                        ) <a onclick="OpenManufacturerWindow();" class="button"><span style="font-weight: bold">Add / Edit</span></a></td>
+               
+            </tr>
+
+            <tr>
+                <td class="text">Model</td>
+                <td>@(Html.Kendo().TextBoxFor(mbox => mbox.EquipModel)
+                                            .Name("EquipModel")
+                                            .HtmlAttributes(new { style = "width: 240px" })
+                                            )</td>
+
+                <td class="text">Notes</td>
+                <td>@(Html.TextAreaFor(m => m.Notes, new { style = "width: 200px;height:70px" }))</td>
+            </tr>
+        </table>
+
+        <table>
+            <tr>
+                <td width="2%">&nbsp;
+                </td>
+                <td width="10%" rowspan="3">
+                    <input type="button" class="inputbuttonbg inputbig" value="Cancel/Back" onclick="cancel()">
+                </td>
+                <td width="12%">&nbsp;
+                </td>
+                <td width="30%" rowspan="3"></td>
+                <td width="7%">&nbsp;
+                </td>
+                <td width="22%" rowspan="3">
+
+                    <input type="button" class="inputbuttonbg inputbig" onclick="Delete('@Model.ModelUID','@Model.EquipModel');" value="DELETE">
+                </td>
+                <td width="7%">&nbsp;
+                </td>
+                <td width="7%" rowspan="3">
+                    <input type="button" class="inputbuttonbg inputbig" onclick="$('#AddForm').submit();" value="Save">
+                </td>
+                <td width="3%">&nbsp;
+                </td>
+            </tr>
+        </table>
+
+
+    </div>
+    
+    @(Html.Kendo().Window()
+                            .Name("windowType")
+                            .Title("Equipment Type")
+                            .Width(1000)
+                            .Height(600)
+                            .Visible(false)
+                            .Draggable(true)
+                            .Modal(true)
+                            .Iframe(true)
+                            .Events(e => e.Close("CloseTypeWindow"))
+                            )
+    
+    
+    @(Html.Kendo().Window()
+                            .Name("windowManu")
+                            .Title("Manufacturer")
+                            .Width(1000)
+                            .Height(600)
+                            .Visible(false)
+                            .Draggable(true)
+                            .Modal(true)
+                            .Iframe(true)
+                            .Events(e => e.Close("CloseManuWindow"))
+                            )
+}
+<script>
+
+    $("#AddForm").kendoValidator({
+    });
+
+</script>
+<script type="text/javascript">
+
+    var somethingChanged = false;
+    $(document).ready(function () {
+        $('input').change(function () {
+            somethingChanged = true;
+        });
+        $('textarea').change(function () {
+            somethingChanged = true;
+        });
+
+        $("#container-header").hide();
+    });
+
+    function cancel() {
+        if (somethingChanged) {
+            var r = confirm("Do you wish to discard any changes you have made?");
+            if (r) {
+                window.location.href = '@Url.Action("GetEquipmentModel", "Equipment")';
+            }
+        }
+        else {
+            window.location.href = '@Url.Action("GetEquipmentModel", "Equipment")';
+        }
+    }
+
+    function Delete(ModelUID, ModelDesc) {
+        var r = confirm("Are you sure you wish to delete this Model " + ModelDesc +"?");
+        if (r) {
+
+            $.ajax({
+                url: '@Url.Action("CheckRefAndDelete", "EquipModel")',
+                type: 'POST',
+                datatype: "json",
+                data: { ModelID: ModelUID },
+
+                success: function (response) {
+                    alert(response.message);
+                    if (response.Delete) {
+                        window.location.href = '@Url.Action("Index", "EquipModel")';
+                    }
+                    ////$("#spCustomer").text(response.CustomerInfo);
+                    ////$("#spLocation").text(response.Location);
+                    ////$("#EquipItem").data("kendoAutoComplete").value(response.EquipItem);
+                    ////if (response.WarrantyExpirationDate != null && response.WarrantyExpirationDate) {
+                    ////    $("#spWarranty").text(dtConvFromJSONOnlyDate(response.WarrantyExpirationDate));
+                    ////}
+                    ////else {
+                    ////    $("#spWarranty").text("");
+                    ////}
+
+                },
+                error: function (req, status, error) {
+                    alert("R: " + req + " S: " + status + " E: " + error);
+                }
+            });
+        }
+    }
+
+    function OpenTypeWindow() {
+
+        var window = $("#windowType").data("kendoWindow");
+        window.Visible = true;
+        var actionURL = '@Url.Action("IndexPopUp", "EquipType")';
+        window.refresh({
+            url: actionURL
+        });
+
+        var width95 = (screen.width) * 75 / 100;
+        var height75 = (screen.height) * 75 / 100;
+        window.setOptions({ width: width95, height: height75 });
+
+        window.center();
+        window.open();
+
+    }
+
+    function OpenManufacturerWindow() {
+
+        var window = $("#windowManu").data("kendoWindow");
+        window.Visible = true;
+        var actionURL = '@Url.Action("IndexPopUp", "EquipManufacturer")';
+        window.refresh({
+            url: actionURL
+        });
+
+        var width95 = (screen.width) * 75 / 100;
+        var height75 = (screen.height) * 75 / 100;
+        window.setOptions({ width: width95, height: height75 });
+
+        window.center();
+        window.open();
+
+    }
+
+    function CloseTypeWindow(e) {
+
+        var dataSource = new kendo.data.DataSource({
+            transport: {
+                read: {
+                    url: '@Url.Action("EquipType", "EquipModel")',
+                    async: false,
+                    data: {}
+                }
+            }
+        });
+
+        var ddl = $('#EquipTypeCode').data("kendoDropDownList");
+        ddl.setDataSource(dataSource);
+        ddl.refresh();
+        var id = '@Model.ModelUID';
+        if (id != 0) {
+            ddl.value('@Model.EquipTypeCode');
+        }
+
+    }
+
+    function CloseManuWindow(e) {
+
+        var dataSource = new kendo.data.DataSource({
+            transport: {
+                read: {
+                    url: '@Url.Action("Manufacture", "EquipModel")',
+                    async: false,
+                    data: {}
+                }
+            }
+        });
+
+        var ddl = $('#Manufacturer').data("kendoDropDownList");
+        ddl.setDataSource(dataSource);
+        ddl.refresh();
+        var id = '@Model.ModelUID';
+        if (id != 0) {
+            ddl.value('@Model.Manufacturer');
+        }
+
+    }
+
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>

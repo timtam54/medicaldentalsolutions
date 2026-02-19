@@ -1,0 +1,176 @@
+﻿@model MDS.DB.ServiceEngineerWork
+@{
+    ViewBag.Title = "Start End Time";
+}
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+
+
+@using (Html.BeginForm("ServiceWorkEndSave", "Tech", FormMethod.Post, new { id = "ServiceWorkEnd" }))
+{
+    if (Model.ChargeTypecode == "TRV")
+    {
+        <h1>Travel Clock Off</h1>
+    }
+    else
+    {
+        <h1>Clock Off</h1>
+
+    }
+    @Html.HiddenFor(m => m.EngineerID)
+    @Html.HiddenFor(m => m.BranchID)
+    @Html.HiddenFor(m => m.Repair)
+    @Html.HiddenFor(m => m.ServiceJobID)
+    @Html.HiddenFor(m => m.ChargeTypecode)
+
+    <table cellspacing="8" cellpadding="0" width="100%" border="0">
+
+        @Html.HiddenFor(i => i.StartTime)
+        <tr width="100%" align="center">
+            <td style="font-size:16px">
+                <b>Start</b>
+            </td>
+            <td style="font-size:16px;text-align:left;" colspan="3">
+                @Model.StartTime.ToString("dd/M/yyyy HH:mm:ss")
+            </td>
+        </tr>
+
+        <tr width="100%" align="center">
+            <td style="font-size:16px;color:red">
+                <b>End</b>
+            </td>
+            <td style="font-size:16px;text-align:left;color:red" colspan="2">
+                @Html.TextBoxFor(i => i.EndTime, new {@onkeyup="manual();return false;", @id = "EndTime", @style = "font-size:16px;text-align:left;width:180px" })
+            </td>
+            <td>
+                <button onclick="SetTimeOutServiceNow(); return false;" class="inputbuttonbg inputbig">< -Now</button>
+            </td>
+        </tr>
+        <tr>
+            <td style="font-size:16px;color:red">
+                <b>Manual</b>
+            </td>
+            <td>@Html.CheckBoxFor(i => i.ManualTime)</td>
+        </tr>
+        <tr width="100%" align="center">
+
+            <td style="font-size:16px;text-align:left;color:red" colspan="2">
+                @if (Model.ChargeTypecode == "TRV")
+                {
+                    <img src="~/Content/images/Travel.png" />
+                }
+                else
+                {
+                    <img src="~/Content/images/Work.png" />
+                }
+            </td>
+            <td colspan="2">
+                <button onclick="SaveEndTime(); return false;" class="inputbuttonbg inputbig">Submit End Time</button>
+            </td>
+        </tr>
+
+    </table>
+
+}
+
+<script type="text/javascript">
+    var isTravel;
+    function manual() {
+
+        $('#ManualTime').prop("checked", true);
+    }
+</script>
+@if (Model.ChargeTypecode == "TRV")
+{
+    <script type="text/javascript">
+        isTravel = true;
+    </script>
+
+}
+else
+{
+    <script type="text/javascript">
+        isTravel = false;
+    </script>
+
+}
+<script type="text/javascript">
+
+    function SetTimeInServiceNow() {
+        try {
+
+            var today = new Date();
+            var date = today.getDate() + '/' + (today.getMonth() + 1) + '/';
+            date = date + today.getFullYear() + ' ';
+            if (today.getHours() < 10)
+                date = date + '0';
+            date = date + today.getHours() + ":";
+            if (today.getMinutes() < 10)
+                date = date + '0';
+            date = date + today.getMinutes() + ':00';
+            $('#StartTime').val(date);
+            $('#ManualTime').prop("checked", false);
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+    function SetTimeOutServiceNow() {
+        try {
+            var today = new Date();
+
+            var date = today.getDate() + '/' + (today.getMonth() + 1) + '/';
+
+            date = date + today.getFullYear() + ' ';
+            if (today.getHours() < 10)
+                date = date + '0';
+
+            date = date + today.getHours() + ":";
+            if (today.getMinutes() < 10)
+                date = date + '0';
+            date = date + today.getMinutes() + ':00';
+            $('#EndTime').val(date);
+            $('#ManualTime').prop("checked", false);
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+    function SaveEndTime() {
+        var myData = $('#ServiceWorkEnd');
+
+        try {
+            $.post('@Url.Action("ServiceWorkEndSave","Tech")', myData.serialize(),
+                function (data) {
+                    if (data.Error == '') {
+                        try {
+                            //TimeStarted = false;
+                            closeDiv();
+                            setTimeFinished(isTravel);
+                            
+                        }
+                        catch (ex) {
+                            alert('1-' + ex.message);
+                        }
+                        try {
+                            ResumeClockOff();
+                        }
+                        catch (ex) {
+                            alert('2-' + ex.message);
+                        }
+                    }
+                    else
+                        alert(data.Error);
+                }
+                , 'json');
+        }
+
+        catch (ex) {
+            alert('createpartsservice-CreatePartsSave2:' + ex.message);
+        }
+    }
+
+</script>

@@ -27,7 +27,7 @@ namespace MDS.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { Error = ex.Message });
+                System.Diagnostics.Debug.WriteLine("Error: " + ex.ToString()); return Json(new { Error = "An error occurred. Please try again." });
             }
         }
         public JsonResult PartSearch(string searchString, int BranchID)
@@ -94,7 +94,7 @@ namespace MDS.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { Error = ex.Message });
+                System.Diagnostics.Debug.WriteLine("Error: " + ex.ToString()); return Json(new { Error = "An error occurred. Please try again." });
 
             }
         }
@@ -123,7 +123,7 @@ namespace MDS.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { Error = ex.Message });
+                System.Diagnostics.Debug.WriteLine("Error: " + ex.ToString()); return Json(new { Error = "An error occurred. Please try again." });
 
             }
         }
@@ -148,7 +148,7 @@ namespace MDS.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { Error = ex.Message,cost="$0" });
+                System.Diagnostics.Debug.WriteLine("Error: " + ex.ToString()); return Json(new { Error = "An error occurred. Please try again.", cost="$0" });
 
             }
         }
@@ -187,7 +187,7 @@ namespace MDS.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { Error = ex.Message });
+                System.Diagnostics.Debug.WriteLine("Error: " + ex.ToString()); return Json(new { Error = "An error occurred. Please try again." });
             }
         }
 
@@ -224,7 +224,7 @@ namespace MDS.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { Error = ex.Message });
+                System.Diagnostics.Debug.WriteLine("Error: " + ex.ToString()); return Json(new { Error = "An error occurred. Please try again." });
             }
         }
 
@@ -277,9 +277,23 @@ namespace MDS.Controllers
             
         }
 
+        private const int MaxAudioFileSizeBytes = 10 * 1024 * 1024; // 10MB limit for audio
+
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
         public JsonResult AudioProcess(System.Web.HttpPostedFileWrapper blob,int? RepairID, int? ServiceID, int BranchID,string Field)
         {
+            // SECURITY: Validate file exists and size
+            if (blob == null || blob.ContentLength == 0)
+            {
+                return Json(new { Error = "No audio file provided" });
+            }
+            if (blob.ContentLength > MaxAudioFileSizeBytes)
+            {
+                return Json(new { Error = "Audio file exceeds maximum allowed size (10MB)" });
+            }
+
             int idx;
             string contenttype = "audio/wav";
             string fileName, path;
@@ -346,7 +360,11 @@ namespace MDS.Controllers
             }
             return View();
         }
+        private const int MaxSignatureSizeBytes = 500 * 1024; // 500KB max for signature images
+
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
         public JsonResult Signature(Signature oo)
         {
             try
@@ -357,10 +375,17 @@ namespace MDS.Controllers
                 if (String.IsNullOrWhiteSpace(oo.SignatureDataUrl))
                     return Json(new { Error = "Signature is blank" });
 
+                // SECURITY: Validate signature data URL format
+                if (!oo.SignatureDataUrl.StartsWith("data:image/png;base64,"))
+                    return Json(new { Error = "Invalid signature format" });
 
                 char[] chars = new char[] { char.Parse(",") };
                 var base64Signature = oo.SignatureDataUrl.Split(chars)[1];
                 var binarySignature = Convert.FromBase64String(base64Signature);
+
+                // SECURITY: Validate signature size
+                if (binarySignature.Length > MaxSignatureSizeBytes)
+                    return Json(new { Error = "Signature data exceeds maximum allowed size" });
 
                 string fileName = "Signature_" + oo.ID.ToString("######") + "-" + oo.RepairOrService + "-" + oo.BranchID.ToString() + ".png";
                 var path = Path.Combine(Server.MapPath("~/UploadedFiles"), fileName);
@@ -377,7 +402,7 @@ namespace MDS.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { Error = ex.Message });
+                System.Diagnostics.Debug.WriteLine("Error: " + ex.ToString()); return Json(new { Error = "An error occurred. Please try again." });
             }
         }
 

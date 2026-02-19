@@ -1,0 +1,119 @@
+﻿@model MDS.Models.EngineerSearch
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<div class="breadcrumb">
+     @Html.ActionLink("Home", "Index", "Dashboard")
+    » @Html.ActionLink("Engineers", "Index", "Engineer")
+</div>*@
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+
+    #rpGrid tbody tr:hover {
+        cursor: pointer !important;
+    }
+</style>
+@if (@Model.PopUp)
+{ 
+    <script type="text/javascript">
+        $("#container-header").hide();       
+    </script>
+}
+<h1>Engineer Search</h1>
+@using (Html.BeginForm("Index", "Engineer", FormMethod.Post, new { id = "enForm" }))
+{
+        if (ViewBag.Error!=null)
+                {
+                    <div style="color:red">@ViewBag.Error</div>
+                }
+    @Html.HiddenFor(m => m.PopUp)
+    <input id="hdPopUp" type="hidden" />
+    <div class="contact-info">
+        <div class="content">
+            <table width="100%">
+                <tr>
+                    <td>Engineer Name:
+                    </td>
+                    <td>
+                        @(Html.Kendo().TextBoxFor(m => m.EngineerName)
+                                .Name("EngineerName")
+                                .HtmlAttributes(new { style = "width: 150px " })
+                            )
+                    </td>
+                    <td>
+                        <a class="button" onclick="$('#enForm').submit();"><span>Search</span></a>
+                    </td>
+                </tr>
+            </table>
+            <table width="100%">
+                <tr>
+                    <td colspan="6">
+                        @(Html.Kendo().Grid(Model.Engineers)
+.Name("enGrid")
+.Columns(columns =>
+{
+
+    if (ViewBag.PopUp != null) { columns.Bound(p => p.EngineerName).Title("Engineer Name").ClientTemplate(@Html.ActionLink("#=EngineerName#", "EditPopUp", "Engineer", new { id = "#=EngineerID#" }, null).ToHtmlString()); }
+    else { columns.Bound(p => p.EngineerName).Title("Engineer Name").ClientTemplate(@Html.ActionLink("#=EngineerName#", "Edit", "Engineer", new { id = "#=EngineerID#" }, null).ToHtmlString()); }
+    columns.Bound(p => p.BranchName).Title("Branch Name");
+
+
+
+})
+.Pageable()
+.Sortable()
+.Filterable()
+.Selectable(s => s.Mode(GridSelectionMode.Single))
+.DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(200)
+        .ServerOperation(false)
+     )
+)
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="button" class="inputbuttonbg inputbig" value="Add New Engineer" onclick="add()"></td>
+
+                </tr>
+            </table>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+
+    function add()
+    {
+        var popup = '@Model.PopUp';
+    
+        if (popup=="True") {
+            var url = '@Url.Action("AddPopUp", "Engineer")';
+             window.location.href = url;
+         }
+         else {
+             window.location.href = '@Url.Action("Add", "Engineer")';
+         }
+    }
+
+</script>
+
+
+<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>

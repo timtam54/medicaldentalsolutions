@@ -1,0 +1,3224 @@
+﻿@model MDS.Models.AddRepaire
+
+@{
+    ViewBag.Title = "Add Repair";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
+
+
+<style type="text/css">
+    td {
+        padding: 2px;
+    }
+
+    body {
+        -moz-transform: scale(0.92, 0.92); /* Moz-browsers */
+        zoom: 0.92; /* Other non-webkit browsers */
+        zoom: 92%; /* Webkit browsers */
+    }
+</style>
+@if (ViewBag.Popup != null && ViewBag.Popup == 1)
+{
+    <script type="text/javascript">
+        $("#container-header").hide();
+        $("#hdPopUp").val("1");
+    </script>
+}
+@if (ViewBag.PopUpRepair != null)
+{
+    <script type="text/javascript">
+        $("#container-header").hide();
+
+    </script>
+}
+
+<script type="text/javascript">
+    function copyJob() {
+        var RepairId = '@Model.RepairId';
+        if (RepairId == 0) {
+            alert('First specify the customer and the equipment to be repaired and then save the record before it can be copied');
+            return;
+        }
+        var BranchID = '@MDS.Controllers.LoginController.BranchID(User.Identity.Name)';
+        try {
+            div.dialog({
+                closeOnEscape: false,
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("CopyJob", "Repair")?ID=' + RepairId + '&BranchID=' + BranchID;
+                    $(this).load(url); @*'@Url.Action("UploadFile", "Applications")');*@
+                },
+                modal: true,
+                resizable: false,
+                width: 1000,
+                height: 600,
+                title: "Copy Recurring Job",
+                buttons:
+                {
+                    Close: function () {
+                        div.remove(); div.dialog("close");
+                    }
+                },
+            });
+        }
+        catch (ex) {
+            alert('catchall:' + ex.message);
+        }
+    }
+
+</script>
+
+<div id="repair" style="width:100%;height:auto;position:relative;">
+    <h1 style="padding-left:30px">@MDS.Controllers.LoginController.RepairLabel Detail</h1>
+    @using (Html.BeginForm("Add", "Repair", FormMethod.Post, new { id = "AddForm" }))
+    {
+        <div id="dialog"></div>
+        @Html.HiddenFor(m => m.EquipId)
+        @Html.HiddenFor(m => m.LabourRate)
+        @Html.HiddenFor(m => m.TravelRate)
+        @Html.HiddenFor(m => m.RepairId)
+        @Html.HiddenFor(m => m.PopUp)
+        <input id="hdPopUp" type="hidden" />
+        <input id="hdReapirID" type="hidden" value="@ViewBag.PopUpRepair" />
+
+        if (ViewData.ModelState[""] != null && ViewData.ModelState[""].Errors.Count > 0)
+        {
+            <div class="alert alert-error">
+                @Html.ValidationSummary(true, "Errors: ")
+            </div>
+        }
+        <div id="box2">
+            <table cellspacing="1" cellpadding="0" width="100%" border="0">
+                <tbody>
+                    <tr>
+                        <td width="54%">
+                            <table cellspacing="1" width="100%" border="0">
+                                <tbody>
+                                    <tr>
+                                        <td height="30" class="text maintexttop">
+                                            Job Setup (to be completed by Admin)
+                                        </td>
+                                        <td>
+                                            @Html.HiddenFor(m => m.SelectedEquipment)
+
+                                            @if (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin)
+                                            {
+                                                @*if (Model.RepairId == 0)
+                                                    {
+                                                        @Html.DropDownListFor(m => m.Customerid, new SelectList(ViewBag.CustomerX ,"CustomerCode", "CompanyName"), htmlAttributes: new { @class = "form-control" })
+                                                    }*@
+                                                <a onclick="OpenEquipmentWindow();" class="button"><span style="font-weight: bold">Pick the Equipment Item</span></a>
+                                            }
+                                        </td>
+                                    </tr>
+
+
+                                    <tr>
+                                        <td width="39%" class="text">
+                                            Equipment Item:
+                                        </td>
+                                        <td width="61%">
+                                            <span id="spEquipItem"></span>
+                                            @*@(Html.Kendo().AutoCompleteFor(m => m.EquipItem)
+                                                     .Name("EquipItem")
+                                                     .HtmlAttributes(new { style = "width: 300px", required = "required", data_required_msg = "Equipment is required." })
+                                                     .Placeholder("Search Equipment Item")
+                                                               .DataTextField("EquipDesc")
+                                                              .Events(e => e
+                                                                    .Select("getEquipInformation")
+                                                                     )
+
+                                                     .DataSource(source =>
+                                                     {
+                                                         source.Read(read =>
+                                                         {
+                                                             read.Action("GetEquipmentItem", "Repair");
+                                                         })
+                                                         .ServerFiltering(true);
+
+                                                     })
+
+                                                )*@
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="39%" class="text">
+                                            Customer:
+                                        </td>
+                                        <td width="61%">
+                                            @*  @(Html.Kendo().TextBoxFor(mbox => mbox.Customer)
+                                                .Name("Customer")
+                                                .HtmlAttributes(new { style = "width: 300px" })
+                                                )*@
+                                            <span id="spCustomer"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="39%" class="text">
+                                            Customer Equip Code :
+                                        </td>
+                                        <td width="61%">
+                                            @*  @(Html.Kendo().TextBoxFor(mbox => mbox.Customer)
+                                                .Name("CustomerEquipCode")
+                                                .HtmlAttributes(new { style = "width: 300px" })
+                                                )*@
+
+                                            <span id="spCustomerCode"></span>
+
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan='2'>
+                                            
+                                                <table>
+                                                    <tr>
+                                        <td>
+                                            Date And Time the initial call was received
+                                        </td>
+                                        <td>
+
+                                            @(Html.Kendo().DatePickerFor(m => m.DateInitalCall)
+                                                                    .Name("DateInitalCall")
+                                                                 
+                                   .HtmlAttributes(new { style = "width:120px", type = "text" })
+                                            )
+                                            @(Html.Kendo().TimePickerFor(m => m.TimeInitalCall)
+                                                                     .Name("TimeInitalCall")
+                                                                     .Interval(15)
+                                     .HtmlAttributes(new { style = "width:100px", type = "text" })
+                                                                     .Min("5:00 AM")
+                                                                     .Max("9:00 PM")
+
+                                            )
+                                        </td>
+                                        <td style='width:80px'>
+                            </td>
+                                        <td style="text-align: center; vertical-align: middle;">
+                    <table style="background-color: #FFFACD; padding: 8px 15px; border-radius: 4px; display: inline-block; font-weight: 500; margin: 0 auto;">
+                        <tr>
+                           
+                            <td style="padding-right: 5px;">
+                                <label>
+                                    WIP1
+                                </label>
+                            </td>
+                            <td style="padding-right: 10px;">
+                                <label>
+                                    @Html.EditorFor(m => m.NoCharge)
+                                </label>
+                            </td>
+                            <td style="padding-right: 5px;">
+                                <label>
+                                    WIP2/3
+                                </label>
+                            </td>
+                            <td>
+                                <label>
+                                    @Html.EditorFor(m => m.ChargePartsOnly)
+                                </label>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                                        </tr>
+                                        </table>
+                                        </td>                                                                 
+                                       </tr>
+                                    @*<tr  style="background-color:ghostwhite">
+                                                                                <td>
+                                                                                    <table>
+                                                                                        <tr>
+                                                                                            <td>
+                                                                                                Repair Scheduled Date<br />
+                                                                                            </td>
+                                                                                            <td>
+                                                                                                <a style="font-size:16px;" href="@Url.Action( "Scheduler", "Dashboard")"
+                                                                                                   type="submit"
+                                                                                                   target="_blank">
+                                                                                                    For Diary View
+                                                                                                </a>
+
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                    </table>
+                                                                                </td>
+                                                                                <td>
+                                                                                    @(Html.Kendo().DatePickerFor(m => m.ScheduledStartDate)
+                                                                                                            .Name("ScheduledStartDate")
+                                                                           .HtmlAttributes(new { style = "width:120px", type = "text" })
+                                                                                    )
+
+                                                                                    @(Html.Kendo().TimePickerFor(m => m.ScheduledStartTime)
+                                                                                                            .Name("ScheduledStartTime")
+                                                                           .HtmlAttributes(new { style = "width:120px", type = "text" })
+                                                                           .Min("7:00 AM")
+                                                                 .Max("4:30 PM")
+                                                                                    )
+                                                                                    To
+                                                                                    @(Html.Kendo().TimePickerFor(m => m.ScheduledEnd)
+                                                                 .Name("ScheduledEnd")
+                                        .HtmlAttributes(new { style = "width:100px", /*required = "required", data_required_msg = "Scheduled Start Time is required.",*/ type = "text" })
+                                        .Min("7:00 AM")
+                                                                 .Max("4:30 PM")
+                                                                                    )
+
+                                                                                </td>
+                                                                            </tr>*@
+
+                                <tr>
+                                    <td class="text red">
+                                        Programmed Date And Time
+                                        @*<br>
+            repair commenced (e.g.23/1/1 9 am)*@
+                                    </td>
+
+                                    <td colspan="1">
+                                        <table>
+                                            <tr>
+                                                <td>
+                                                    @Html.EditorFor(m => m.DateEquipRepair, new
+                                                   {
+                                                       style = "width:120px"@*, type = "text", data_type = "date"*@})
+
+
+                                                    @*@(Html.Kendo().DatePickerFor(m => m.DateEquipRepair)
+                                                                                .Name("DateEquipRepair")
+            .HtmlAttributes(new { style = "width:120px", type = "text", required = "required", data_required_msg = "Date In is required." })
+                                                        )*@
+
+                                                    @(Html.Kendo().TimePickerFor(m => m.TimeEquipRepair)
+                                                                     .Name("TimeEquipRepair")
+                                                                      .Interval(15)
+.HtmlAttributes(new { style = "width:100px", required = "required", data_required_msg = "Date In is required.", type = "text" })
+                      .Min("5:00 AM")
+                                                                     .Max("9:00 PM")
+                                            )
+                                                    To
+                                                    @(Html.Kendo().TimePickerFor(m => m.TimeOutEquipRepair)
+                         .Name("TimeOutEquipRepair")
+
+                         .Interval(15)
+    .HtmlAttributes(new { style = "width:100px", /*required = "required", data_required_msg = "Scheduled Start Time is required.",*/ type = "text" })
+    .Min("5:00 AM")
+                         .Max("9:00 PM")
+                                            )
+                                                    @*<a href="@Url.Action( "Scheduler", "Dashboard")"
+               type="submit"
+               target="_blank">
+                For Diary
+            </a>*@
+
+                                                </td>
+                                                @if (MDS.Controllers.LoginController.IsAdmin(User.Identity.Name) != MDS.Controllers.ATC.Customer)
+                                                {
+                                                    if (Model.RepairId != 0)
+                                                    {
+                                                        <td>
+                                                            <img src="~/Images/copy.png" onclick="copyJob(); return false;" />
+                                                        </td>
+                                                        <td>
+                                                            <a href="" onclick="copyJob(); return false;">Copy<br />Recurring</a>
+                                                        </td>
+
+                                                    }
+                                                }
+                                                </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+
+
+                                    <tr>
+                                        <td width="36%" class="blue text">
+                                            <strong>Notes:</strong>
+                                        </td>
+                                        @if (Model.RepairId == 0)
+                                        {
+                                    <td width="64%">
+                                        @(Html.TextAreaFor(m => m.Notes,8,4, new { style = "width: 100%;height:60px" })       )
+                                    </td>
+                                        }
+                                        else
+                                        {
+                                            <td width="64%">
+                                                <table>
+                                                    <tr>
+                                                        <td id="divNotes">
+                                                            @Model.Notes
+                                                        </td>
+                                                        @if (MDS.Controllers.LoginController.IsAdmin(User.Identity.Name) != MDS.Controllers.ATC.Customer)
+                                                        {
+                                                            <td>
+                                                                <button onclick="openNotes(); return false;" class="inputbuttonbg inputbig">...</button>
+                                                            </td>
+                                                        }
+                                                        </tr>
+                                                </table>
+                                            </td>
+                                        }
+                                        </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+                                            <span id="spPrevious">No previous services or repairs </span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td width="36%" class="blue text">
+                                            <strong>@MDS.Controllers.LoginController.EngineerLabel:</strong>
+                                        </td>
+
+                                        <td colspan="1">
+                                            <table>
+                                                <tr>
+                                                    @for (int eii = 0; eii < Model.Engineers.Count(); eii++)
+                                                    {
+                                                        <td>
+                                                            @Html.DropDownListFor(i => i.Engineers[eii], new SelectList(ViewBag.EngineerIDX, "EngineerID", "EngineerName"), "-Select One-", null)
+                                                        </td>
+                                                    }
+                                                </tr>
+                                            </table>
+                                        </td>
+
+                                        @*<td width="64%">
+
+                                                @(Html.DropDownListFor(m => m.EngineerID,new SelectList(Model.EngineerList,"EngineerID","EngineerName"),new { style = "width:62%" })
+                                                )
+                                            </td>*@
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </td>
+                        <td width="46%" valign="top">
+                            <table cellspacing="3" cellpadding="0" width="100%" border="0">
+                                <tbody>
+                                    <tr>
+                                        <td height="35" bgcolor="#c0c0c0">
+                                            <div class="hdone">
+                                                Job Number: <span>@Model.JobCode</span>
+                                                @if (MDS.Controllers.LoginController.IsAdmin(User.Identity.Name) != MDS.Controllers.ATC.Customer)
+                                                {
+                                                    if (MDS.Controllers.LoginController.AllRecipientMailout)
+                                                    {
+                                                    <button onclick="emailnotification(); return false;" class="inputbuttonbg inputbig">Email Reminder</button>
+                                                    }
+                                                }
+                                                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                                    <span id="spSupply"></span>
+                                                </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text style1">
+                                            Warranty Expiration Date :
+                                            <span id="spWarranty"></span>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <label>
+                                                @Html.CheckBoxFor(m => m.Approve, new { @onclick = "DisplayApprovalRequired();" })
+                                            </label>
+                                            <span class="text red">Is Approval required before performing the @MDS.Controllers.LoginController.RepairLabel work? </span>
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+
+                                            <label>
+                                                @*<input type="checkbox" id="checkbox" name="checkbox">*@
+
+                                                @Html.EditorFor(m => m.orderNumber)
+                                            </label>
+                                            <span class="text">Is An Order Number Required before performing the @MDS.Controllers.LoginController.RepairLabel work</span>
+
+                                        </td>
+                                        <td>
+                                            <style type="text/css">
+                                                input[type=checkbox] {
+                                                    /* Double-sized Checkboxes */
+                                                    -ms-transform: scale(2); /* IE */
+                                                    -moz-transform: scale(2); /* FF */
+                                                    -webkit-transform: scale(2); /* Safari and Chrome */
+                                                    -o-transform: scale(2); /* Opera */
+                                                    padding: 10px;
+                                                }
+                                            </style>
+
+
+                                        </td>
+                                    </tr>
+                                    <tr style="display: none;">
+                                        <td class="text">
+                                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="32%">
+                                                            <span class="text">Technical Contact</span>
+                                                        </td>
+                                                        <td width="56%">
+                                                            @*<input type="text" size="35" id="textfield11" name="textfield9"></td>*@
+                                                            @(Html.Kendo().TextBoxFor(m => m.TechnicalContact)
+                                                             .Name("TechnicalContact")
+
+            .HtmlAttributes(new { style = "width: 100%" })
+
+                                                            )
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text">
+                                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="32%">
+                                                            <span class="text">Approval Contact</span>
+                                                        </td>
+                                                        <td width="56%">
+                                                            @*<input type="text" size="35" id="textfield11" name="textfield9"></td>*@
+                                                            @(Html.Kendo().TextBoxFor(m => m.ApprovalContact)
+                                                             .Name("ApprovalContact")
+
+            .HtmlAttributes(new { style = "width: 80%" })
+
+                                                            )
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="32%" valign="top">
+                                                            <span class="text">Accessories</span>
+                                                        </td>
+                                                        <td width="56%">
+
+                                                            @(Html.TextAreaFor(m => m.Accessories, new { style = "width: 80%;height:55px" })
+
+                                                            )
+                                                        </td>
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="@Url.Action( "Maps", "Tech",new { EquipUID = Model.EquipId,BranchID=MDS.Controllers.LoginController.BranchID(User.Identity.Name) })"
+                                               type="submit"
+                                               id="runReport"
+                                               target="_blank">
+                                                @MDS.Controllers.TechController.GetAddress(Model.EquipId, MDS.Controllers.LoginController.BranchID(User.Identity.Name))
+                                            </a>
+                                            <img src="~/Images/googlemaps.png" onclick="alert('click on address to see on maps');" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+
+                                        <td>
+                                            <span id="spJob" style="color: #083f88; font-weight: bold;">@Model.AssociateServiceJob</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="box3">
+            <table cellspacing="1" cellpadding="0" width="100%" border="0">
+                <tbody>
+                    <tr>
+                        <td width="54%" valign="top">
+                            <table cellspacing="1" width="98%" border="0">
+                                <tbody>
+                                    <tr>
+                                        <td class="text maintexttop">
+                                            @MDS.Controllers.LoginController.RepairLabel work (to be completed by the Engineer)
+                                        </td>
+                                    </tr>
+                                    <tr width="100%">
+                                        <td width="100%">
+                                            <div id="ServiceWorkTimesX"></div>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="20%" valign="middle" class="text">Fault Details (inc any estimates given to customer)</td>
+                                                        <td width="80%">
+                                                            @(Html.TextAreaFor(m => m.FaultDetail, new { style = "width: 100%;height:35px" })
+
+                                                            )
+                                                        </td>
+
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="20%" valign="middle" class="text">Work Actually Done</td>
+                                                        <td width="80%">
+                                                            @(Html.TextAreaFor(m => m.WorkDone, new { style = "width: 100%;height:35px" })
+                                                            )
+                                                        </td>
+
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table cellspacing="1" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td valign="middle" width="20%" class="text">
+                                                            Parts Used in Repair
+                                                        </td>
+                                                        <td width="80%">
+                                                            <div id="PartsX" />
+
+                                                        </td>
+                                                        @* <td width="80%">
+                                                                @(Html.Kendo().Grid(Model.Parts)
+                                                                        .Name("AddGrid")
+                                                                        .DataSource(dataSource => dataSource
+                                                                                .Ajax()
+                                                                            .ServerOperation(false)
+                                                                                .Model(model => model.Id(m => m.Id))
+                                                                                .Read(read => read.Action("GetParts", "Repair"))
+                                                                                .Update(update => update.Action("UpdatePart", "Repair"))
+                                                                                .Create(create => create.Action("CreatePart", "Repair"))
+                                                                                .Destroy(create => create.Action("DeletePart", "Repair"))
+
+                                                                            )
+                                                                        .Columns(columns =>
+                                                                        {
+                                                                            columns.Bound(p => p.Id).Visible(false);
+                                                                            columns.Bound(p => p.PartId).Visible(false);
+                                                                            columns.Bound(p => p.Stocked_Part).Visible(false);
+                                                                            columns.Bound(p => p.PartNumber).Title("Part Number");
+                                                                            columns.Bound(p => p.PartName).Title("Part Name");
+                                                                            columns.Bound(p => p.NoOfParts).Title("Units").Format("{0:n2}");
+                                                                            columns.Bound(p => p.Price).Title("Price").Format("{0:c}");
+                                                                            columns.Command(command => command.Edit());
+                                                                            columns.Command(command => command.Destroy()).Visible(false);
+
+                                                                        })
+
+                                                                        .Pageable()
+                                                                         .ToolBar(t => t.Create())
+                                                                         .Editable(ed => ed.Mode(GridEditMode.PopUp))
+                                                                         .Events(e => e.Edit("hideIdField"))
+                                                                )
+                                                            </td> *@
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <table cellspacing="1" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="36%" valign="middle" class="text">
+                                                            Condition Report
+                                                        </td>
+                                                        <td width="64%" colspan="2">
+
+                                                            @(Html.Kendo().DropDownListFor(m => m.ConditionID)
+                                                               .Name("ConditionID")
+                                                                .Filter("startswith")
+                                                              .DataTextField("ConditionDesc")
+                                                              .DataValueField("ConditionID")
+                                                               .BindTo(Model.ConditionList)
+                                                              .HtmlAttributes(new { style = "width:62%" })
+                                                            )
+
+
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+
+
+                                    <tr>
+                                        <td>
+                                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="60%">
+                                                            <strong>Carry out Safety Test and put values below</strong>
+                                                        </td>
+
+                                                        <td width="15%"></td>
+                                                        <td width="30%">
+                                                            <label>
+                                                                @Html.EditorFor(m => m.SafetyTestDone)
+                                                            </label>
+                                                            Safety Test Done
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="31%">
+                                                            <span class="style11">Earth Resistance:</span>
+                                                        </td>
+                                                        <td width="24%">
+                                                            @(Html.Kendo().TextBoxFor(m => m.EarthResistant)
+                                                                     .Name("EarthResistant")
+.HtmlAttributes(new { style = "width: 170px" })
+                                                            )
+                                                        </td>
+                                                        <td width="45%">
+                                                            mohms
+                                                        </td>
+                                                        <td width="30%" style="display:none;">
+                                                            <label>
+                                                                @Html.EditorFor(m => m.Charge)
+                                                            </label>
+                                                            Charge
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td height="22" width="31%">
+                                                            <span class="style11">Insulation Resistance:</span>
+                                                        </td>
+                                                        <td width="24%">
+                                                            @*<input type="text" size="20" id="textfield16" name="textfield15">*@
+                                                            @(Html.Kendo().TextBoxFor(m => m.Insulation)
+                                                                     .Name("Insulation")
+.HtmlAttributes(new { style = "width: 170px" })
+                                                            )
+                                                        </td>
+                                                        <td width="15%">
+                                                            mohms
+                                                        </td>
+                                                        <td width="30%">
+                                                           
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="31%">
+                                                            <span class="style11">leakage Current:</span>
+                                                        </td>
+                                                        <td width="24%">
+                                                            @* <input type="text" size="20" id="textfield17" name="textfield16">*@
+                                                            @(Html.Kendo().TextBoxFor(m => m.LeakageCurrent)
+                                                                    .Name("LeakageCurrent")
+.HtmlAttributes(new { style = "width: 170px" })
+                                                            )
+                                                        </td>
+                                                        <td width="15%">
+                                                            uAmps
+                                                        </td>
+                                                        <td width="30%">
+                                                            
+                                                        </td>
+                                                    </tr>
+                                                    @*<tr>
+                                                            <td>&nbsp;
+                                                            </td>
+                                                            <td>&nbsp;
+                                                            </td>
+                                                            <td>&nbsp;
+                                                            </td>
+                                                            <td></td>
+                                                        </tr>*@
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </td>
+                        <td width="46%" valign="top">
+                            <table cellspacing="3" cellpadding="0" width="100%" border="0" bgcolor="#e2e2e2">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <span class="style11">
+                                                @*<input type="checkbox" id="checkbox3" name="checkbox3">*@
+
+                                                @Html.CheckBoxFor(m => m.VerbalApproval, new { @onclick = "DisplayVerbalApprovalObtained();" })
+                                            </span>Verbal Approval was obtained
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="29%" class="text">
+                                                            Order No.
+                                                        </td>
+                                                        <td width="71%">
+                                                            @(Html.Kendo().TextBoxFor(m => m.OrderNo)
+                                                                     .Name("OrderNo")
+.HtmlAttributes(new { style = "width: 200px", @disabled = "disabled", @maxlength = "15" })
+                                                            )
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="29%" class="text">
+                                                            Approval was
+                                                            <br>
+                                                            received from:
+                                                        </td>
+                                                        <td width="71%" valign="top">
+
+                                                            @(Html.Kendo().TextBoxFor(m => m.ApprovalReceived)
+                                                                     .Name("ApprovalReceived")
+.HtmlAttributes(new { style = "width: 200px", @disabled = "disabled" })
+                                                            )
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <table align="center" cellspacing="0" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="text" align="center">
+                                                            <b>
+                                                                Charge Out Type
+                                                            </b>
+                                                        </td>
+                                                        <td align="center">
+                                                            <b>
+                                                                Charge Out Rate
+                                                            </b>
+                                                        </td>
+                                                        <td align="center">
+                                                            <b>
+                                                                Hours
+                                                            </b>
+                                                        </td>
+                                                        <td align="center">
+                                                            <b>
+                                                                Total
+                                                            </b>
+                                                        </td>
+                                                    </tr>
+                                                    @if (Model.ChargeTypeHours != null)
+                                                    {
+                                                        foreach (var item in Model.ChargeTypeHours)
+                                                        {
+                                                            <tr>
+                                                                @if (item.ChargeType == "Total")
+                                                                {
+                                                                    <td>
+                                                                        <a href="" onclick="AllWorkTimes(); return false;">All Work times</a>
+                                                                    </td>
+                                                                    <td align="center"><b>Total</b></td>
+                                                                    <td align="center">
+                                                                        <b>  @Convert.ToDecimal(item.Hours).ToString("0.0")</b>
+                                                                    </td>
+
+                                                                    <td align="center"><b> @Convert.ToDecimal(item.Total).ToString("c")</b></td>
+
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td class="text" align="center">
+                                                                        @item.ChargeType
+                                                                    </td>
+                                                                    <td align="center">
+                                                                        @Convert.ToDecimal(@item.ChargeRate).ToString("c")
+                                                                    </td>
+                                                                    <td align="center">
+                                                                        @Convert.ToDecimal(item.Hours).ToString("0.00")
+                                                                    </td>
+                                                                    <td align="center">
+                                                                        @Convert.ToDecimal(item.Total).ToString("c")
+                                                                    </td>
+                                                                }
+                                                            </tr>
+                                                        }
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+
+
+
+                                    <tr>
+                                        <td>
+                                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="21%" class="text">
+                                                            &nbsp;
+                                                        </td>
+                                                        <td width="33%">
+                                                            &nbsp;
+                                                        </td>
+                                                        <td width="10%" align="left">
+                                                            &nbsp;
+                                                        </td>
+                                                        <td width="20%" align="left">
+                                                            Hours
+                                                        </td>
+                                                        <td width="16%" valign="middle" align="center">
+                                                            &nbsp;
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="21%" class="text">
+                                                            Labour
+                                                        </td>
+                                                        <td width="33%">
+                                                            @(Html.Kendo().DropDownListFor(m => m.ChargeTypeCode)
+                                                                  .Name("ChargeTypeCode")
+                                                                  .DataTextField("ChargeType")
+                                                                  .DataValueField("ChargeTypeCode")
+                                                                  .BindTo(Model.ChargeType)
+                                                                  .HtmlAttributes(new { style = "width:140px" })
+                                                            )
+                                                        </td>
+                                                        <td width="10%" align="left">
+                                                            <span id="spLabourRs">
+                                                                $0.00
+                                                            </span>
+
+                                                        </td>
+                                                        <td width="20%" align="left">
+                                                            @(Html.Kendo().TextBoxFor(m => m.LabourHours)
+                                                                     .Name("LabourHours")
+.HtmlAttributes(new { style = "width: 80px", required = "required", data_required_msg = "Hours is required." })
+                                                            )
+                                                        </td>
+                                                        <td width="16%" valign="middle" align="center">
+                                                            <span id="spTotalLabourCost">$0.00</span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="21%" class="text">
+                                                            Travel
+                                                        </td>
+                                                        <td width="33%">
+
+                                                            @(Html.Kendo().DropDownListFor(m => m.TravelTypeCode)
+                                                                  .Name("TravelTypeCode")
+                                                                  .DataTextField("TravelType")
+                                                                  .DataValueField("TravelTypeCode")
+                                                                  .BindTo(Model.TravelList)
+                                                                  .HtmlAttributes(new { style = "width:140px" })
+                                                            )
+                                                        </td>
+                                                        <td width="10%" align="left">
+                                                            <span id="spTravelRs">
+                                                                $0.00
+                                                            </span>
+
+                                                        </td>
+                                                        <td width="20%" align="left">
+
+                                                            @(Html.Kendo().TextBoxFor(m => m.TravelHours)
+                                                                     .Name("TravelHours")
+                                                                    .HtmlAttributes(new { style = "width: 80px " })
+                                                            )
+                                                        </td>
+                                                        <td width="16%" valign="middle" align="center">
+                                                            <span id="spTotalTravelCost">$0.00</span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="21%" class="text">
+                                                            Date Repair
+                                                            <br>
+                                                            Finished
+                                                        </td>
+                                                        @*<td width="19%" align="left">
+                                                               <input type="text" class="inputboxsm2" id="textfield21" name="textfield19">
+                                                            </td>*@
+                                                        <td width="33%" colspan="2">
+
+                                                            @(Html.Kendo().DatePickerFor(m => m.RepairDate)
+                                                                            .Name("RepairDate")
+.HtmlAttributes(new { style = "width:120px", type = "text" })
+                                                            )
+                                                        </td>
+                                                        <td width="30%" class="text">
+                                                            Total Labour and Travel
+                                                        </td>
+                                                        <td width="16%" valign="middle" align="center">
+                                                            <span id="spTotalLabourTravelCost">$0.00</span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="21%" class="text">
+                                                            &nbsp;
+                                                        </td>
+                                                        <td width="63%" valign="top" class="text">
+                                                            <div align="right">
+                                                                Proportion of additional expenses:
+                                                            </div>
+                                                        </td>
+                                                        <td width="16%" valign="middle" align="center">
+                                                            @(Html.Kendo().CurrencyTextBoxFor(m => m.PromotionalExpenses)
+                                                                     .Name("PromotionalExpenses")
+                                                                    .HtmlAttributes(new { style = "width: 80px " })
+                                                            )
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="21%" class="text">
+                                                            &nbsp;
+                                                        </td>
+                                                        <td width="63%" valign="top" class="text">
+                                                            <div align="right">
+                                                                Total costs of parts used:
+                                                            </div>
+                                                        </td>
+                                                        <td width="16%" valign="middle" align="center">
+                                                            <span id="spTotalCostParts">$0.00</span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="21%" class="text">
+                                                            &nbsp;
+                                                        </td>
+                                                        <td width="63%" valign="top" class="text">
+                                                            <div align="right">
+                                                                Total costs associated with repair:
+                                                            </div>
+                                                        </td>
+                                                        <td width="16%" valign="middle" align="center" bordercolor="#000000">
+                                                            <span id="spTotalCostRepair">$0.00</span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="box4">
+            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                <tbody>
+                    @*<tr>
+                            <td>&nbsp;
+                            </td>
+                            <td>&nbsp;
+                            </td>
+                            <td>&nbsp;
+                            </td>
+                            <td>&nbsp;
+                            </td>
+                            <td>&nbsp;
+                            </td>
+                            <td>&nbsp;
+                            </td>
+                            <td>&nbsp;
+                            </td>
+                        </tr>*@
+                    <tr>
+                        <td width="2%">
+                            &nbsp;
+                        </td>
+                        <td width="28%">
+                            @Html.EditorFor(m => m.AllSpecified)
+
+                            <div class="text checktext" style="width:94%">
+                                All the specified @MDS.Controllers.LoginController.RepairLabel work has been completed, the post-repair test has been
+                                done and the customer has been informed for pickup or advised on site
+                            </div>
+                        </td>
+                        <td width="6%">
+                            <div align="center" class="blue">
+                                <strong>OR</strong>
+                            </div>
+                        </td>
+                        <td width="28%" valign="top">
+                            @Html.EditorFor(m => m.ItemRepair)
+
+                            <div class="text checktext" style="width:94%">
+                                Item was not fully repaired when returned to the customer (state reason in the WORK
+                                DONE.)
+                            </div>
+                        </td>
+                        <td width="6%">
+                            <div align="center" class="blue">
+                                <strong>OR</strong>
+                            </div>
+                        </td>
+                        <td width="28%" valign="top">
+
+
+                            @Html.EditorFor(m => m.ResultRepair)
+                            <div class="text checktext" style="width:94%">
+                                As a result of this repair investigation, this equipment item has been retired
+                            </div>
+                        </td>
+                        <td width="2%">
+                            &nbsp;
+                        </td>
+                    </tr>
+                    @*<tr>
+                            <td>&nbsp;
+                            </td>
+                            <td>&nbsp;
+                            </td>
+                            <td>&nbsp;
+                            </td>
+                            <td valign="top">&nbsp;
+                            </td>
+                            <td>&nbsp;
+                            </td>
+                            <td valign="top">&nbsp;
+                            </td>
+                            <td>&nbsp;
+                            </td>
+                        </tr>*@
+                </tbody>
+            </table>
+        </div>
+        <div id="box5">
+            <table cellspacing="1" cellpadding="0" width="100%" border="0">
+                <tbody>
+
+                    <tr>
+                        <td width="98%" class="style10 text">
+                            <strong>Job termination (to be Completed by Admin)</strong>
+                        </td>
+                    </tr>
+                    @*<tr>
+                            <td class="style10 text">&nbsp;
+                            </td>
+                        </tr>*@
+                    <tr>
+                        <td class="style10 text">
+                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                <tbody>
+                                    <tr>
+                                        <td width="2%">
+                                            &nbsp;
+                                        </td>
+                                        <td width="2%" valign="top" align="center" class="RetirementReportPrintedcls">
+                                            @Html.EditorFor(m => m.RetirementReportPrinted)
+                                        </td>
+                                        <td width="15%" valign="top" align="left" class="RetirementReportPrintedcls">
+                                            <span class="text">Has retirement been printed?</span>
+                                        </td>
+                                        <td width="2%" valign="top" align="center">
+                                            @Html.CheckBoxFor(m => m.HasItem, new { @onclick = "DisplayHandoverCompleted();" })
+                                        </td>
+                                        <td width="22%" valign="top" align="left">
+                                            <span class="text">Has the item been returned or collected or the job finished on site?</span>
+                                        </td>
+
+                                        <td width="17%" valign="top" align="center">
+                                            <span class="text">Date/Time job completed</span>
+                                        </td>
+                                        <td width="13%" valign="top" align="center">
+                                            @Html.EditorFor(m => m.JobCompletionDate, new
+                                            {
+                                                style = "width:120px"@*, type = "text", data_type = "date"*@})
+
+                                            @*@(Html.Kendo().DatePickerFor(m => m.JobCompletionDate)
+                                                                               .Name("JobCompletionDate")
+                                                .HtmlAttributes(new { style = "width:120px", type = "text" })
+                                                                              )*@
+                                        </td>
+                                        <td width="13%" valign="top" align="center">
+                                            @Html.DropDownListFor(i => i.JobCompletionTime, new SelectList(ViewBag.JobCompletionTimeX, "Time24Hour", "Desc"))
+
+                                            @*@(Html.Kendo().TimePickerFor(m => m.JobCompletionTime)
+                                                                                 .Name("JobCompletionTime")
+                                                .HtmlAttributes(new { style = "width:90px", type = "text" })*@
+                                        </td>
+
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    @*<tr>
+                            <td>&nbsp;
+                            </td>
+                        </tr>*@
+                    <tr>
+                        <td>
+                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                <tbody>
+                                    <tr>
+                                        <td width="3%">
+                                            &nbsp;
+                                        </td>
+                                        <td width="3%" class="sj">
+                                            @Html.CheckBoxFor(m => m.InvoiceThruServiceJob, new { onclick = "DisplayInvoiceThruServiceJob();" })
+                                        </td>
+                                        <td width="25%" class="sj">
+                                            <span class="text">This @MDS.Controllers.LoginController.RepairLabel work is covered by the Service Job invoice?</span>
+                                        </td>
+                                        <td width="3%" class="invoice">
+                                            @Html.CheckBoxFor(m => m.HasJob, new { @onclick = "DisplayHasBeenInvoiced();" })
+                                        </td>
+                                        <td width="15%" class="invoice">
+                                            <span class="text">Has the job been invoiced?</span>
+                                        </td>
+                                        <td width="3%" class="invoice">
+                                            &nbsp;
+                                        </td>
+                                        <td width="8%" class="invoice">
+                                            Invoice #:
+                                        </td>
+                                        <td width="11%" class="invoice">
+
+                                            @Html.EditorFor(m => m.Invoice, new { style = "width: 100px", @maxlength = "15" })
+
+
+                                        </td>
+                                        <td width="11%" class="invoice">
+                                            <span class="text">Invoice Date</span>
+                                        </td>
+                                        <td width="11%" class="invoice">
+                                            @Html.EditorFor(m => m.InvoiceDate)
+
+                                            @*@(Html.Kendo().DatePickerFor(m => m.InvoiceDate)
+                                                                              .Name("InvoiceDate")
+                                                .HtmlAttributes(new { style = "width:120px", type = "text" })
+                                                                             )*@
+                                        </td>
+
+
+                                        <td width="7%" class="invoice">
+                                            Charge $
+                                        </td>
+                                        <td width="11%" class="invoice">
+                                            @Html.EditorFor(m => m.ChargesInvoice, new { style = "width: 100px " })
+                                            @*@(Html.Kendo().CurrencyTextBoxFor(m => m.ChargesInvoice)
+                                                 .Name("ChargesInvoice")
+                                                .HtmlAttributes(new { style = "width: 100px " })
+                                                )*@
+                                            @Html.ValidationMessageFor(m => m.ChargesInvoice)
+                                        </td>
+                                        <td width="1%">
+                                            &nbsp;
+                                        </td>
+                                        <td width="2%">
+                                            &nbsp;
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    @*<tr>
+                            <td>&nbsp;
+                            </td>
+                        </tr>*@
+                </tbody>
+            </table>
+        </div>
+        <div id="box6">
+            <table cellspacing="1" cellpadding="0" width="100%" border="0">
+                <tbody>
+                    @*<tr>
+                            <td>&nbsp;
+                            </td>
+                        </tr>*@
+                    <tr>
+                        <td>
+                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            Name of Person receiving Equipment
+                                        </td>
+                                        <td>
+
+                                            @(Html.Kendo().TextBoxFor(m => m.PersonName)
+                                             .Name("PersonName")
+                                            .HtmlAttributes(new { style = "width: 250px " })
+                                            )
+                                        </td>
+                                        <td>
+                                            Receipt Date/Time
+                                        </td>
+                                        <td>
+                                            @Html.EditorFor(m => m.ReceiptDate)
+
+                                            @*@(Html.Kendo().DateTimePickerFor(m => m.ReceiptDate)
+                                                .Name("ReceiptDate")
+                                                .HtmlAttributes(new { style = "width:200px" })
+                                                )*@
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    @*<tr>
+                            <td height="19">&nbsp;
+                            </td>
+                        </tr>*@
+                    <tr>
+                        <td height="19">
+                            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                <tbody>
+                                    <tr>
+                                        @*<td width="2%">
+                                                &nbsp;
+                                            </td>*@
+                                        <td @*width="10%" rowspan="3"*@>
+                                            @if (ViewBag.AddNew == null)
+                                            {
+                                                <input type="button" class="inputbuttonbg inputbig" value="Cancel / Back" onclick="cancel()">
+
+                                            }
+                                        </td>
+                                        @*<td width="12%">
+                                                &nbsp;
+                                            </td>*@
+                                        <td @*width="12%" rowspan="3"*@>
+                                            <input type="submit" id="btnPrintWO" class="inputbuttonbg inputbig" value="Print the @MDS.Controllers.LoginController.RepairLabel Work Order">
+                                        </td>
+                                        @*<td width="7%">
+                                                &nbsp;
+                                            </td>*@
+                                        <td @*width="12%" rowspan="3"*@>
+                                            <input type="button" id="btnPrintRetirement" class="inputbuttonbg inputbig" value="Print Equipment Retirement Form">
+                                        </td>
+                                        @*<td width="7%">
+                                                &nbsp;
+                                            </td>*@
+                                        <td @*width="22%" rowspan="3"*@>
+                                            <input type="submit" id="btnPrintDetail" class="inputbuttonbg inputbig" value="Print @MDS.Controllers.LoginController.RepairLabel Detail Report">
+                                        </td>
+                                        @*<td width="7%">
+                                                &nbsp;
+                                            </td>*@
+                                        <td @*width="7%" rowspan="3"*@>
+                                            @if (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin)
+                                            {
+                                                <input type="button" onclick="btnOKclick();return false" class="inputbuttonbg inputbig" id="btnOK" value="Ok">
+                                            }
+                                        </td>
+                                        @*<td width="3%">
+                                                &nbsp;
+                                            </td>*@
+                                    </tr>
+                                    @*<tr>
+                                            <td>
+                                                &nbsp;
+                                            </td>
+                                            <td>
+                                                &nbsp;
+                                            </td>
+                                            <td>
+                                                &nbsp;
+                                            </td>
+                                            <td>
+                                                &nbsp;
+                                            </td>
+                                            <td>
+                                                &nbsp;
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                &nbsp;
+                                            </td>
+                                            <td>
+                                                &nbsp;
+                                            </td>
+                                            <td>
+                                                &nbsp;
+                                            </td>
+                                            <td>
+                                                &nbsp;
+                                            </td>
+                                            <td>
+                                                &nbsp;
+                                            </td>
+                                        </tr>*@
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    @*<tr>
+                            <td height="19">&nbsp;
+                            </td>
+                        </tr>*@
+                </tbody>
+            </table>
+        </div>
+
+        @(Html.Kendo().Window()
+                                                        .Name("Rewindow")
+                                                        .Title("Retirement Details")
+                                                        .Width(1000)
+                                                        .Draggable(true)
+                                                        .Height(450)
+                                                        .Visible(false)
+                                                        .Iframe(true)
+                                                        .Modal(true)
+                                                        .Events(e => e.Close("onClose1"))
+        )
+
+        @(Html.Kendo().Window()
+                            .Name("PrintRepairWO")
+                            .Title("Repair Work Order")
+                            .Width(1000)
+                            .Height(600)
+                            .Visible(false)
+                            .Modal(true)
+                            .Draggable(true)
+                            .Iframe(true)
+        )
+
+        @(Html.Kendo().Window()
+                            .Name("PrintRepairDetail")
+                            .Title("Repair Detail Report")
+                            .Width(1000)
+                            .Height(600)
+                            .Visible(false)
+                            .Draggable(true)
+                            .Modal(true)
+                            .Iframe(true)
+        )
+
+        @(Html.Kendo().Window()
+                            .Name("PrintRetirement")
+                            .Title("Retirement Detail Report")
+                            .Width(1000)
+                            .Height(600)
+                            .Visible(false)
+                            .Draggable(true)
+                            .Modal(true)
+                            .Iframe(true)
+        )
+
+        @*@(Html.Kendo().Window()
+                                .Name("windowEngineer")
+                                .Title("Engineers")
+                                .Width(1000)
+                                .Height(600)
+                                .Visible(false)
+                                .Draggable(true)
+                                .Modal(true)
+                                .Iframe(true)
+                                .Events(e => e.Close("CloseEngineerWindow"))
+            )*@
+
+        <input type="hidden" id="hdRetirementDone" />
+
+    }
+    <div id="box6">
+
+        <table cellspacing="1" cellpadding="0" width="100%" border="0">
+            <tbody style="width:100%">
+
+                <tr style="width:100%">
+                    <td height="30" class="text maintexttop">
+                        Attachments
+                    </td>
+                    <td width="100%">
+
+                        @if (Model.RepairId == 0)
+                        {
+
+                            <button onclick="savedataforphotos();" class="inputbuttonbg inputbig">Add Attachments</button>
+                        }
+                        else
+                        {
+
+                            <div id="PhotosX" />
+                        }
+                    </td>
+
+                </tr>
+            </tbody>
+        </table>
+
+        <table cellspacing="1" cellpadding="0" width="100%" border="0">
+            <tbody style="width:100%">
+                <tr style="width:100%">
+                    <td height="30" class="text maintexttop">
+                        Customer Signature
+                    </td>
+                    @if (MDS.Controllers.LoginController.CustomerSign_ElseName)
+                    {
+                        if (Model.CustomerSignature)
+                        {
+                            <td width="100%">
+                                <img src="@Url.Content("~/UploadedFiles/Signature_" + Model.RepairId.ToString() + "-R-" + MDS.Controllers.LoginController.BranchID(User.Identity.Name).ToString() + ".png")" height="500" width="500" />
+                            </td>
+                        }
+                        else
+                        {
+                            <td width="100%">
+                                Not signed
+                            </td>
+                        }
+                    }
+                    else
+                    {
+                        <td  width="90%">
+                            @Model.CustName
+                        </td>
+                    }
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+<!-- box2 End -->
+<script type="text/javascript">
+
+
+
+    var div = $("#dialog");
+
+
+    var RepairUID = 0;
+        RepairUID = '@Model.RepairId';
+
+
+    function setNotes(notes) {
+        // alert(notes);
+        $('#divNotes').text(notes);
+    }
+    function emailnotification() {
+        var RepairID = '@Model.RepairId';
+        $.ajax({
+            url: '@Url.Action("emailnotification", "Repair")',
+            type: 'POST',
+            async: false,
+            datatype: "json",
+            data: { RepairID: RepairID },
+            success: function (response) {
+                if (response.Error == '') {
+                    alert('email sent');
+                }
+                else {
+                    alert('email failed to send:' + response.Error);
+                }
+            },
+            error: function (req, status, error) {
+            }
+        });
+
+    }
+    function btnOKclick() {
+        try {
+            if ($("#SelectedEquipment").val() == "" || $("#SelectedEquipment").val() == "0" || $("#SelectedEquipment").val() == null) {
+                ShowAlert("You must pick the equipment item.");
+                return false;
+            }
+            var isvalid = ApprovalValidation();
+            var isvalid1 = CompletionDateTimeValidation();
+            var isvalid2 =RepairCommenced();
+            var isvalid3 = LabourHours();
+            if (isvalid && isvalid1 && isvalid2 && isvalid3) {
+                // show loading indicator
+                kendo.ui.progress($('#repair'), true);
+
+                $.post('@Url.Action("SaveUpdateRepair", "Repair")', $("#AddForm").serialize(), function (data) {
+                    if (data.message != '') {
+                        if (data.Error) {
+                            ShowAlert(data.message);
+        var url = '@Url.Action("Edit", "Repair")' + "?id=" + data.id;
+            window.location.href = url;
+                        }
+                        else {
+                            ShowSuccess(data.message);
+                            setTimeout("window.location.href = '@Url.Action("Index", "Repair")';", 2000);
+
+//        var url = '@Url.Action("Edit", "Repair")' + "?id=" + data.id;
+  //          window.location.href = url;
+                        }
+                    }
+                    else {
+                        if (data.msg == "1") {
+                            // hide loading indicator
+                            kendo.ui.progress($('#repair'), false);
+                            ShowSuccess(data.message);
+                            if ($("#hdReapirID").val() != "") {
+                                var url = '@Url.Action("GetRepairForService", "Service")' + "?ServiceJobID=" + $("#hdReapirID").val();
+                                setTimeout("window.location.href = '" + url + "';", 2000);
+                            }
+                            else {
+                                setTimeout("window.location.href = '@Url.Action("Index", "Repair")';", 2000);
+                            }
+                        }
+                        else {
+                            ShowSuccess(data.message);
+                            setTimeout('parent.$("#rpwindow").data("kendoWindow").close();', 2000);
+                        }
+                    }
+                });
+            }
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+    function openNotes() {
+        var RepairID = '@Model.RepairId';
+        if (RepairID == 0) {
+            alert('First specify the customer and the equipment to be repaired and then save the record before parts can be added');
+            return;
+        }
+        var BranchID = '@MDS.Controllers.LoginController.BranchID(User.Identity.Name)';
+
+        try {
+            div.dialog({
+                closeOnEscape: false,
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("Notes", "Repair")?ID=' + RepairID + '&BranchID=' + BranchID +"&SourceAdmin_Tech=true&Repair=true";
+                    $(this).load(url); @*'@Url.Action("UploadFile", "Applications")');*@
+
+                },
+                modal: true,
+                resizable: false,
+
+                width: 800,
+                height: 500,
+                title: "Notes",
+                buttons:
+                {
+                    Close: function () {
+                        div.remove(); div.dialog("close");
+                    }
+                },
+            });
+        }
+        catch (ex) {
+            alert('catchall:' + ex.message);
+        }
+        return false;
+
+    }
+    function CompletionDateTimeValidation() {
+        var valid = true;
+        var JobCompletionDate = $("#JobCompletionDate");//.data("kendoDatePicker").value();
+        var JobCompletionTime = $("#JobCompletionTime");//.data("kendoTimePicker").value();
+        var InvoiceDate = $("#InvoiceDate");//.data("kendoDatePicker").value();
+
+        var HasItemCheck = $("#HasItem").is(":checked");
+        var HasJobCheck = $("#HasJob").is(":checked");
+        if (HasItemCheck) {
+            if (JobCompletionDate.val() == "" || JobCompletionDate.val() == null)// || JobCompletionTime == "" || JobCompletionTime == null)
+            {
+                ShowAlert("The equipment is marked as being returned to client yet a valid date that the item was taken back/picked up has not been specified.");
+                valid = false;
+            }
+        }
+        if (HasJobCheck) {
+            if (InvoiceDate.val() == "" || InvoiceDate.val() == null) {
+                ShowAlert("You must specify the date on the invoice.");
+                valid = false;
+            }
+            if ($("#Invoice").val() == "" || $("#Invoice").val() == null) {
+                ShowAlert("You must specify the invoice number issued.");
+                valid = false;
+            }
+        }
+        return valid;
+    }
+
+
+        function ApprovalValidation() {
+        var valid = true;
+        var bRepairSectionDone = $("#AllSpecified").is(":checked") || $("#ItemRepair").is(":checked") || $("#ResultRepair").is(":checked");
+        if (bRepairSectionDone) {
+            if ($("#Approve").is(":checked")) {
+                if ($("#VerbalApproval").is(":checked") == false || $("#ApprovalReceived").val() == "" || $("#ApprovalReceived").val() == null) {
+                    ShowAlert("Approval was required before proceeding with this job. You must tick the ApprovalRequired AND enter the ApprovedBy, Alternatively, un-tick the '@MDS.Controllers.LoginController.RepairLabel work has been completed");
+                    valid = false;
+                }
+            }
+
+            if ($("#orderNumber").is(":checked")) {
+                if ($("#OrderNo").val() == "") {
+                    ShowAlert("An order number is required before this job can be treated as completed.");
+                    valid = false;
+                }
+            }
+        }
+        return valid;
+    }
+
+           $("#orderNumber").prop("disabled", true);
+        $("#VerbalApproval").prop("disabled", true);
+        $("#HasJob").prop("disabled", true);
+
+
+
+    function RefreshRecord() {
+
+        DisplayServicejobDetails();
+        DisplayInvoiceThruServiceJob();
+        DisplayApprovalRequired();
+        DisplayVerbalApprovalObtained();
+        DisplayOrderNumberRequired();
+        DisplayHasBeenInvoiced();
+        DisplayHandoverCompleted();
+        DisplayRepairCompleted();
+        DisplaySupplyStopped();
+//        alert('RefreshRecord()');
+        RefreshLastServiceOrRepair();
+  //      alert('RefreshRecord()');
+    }
+
+
+        function RefreshLastServiceOrRepair() {
+        var ServiceUID = -1;
+        var EquipId = 0;
+        EquipId = $("#SelectedEquipment").val();
+
+        if (EquipId == 0 || EquipId == "" || EquipId == null) {
+            //alert("Please pick the Equipment Item");
+            //return false;
+            EquipId = -1;
+        }
+
+        var ActualServiceDate = $("#DateEquipRepair");//.data("kendoDatePicker");
+            var d = ActualServiceDate.val();
+
+        if (d != "" && d != null) {
+            d = d.toLocaleString("en-AU");
+        }
+        if (d == null) {
+            d = new Date().toLocaleString("en-AU");
+        }
+
+        if (ServiceUID == 0 || ServiceUID == "" || ServiceUID == null) {
+            ServiceUID = -1;
+        }
+//                        alert('RefreshLastServiceOrRepair()');
+
+        if (RepairUID == 0 || RepairUID == "" || RepairUID == null) {
+            RepairUID = -1;
+        }
+
+
+        $.ajax({
+            url: '@Url.Action("RefreshLastServiceOrRepair", "ServiceWorkOrder")',
+            type: 'POST',
+            async: false,
+            datatype: "json",
+            data: { EquipUID: EquipId, RepairUID: RepairUID, ServiceUID: ServiceUID, ActualDateOfService: d },
+            success: function (response) {
+                if (response.bWithin90Days == true) {
+                    $("#spPrevious").css("color", "red");
+                }
+                else {
+                    $("#spPrevious").css("color", "black");
+                }
+                $("#spPrevious").text(response.notes + ' ' + response.lastnotes);
+            },
+            error: function (req, status, error) {
+            }
+        });
+    }
+
+    function DisplayHasBeenInvoiced() {
+        var InvoiceDate = $("#InvoiceDate");//$("#InvoiceDate").data("kendoDatePicker");
+        var bRepairSectionDone = $("#AllSpecified").is(":checked") || $("#ItemRepair").is(":checked") || $("#ResultRepair").is(":checked");
+        var hasJob = !($("#HasJob").is(":checked"));
+        //alert('hasJobdisabled');
+        //alert(hasJob);
+        if (bRepairSectionDone && !(hasJob)) {
+           // alert('enabled');
+            InvoiceDate.removeAttr("disabled");
+            $("#Invoice").prop("disabled", false);
+            $('#ChargesInvoice').removeAttr("disabled");
+
+        }
+        else {
+          //  alert('disabled');
+            InvoiceDate.attr("disabled", "disabled");
+            $("#Invoice").prop("disabled", true);
+            $('#ChargesInvoice').attr("disabled", "disabled");
+
+        }
+    }
+
+    function DisplayApprovalRequired() {
+        var chkBoxVerbalApprovalObtained = $("#VerbalApproval").is(":checked");
+        var chkBoxApprovalRequired = $("#Approve").is(":checked");
+        $("#ApprovalReceived").prop("disabled", !(chkBoxApprovalRequired && chkBoxVerbalApprovalObtained));
+        $("#orderNumber").prop("disabled", !(chkBoxApprovalRequired));
+        $("#VerbalApproval").prop("disabled", !(chkBoxApprovalRequired));
+        $("#OrderNo").prop("disabled", !(chkBoxApprovalRequired && chkBoxVerbalApprovalObtained));
+    }
+
+    function DisplayVerbalApprovalObtained() {
+//        alert('DisplayVerbalApprovalObtained()');
+            var chkBoxVerbalApprovalObtained = $("#VerbalApproval").is(":checked");
+        var chkBoxApprovalRequired = $("#Approve").is(":checked");
+        var chkBoxOrderRequired = $("#orderNumber").is(":checked");
+        $("#ApprovalReceived").prop("disabled", !(chkBoxApprovalRequired && chkBoxVerbalApprovalObtained));
+      //  alert(chkBoxOrderRequired && chkBoxVerbalApprovalObtained);
+        $("#OrderNo").prop("disabled", !(chkBoxOrderRequired && chkBoxVerbalApprovalObtained));
+    }
+        function DisplayInvoiceThruServiceJob() {
+        var bVisible = !$("#InvoiceThruServiceJob").is(":checked");
+        if (bVisible) {
+            $(".invoice").show();
+        }
+        else {
+            $(".invoice").hide();
+        }
+    }
+
+
+            function DisplayHandoverCompleted() {
+            var JobCompletionDate = $("#JobCompletionDate");//.data("kendoDatePicker");
+            var JobCompletionTime = $("#JobCompletionTime");//.data("kendoTimePicker");
+            var HasItemCheck = $("#HasItem").is(":checked");
+            var bRepairSectionDone = $("#AllSpecified").is(":checked") || $("#ItemRepair").is(":checked") || $("#ResultRepair").is(":checked");
+            if (bRepairSectionDone && HasItemCheck) {
+                //JobCompletionTime.enable();
+                //            JobCompletionDate.enable();
+                JobCompletionDate.removeAttr("disabled");
+                JobCompletionTime.removeAttr("disabled");
+            }
+            else {
+                JobCompletionDate.attr("disabled", "disabled");
+                JobCompletionTime.attr("disabled", "disabled");
+                //            JobCompletionTime.enable(false);
+                //          JobCompletionDate.enable(false);
+            }
+        }
+
+
+    function DisplayRepairCompleted() {
+        var bRepairSectionDone = $("#AllSpecified").is(":checked") || $("#ItemRepair").is(":checked") || $("#ResultRepair").is(":checked");
+        $("#HasItem").prop("disabled", !(bRepairSectionDone));
+        var HasItemEnable = $("#HasItem").is(":checked");
+        var JobCompletionDate = $("#JobCompletionDate");//.data("kendoDatePicker");
+        var JobCompletionTime = $("#JobCompletionTime");//.data("kendoTimePicker");
+
+        if (bRepairSectionDone && HasItemEnable) {
+            JobCompletionDate.removeAttr("disabled");
+            JobCompletionTime.removeAttr("disabled");
+
+            //            JobCompletionTime.enable();
+            //          JobCompletionDate.enable();
+        }
+        else {
+            JobCompletionTime.attr("disabled", "disabled");
+            JobCompletionDate.attr("disabled", "disabled");
+            //            JobCompletionDate.enable(false);
+        }
+        //alert('DisplayRepairCompleted()');
+
+        var ChargesTextBox = $("#ChargesInvoice");//.data("kendoNumericTextBox");
+        if (bRepairSectionDone) {
+            //ChargesTextBox.enable();
+            //ChargesTextBox.attr("disabled", "disabled");
+            JobCompletionTime.removeAttr("disabled");
+        }
+        else {
+            ChargesTextBox.attr("disabled", "disabled");
+            //ChargesTextBox.enable(false);
+        }
+
+        $("#HasJob").prop("disabled", !(bRepairSectionDone));
+        var InvoiceEnabled = ($("#HasJob").is(":checked"));
+       /// alert(InvoiceEnabled && bRepairSectionDone);
+       // alert('InvoiceNoEnable');
+       // alert((InvoiceEnabled && bRepairSectionDone));
+        $("#Invoice").prop("disabled", !(InvoiceEnabled && bRepairSectionDone));
+
+        var InvoiceDate = $("#InvoiceDate");//.data("kendoDatePicker");
+        if (InvoiceEnabled && bRepairSectionDone) {
+            InvoiceDate.removeAttr("disabled");
+            $('#ChargesInvoice').removeAttr("disabled");
+        }
+        else {
+            InvoiceDate.attr("disabled", "disabled");
+            $('#ChargesInvoice').attr("disabled", "disabled");
+
+        }
+        //InvoiceDate.enable(InvoiceEnabled && bRepairSectionDone);
+        if ($("#ResultRepair").is(":checked")) {
+            $(".RetirementReportPrintedcls").show();
+            $("#btnPrintRetirement").show();
+        }
+        else {
+            $(".RetirementReportPrintedcls").hide();
+            $("#btnPrintRetirement").hide();
+        }
+    }
+
+
+        function DisplayServicejobDetails() {
+        var spjobtext = '@Model.ServiceJobID';
+        var ServiceJob = false;
+        if (spjobtext == "0") {
+            ServiceJob = false;
+        }
+        else {
+            ServiceJob = true;
+        }
+
+        if ($("#InvoiceThruServiceJob").is(":checked") && ServiceJob == false) {
+            $("#InvoiceThruServiceJob").prop("checked", false);
+        }
+        try {
+            if (ServiceJob == false) {
+                $(".sj").hide();
+
+            }
+            else {
+                $(".sj").show();
+            }
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+    function DisplayOrderNumberRequired() {
+        var chkBoxVerbalApprovalObtained = $("#VerbalApproval").is(":checked");
+        var chkBoxApprovalRequired = $("#Approve").is(":checked");
+        $("#OrderNo").prop("disabled", !(chkBoxApprovalRequired && chkBoxVerbalApprovalObtained));
+
+    }
+
+
+        function DisplaySupplyStopped() {
+
+        var EquipId = 0;
+        EquipId = $("#SelectedEquipment").val();
+
+        if (EquipId == 0 || EquipId == "" || EquipId == null) {
+            EquipId = -1;
+        }
+
+        $.ajax({
+            url: '@Url.Action("StopSupply", "Repair")',
+            type: 'POST',
+            datatype: "json",
+            data: { EquipId: EquipId },
+            success: function (response) {
+                if (response.StopSupplymsg == "1") {
+                    $("#spSupply").text("Supply Stopped");
+                }
+                else {
+                    $("#spSupply").text("");
+                }
+            }
+        });
+
+    }
+
+
+        RefreshRecord();
+
+        RefreshParts();
+    function RefreshParts() {
+        try {
+            var RepairID = '@Model.RepairId';
+            var BranchID = '@MDS.Controllers.LoginController.BranchID(User.Identity.Name)';
+
+            $.ajax({
+                url: '@Url.Content("~/Tech/RepairParts")',
+                type: 'POST',
+                data: { RepairID: RepairID, BranchID: BranchID, Readonly: false },
+                success: /*doSubmitSuccessParts*/
+                    function (result) {
+                        try {
+                            $('#PartsX').html(result);
+                            RecalcParts();
+
+                        }
+                        catch (ex) {
+                            alert('Error in doSubmitSuccessParts():' + ex.message);
+                        }
+
+                    }
+            });
+        }
+        catch (ex) {
+            alert('Error in init():' + ex.message);
+        }
+    }
+
+    function RecalcParts() {
+        var RepairID = '@Model.RepairId';
+        var BranchID = '@MDS.Controllers.LoginController.BranchID(User.Identity.Name)';
+
+        var data = { RepairID: RepairID, BranchID: BranchID }
+        $.post('@Url.Action("CostOfPart", "Tech")', data,
+            function (data) {
+                if (data.Error == '') {
+                    $("#spTotalCostParts").text(data.cost);
+                    CalculateCost();
+                }
+                else
+                    alert("Could not recalc cost of parts");
+            }
+            , 'json');
+
+    }
+
+
+        function doSubmitSuccessPartsOLD(result)
+{
+            try
+            {
+                            $('#PartsX').html(result);
+            }
+            catch (ex)
+            {
+                alert('Error in doSubmitSuccessParts():' + ex.message);
+            }
+
+}
+
+    function deletePart(RepairPartId, BranchID) {
+        if (confirm("Do you want to remove this part?")) {
+            var data = { RepairPartId: RepairPartId, BranchID: BranchID }
+            $.post('@Url.Action("DeletePart", "Tech")', data,
+                function (data) {
+                    if (data.Error == '') {
+                        RefreshParts();
+                    }
+                    else
+                        alert("Could not delete");
+                }
+                , 'json');
+        }
+    }
+
+
+
+                function editPart(RepairPartId, BranchID)
+{
+
+div.dialog({
+    closeOnEscape: false,
+                open: function(event, ui) {
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+        var url = '@Url.Action("EditParts", "Tech")?RepairPartId=' + RepairPartId + '&BranchID=' + BranchID;
+                $(this).load(url); @*'@Url.Action("UploadFile", "Applications")');*@
+
+            },
+                        modal: true,
+                        resizable: false,
+
+                        width: 800,
+                        height: 500,
+                        title: "Edit Parts",
+                        buttons:
+            {
+                Close: function() {
+                        $(this).dialog("close");
+                }
+            },
+                        });
+}
+
+    function CreateParts() {
+        var RepairID = '@Model.RepairId';
+        var BranchID = '@MDS.Controllers.LoginController.BranchID(User.Identity.Name)';
+        if (RepairID == 0) {
+            alert('First specify the customer and the equipment to be repaired and then save the record before parts can be added');
+            return;
+        }
+        try {
+            div.dialog({
+                closeOnEscape: false,
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("CreateParts", "Tech")?RepairID=' + RepairID + '&BranchID=' + BranchID;
+                    $(this).load(url); @*'@Url.Action("UploadFile", "Applications")');*@
+
+                },
+                modal: true,
+                resizable: false,
+
+                width: 800,
+                height: 500,
+                title: "Create Parts",
+                buttons:
+                {
+                    Close: function () {
+                        div.remove(); div.dialog("close");
+
+                        //$(this).dialog("close");
+                    }
+                },
+            });
+        }
+        catch (ex) {
+            alert('catchall:' + ex.message);
+        }
+        return false;
+    }
+
+
+</script>
+<script>
+    $("#AddForm").kendoValidator({
+    });
+</script>
+<script>
+
+    var somethingChanged = false;
+    $(document).ready(function () {
+
+        var Edit_EquipId = '@Model.SelectedEquipment';
+        if (Edit_EquipId != "" && Edit_EquipId != "0") {
+            getEquipInformationEdit(Edit_EquipId);
+            $("#spLabourRs").text('@Model.LabourRate');
+            $("#spTravelRs").text('@Model.TravelRate');
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("PartPrice", "Repair")',
+                data: {
+                },
+                success: function (r) {
+                    $("#spTotalCostParts").text(r.cost);
+                    CalculateCost();
+                }
+            });
+
+
+        }
+        $('input').change(function () {
+            somethingChanged = true;
+        });
+        $('textarea').change(function () {
+            somethingChanged = true;
+        });
+        @*$("#spJob").text('@Model.AssociateServiceJob');*@
+        //Check State on Every Postback Request
+
+        //ApprovalCheck();
+        //OrderNumberCheck();
+        //VerbalApprovalCheck();
+
+        // Is Approval requied before performing the repair work?  Click
+        //$("#Approve").click(function () {
+        //    //ApprovalCheck();
+        //    DisplayApprovalRequired();
+        //});
+
+        //Verbal Approval was obtained Click
+
+        //$("#VerbalApproval").click(function () {
+        //    //VerbalApprovalCheck();
+        //    DisplayVerbalApprovalObtained();
+        //});
+
+        //$("#HasJob").click(function () {
+        //    DisplayHasBeenInvoiced();
+        //});
+
+        //$("#InvoiceThruServiceJob").click(function () {
+        //    DisplayInvoiceThruServiceJob();
+        //});
+
+        //$("#HasItem").click(function () {
+        //    DisplayHandoverCompleted();
+        //});
+
+        $("#ItemRepair").click(function () {
+            if ($(this).is(":checked")) {
+                $("#AllSpecified").prop("checked", false);
+                $("#ResultRepair").prop("checked", false);
+            }
+
+            DisplayRepairCompleted();
+
+        });
+
+        $("#AllSpecified").click(function () {
+            if ($(this).is(":checked")) {
+                $("#ItemRepair").prop("checked", false);
+                $("#ResultRepair").prop("checked", false);
+            }
+            DisplayRepairCompleted();
+        });
+        //Is An Order Number Required before perforing the repair work
+
+        $("#btnPrintWO").click(function (event) {
+            //if (RepairUID == -1 || RepairUID == 0) {
+            //    ShowAlert("Please save the repair details first");
+            //    return false;
+            //}
+            event.preventDefault();
+            if ($("#SelectedEquipment").val() == "" || $("#SelectedEquipment").val() == "0" || $("#SelectedEquipment").val() == null) {
+                ShowAlert("You must pick the equipment item.");
+                return false;
+            }
+            var isvalid = ApprovalValidation();
+            var isvalid1 = CompletionDateTimeValidation();
+            var isvalid2 = RepairCommenced();
+            var isvalid3 = LabourHours();
+            if (isvalid && isvalid1 && isvalid2 && isvalid3) {
+                kendo.ui.progress($('#repair'), true);
+                $.post('@Url.Action("PrintRepairWO", "Repair")', $("#AddForm").serialize(), function (data) {
+                    alert(data.message);
+                    //var window = $("#PrintRepairWO").data("kendoWindow");
+                    //window.Visible = true;
+                    //var actionURL = data.URL;
+                    //window.refresh({
+                    //    url: actionURL,
+                    //    data: {}
+                    //});
+
+                    //if ($("#hdPopUp").val() == "1") {
+                    //    var width95 = (screen.width) * 75 / 100;
+                    //    var height75 = (screen.height) * 75 / 100;
+                    //    window.setOptions({ width: width95, height: height75 });
+                    //}
+                    //else {
+                    //    var width95 = (screen.width) * 95 / 100;
+                    //    var height75 = (screen.height) * 75 / 100;
+                    //    window.setOptions({ width: width95, height: height75 });
+                    //}
+                    //window.center();
+                    //window.open();
+                    kendo.ui.progress($('#repair'), false);
+                    openCenteredWindow(data.URL);
+                });
+            }
+        });
+
+        $("#btnPrintDetail").click(function (event) {
+            event.preventDefault();
+            if ($("#SelectedEquipment").val() == "" || $("#SelectedEquipment").val() == "0" || $("#SelectedEquipment").val() == null) {
+                ShowAlert("You must pick the equipment item.");
+                return false;
+            }
+            var isvalid = ApprovalValidation();
+            var isvalid1 = CompletionDateTimeValidation();
+            var isvalid2 = RepairCommenced();
+            var isvalid3 = LabourHours();
+            if (isvalid && isvalid1 && isvalid2 && isvalid3) {
+                kendo.ui.progress($('#repair'), true);
+                $.post('@Url.Action("PrintRepairDetail", "Repair")', $("#AddForm").serialize(), function (data) {
+                    if (data.message != '') {
+                        alert(data.message);
+                    }
+                    //var window = $("#PrintRepairDetail").data("kendoWindow");
+                    //window.Visible = true;
+                    //var actionURL = data.URL;
+                    //window.refresh({
+                    //    url: actionURL,
+                    //    data: {}
+                    //});
+
+                    //if ($("#hdPopUp").val() == "1") {
+                    //    var width95 = (screen.width) * 75 / 100;
+                    //    var height75 = (screen.height) * 75 / 100;
+                    //    window.setOptions({ width: width95, height: height75 });
+                    //}
+                    //else {
+                    //    var width95 = (screen.width) * 95 / 100;
+                    //    var height75 = (screen.height) * 75 / 100;
+                    //    window.setOptions({ width: width95, height: height75 });
+                    //}
+                    //window.center();
+                    //window.open();
+                    kendo.ui.progress($('#repair'), false);
+                    openCenteredWindow(data.URL);
+                });
+            }
+        });
+
+        $("#btnPrintRetirement").click(function (event) {
+            event.preventDefault();
+            if ($("#SelectedEquipment").val() == "" || $("#SelectedEquipment").val() == "0" || $("#SelectedEquipment").val() == null) {
+                ShowAlert("You must pick the equipment item.");
+                return false;
+            }
+            var isvalid = ApprovalValidation();
+            var isvalid1 = CompletionDateTimeValidation();
+            var isvalid2 = RepairCommenced();
+            var isvalid3 = LabourHours();
+            if (isvalid && isvalid1 && isvalid2 && isvalid3) {
+                kendo.ui.progress($('#repair'), true);
+                $.post('@Url.Action("PrintRetirementDetail", "Repair")', $("#AddForm").serialize(), function (data) {
+                    if (data.message != '') {
+                        alert(data.message);
+                    }
+                    kendo.ui.progress($('#repair'), false);
+                    openCenteredWindow(data.URL);
+                });
+            }
+        });
+
+        $("#orderNumber").click(function () {
+            //OrderNumberCheck();
+            DisplayOrderNumberRequired();
+        });
+
+        $("#ResultRepair").click(function () {
+            if ($(this).is(":checked")) {
+                var EquipId = 0;
+                EquipId = $("#SelectedEquipment").val();
+
+                if (EquipId == 0 || EquipId == "" || EquipId == null) {
+                    EquipId = -1;
+                }
+
+
+                if (EquipId == -1) {
+                    ShowAlert("Please select the Equipment Item first");
+                    return false;
+                }
+
+
+                swal({
+                    title: "Retire Equipment",
+                    text: "Are you sure you wish to retire this item of equipment now?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "green",
+                    confirmButtonText: "Yes",
+                    cancelButtonText: "No",
+                    closeOnConfirm: true,
+                    closeOnCancel: true
+                },
+                    function (isConfirm1) {
+                        if (isConfirm1) {
+                            OpenWindowRetire();
+                            //$("#AllSpecified").prop("checked", false);
+                            //$("#HasItem").prop("checked", false);
+                            $("#ItemRepair").prop("checked", false);
+                            $("#AllSpecified").prop("checked", false);
+                        }
+                        else {
+                            $("#ResultRepair").prop("checked", false);
+                        }
+                    });
+
+
+            }
+            DisplayRepairCompleted();
+        });
+
+        $("#ChargeTypeCode").change(function () {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("ChargeTypeRate", "Repair")',
+                data: {
+                    ChargeTypeCode: $("#ChargeTypeCode").val()
+                },
+                success: function (r) {
+                    $("#spLabourRs").text("$" + r.rate);
+                    $("#LabourRate").val("$" + r.rate);
+                    CalculateCost();
+                }
+            });
+        });
+        $("#TravelTypeCode").change(function () {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("TravelTypeRate", "Repair")',
+                data: {
+                    TravelTypeCode: $("#TravelTypeCode").val()
+                },
+                success: function (r) {
+                    $("#spTravelRs").text("$" + r.rate);
+                    $("#TravelRate").val("$" + r.rate);
+                    CalculateCost();
+                }
+            });
+        });
+        $("#LabourHours").change(function () {
+            CalculateCost();
+        });
+        $("#TravelHours").change(function () {
+            CalculateCost();
+        });
+        $("#PromotionalExpenses").change(function () {
+            CalculateCost();
+        });
+
+
+        $(document).on('click', '#Stocked_Part', function () {
+            if ($(this).is(":checked")) {
+                $("#PartNumber").show();
+                $("label[for='PartNumber']").show();
+                var autocomplete = $("#PartName").data("kendoAutoComplete");
+                autocomplete.unbind("open");
+                autocomplete.options.suggest = true;
+            }
+            else {
+                $("#PartNumber").hide();
+                $("#PartNumber").val("");
+                $("label[for='PartNumber']").hide();
+                var autocomplete = $("#PartName").data("kendoAutoComplete");
+                autocomplete.options.suggest = false;
+                autocomplete.bind("open", function (e) {
+                    e.preventDefault();
+                });
+            }
+        })
+    });
+
+    function CalculateCost() {
+        var ChargeRate = $("#spLabourRs").text().replace("$", "").replace(",", "");
+        var TravelRate = $("#spTravelRs").text().replace("$", "").replace(",", "");
+        var PromotionalCost = $("#PromotionalExpenses").val().replace("$", "").replace(",", "");
+        var PartsCost = parseFloat($("#spTotalCostParts").text().replace("$", "").replace(",", ""));
+        if (PromotionalCost == "") { PromotionalCost = "0.00"; }
+        PromotionalCost = parseFloat(PromotionalCost);
+        var ChargeHours = $("#LabourHours").val();
+        var TravelHours = $("#TravelHours").val();
+        var TotalLabourCost = parseFloat(ChargeRate * ChargeHours);
+        var TotalTravelCost = parseFloat(TravelRate * TravelHours);
+        $("#spTotalLabourCost").text("$" + TotalLabourCost.toFixed(2));
+        $("#spTotalTravelCost").text("$" + TotalTravelCost.toFixed(2));
+        $("#spTotalLabourTravelCost").text("$" + (TotalLabourCost + TotalTravelCost).toFixed(2));
+        var totalcost = TotalLabourCost + TotalTravelCost + PromotionalCost + PartsCost;
+        $("#spTotalCostRepair").text("$" + totalcost.toFixed(2));
+
+    }
+
+
+    function cancel() {
+        if (somethingChanged) {
+            var r = confirm("Do you wish to discard any changes you have made?");
+            if (r) {
+                back();
+            }
+        }
+        else {
+            back();
+        }
+    }
+
+    function back() {
+
+        if ($("#hdReapirID").val() != "") {
+            var url = '@Url.Action("GetRepairForService", "Service")' + "?ServiceJobID=" + $("#hdReapirID").val();
+            window.location.href = url;
+        }
+        else if ($("#PopUp").val() == "True") {
+            parent.$("#rpwindow").data("kendoWindow").close();
+        }
+        else {
+            window.location.href = '@Url.Action("Index", "Repair")';
+        }
+    }
+
+    function onClose(e) {
+        if (!confirm("Are you sure you want to close window?"))
+            e.preventDefault();
+    }
+
+
+    function getEquipInformation(e) {
+        var dataItem = this.dataItem(e.item.index());
+        var data = kendo.stringify(dataItem);
+        var obj = JSON.parse(data);
+
+        //$('#Customer').val(obj.CustomerInfo);
+        $('#spCustomer').text(obj.CustomerInfo);
+        $('#spCustomerCode').text(obj.CustomerCode);
+        //$('#CustomerEquipCode').val(obj.CustomerCode);
+        $("#EquipId").val(obj.EquipUID);
+        if (obj.WarrantyExpirationDate != null && obj.WarrantyExpirationDate) {
+            $("#spWarranty").text(dtConvFromJSONOnlyDate(obj.WarrantyExpirationDate));
+        }
+        else {
+            $("#spWarranty").text("");
+        }
+    }
+
+    function dtConvFromJSONOnlyDate(date) {
+        var ms = date.substring(6, date.length - 2);
+        var date = new Date(parseInt(ms));
+        return date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
+    }
+    function getPartInformation(e) {
+        var dataItem = this.dataItem(e.item.index());
+        var data = kendo.stringify(dataItem);
+        var obj = JSON.parse(data);
+        var uid = $(".k-edit-form-container").closest("[data-role=window]").data("uid");
+        var model = $("#AddGrid").data("kendoGrid").dataSource.getByUid(uid);
+        model.set("PartNumber", obj.Item);
+        model.set("Price", obj.Price);
+        model.set("PartId", obj.ID);
+        //$("#PartNumber").val(obj.Item);
+    }
+
+    function hideIdField(e) {
+        $("#Id").hide();
+        $("label[for='Id']").hide();
+        $("#PartId").hide();
+        $("label[for='PartId']").hide();
+        var grid = e.sender;
+        var table = grid.table;
+        var uid = e.model.uid;
+        $('<a class="k-button k-button-icontext k-grid-delete custom" href="\\#"><span class="k-icon k-delete"></span>Delete</a>').insertAfter(".k-grid-update");
+        $(".custom").click(function (e) {
+            e.preventDefault();
+            var elem = $(table).find("tr[data-uid='" + uid + "']");
+            grid.removeRow(elem);
+        });
+
+        if (e.model.isNew() && !e.model.dirty) {
+            e.container
+              .find("input[name=Stocked_Part]")
+              .val(true)
+              .change();
+        }
+        else {
+            if ($("#Stocked_Part").is(":checked")) {
+                $("#PartNumber").show();
+                $("label[for='PartNumber']").show();
+                var autocomplete = $("#PartName").data("kendoAutoComplete");
+                autocomplete.unbind("open");
+                autocomplete.options.suggest = true;
+            }
+            else {
+                $("#PartNumber").hide();
+                $("#PartNumber").val("");
+                $("label[for='PartNumber']").hide();
+                var autocomplete = $("#PartName").data("kendoAutoComplete");
+                autocomplete.options.suggest = false;
+                autocomplete.bind("open", function (e) {
+                    e.preventDefault();
+                });
+            }
+        }
+        //Triggered when a Window is closed (by a user or through the close() method)
+        e.container.data("kendoWindow").bind("close", function () {
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("PartPrice", "Repair")',
+                data: {
+                },
+                success: function (r) {
+                    $("#spTotalCostParts").text(r.cost);
+                    CalculateCost();
+                }
+            });
+
+        })
+
+    }
+    function closeDiv() {
+        try {
+            div.remove();
+//            div.remove(); div.dialog("close");
+        }
+        catch (ex) {
+            ;//alert(ex.message);
+        }
+        try {
+            div.dialog("close");
+        }
+        catch (ex) {
+            ;//alert(ex.message);
+        }
+    }
+
+    function getEquipInformationEdit(equipId) {
+
+
+        $.ajax({
+            url: '@Url.Action("GetEquipInfomation", "Repair")',
+            type: 'POST',
+            datatype: "json",
+            data: { EquipUID: equipId },
+
+            success: function (response) {
+
+                $("#spCustomer").text(response.CustomerInfo);
+                $('#spCustomerCode').text(response.CustomerCode);
+                if (response.WarrantyExpirationDate != null && response.WarrantyExpirationDate) {
+                    $("#spWarranty").text(dtConvFromJSONOnlyDate(response.WarrantyExpirationDate));
+                }
+                else {
+                    $("#spWarranty").text("");
+                }
+
+                $("#spEquipItem").text(response.EquipItem);
+
+            },
+            error: function (req, status, error) {
+                alert("R: " + req + " S: " + status + " E: " + error);
+            }
+        });
+    }
+
+        function OpenWindowRetire() {
+            try {
+                 $('#hdRetirementDone').val("0");
+        var EquipId = $("#SelectedEquipment").val();
+                    var width95 = (screen.width) * 75 / 100;
+                var height90 = (screen.height) * 75 / 100;
+            div.dialog({
+                closeOnEscape: false,
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("RetirementItem", "Repair")?EquipId=' + EquipId;
+                    $(this).load(url);
+                },
+                modal: true,
+                resizable: false,
+
+                width: width95,
+                height: height90,
+                title: "Select Equipment",
+                buttons: {
+                    Close: function () {
+                        div.remove(); div.dialog("close");
+                    }
+                },
+            });
+        }
+        catch (ex) {
+            alert('catchall-createpartsservice:' + ex.message);
+        }
+        return false;
+        @*var EquipId = 0;
+        $('#hdRetirementDone').val("0");
+        EquipId = $("#SelectedEquipment").val();
+        var window = $("#Rewindow").data("kendoWindow");
+        window.Visible = true;
+        var actionURL = '@Url.Action("RetirementItem", "Repair")' + "?EquipId=" + EquipId
+        window.refresh({
+            url: actionURL
+        });
+        if ($("#hdPopUp").val() == "1") {
+            var width95 = (screen.width) * 75 / 100;
+            var height75 = (screen.height) * 75 / 100;
+            window.setOptions({ width: width95, height: height75 });
+        }
+        else {
+            var width95 = (screen.width) * 95 / 100;
+            var height75 = (screen.height) * 75 / 100;
+            window.setOptions({ width: width95, height: height75 });
+        }
+        window.center();
+        window.open();*@
+    }
+
+
+    function CloseEngineerWindow(e) {
+        var dataSource = new kendo.data.DataSource({
+            transport: {
+                read: {
+                    url: '@Url.Action("GetEngineers", "Repair")',
+                    async: false,
+                    data: {}
+                }
+            }
+        });
+
+        @* todotim
+            var ddl = $('#EngineerID').data("kendoDropDownList");
+        ddl.setDataSource(dataSource);
+        ddl.refresh();
+        if (RepairUID != 0) {
+            ddl.value('@Model.EngineerID');
+        }*@
+    }
+
+    function onClose1() {
+        var EquipId = 0;
+        EquipId = $("#SelectedEquipment").val();
+        if ($('#hdRetirementDone').val() == "1") {
+            $.ajax({
+                url: '@Url.Action("GetRetirementDetails", "Repair")',
+                type: 'POST',
+                datatype: "json",
+                data: { EquipId: EquipId },
+                success: function (response) {
+                    $("#WorkDone").val($("#WorkDone").val() + " " + response.msg);
+                },
+                error: function (req, status, error) {
+                    //  alert("R: " + req + " S: " + status + " E: " + error);
+                }
+            });
+        }
+        else {
+            $("#ResultRepair").prop("checked", false);
+        }
+
+        DisplayRepairCompleted();
+        }
+        function EditEngTime(EngineerID, StartDate, StartTime) {
+            try {
+                var BranchID = '@MDS.Controllers.LoginController.BranchID(User.Identity.Name)';
+                var ServiceJobUID = '@Model.RepairId';
+                div.dialog({
+                    closeOnEscape: false,
+                    open: function (event, ui) {
+                        $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                        var url = '@Url.Action("ServiceWorkEngTimes", "Service")?EngineerID='+EngineerID+'&StartDate='+StartDate+'&StartTime='+StartTime+'&ServiceJobUID=' + ServiceJobUID + '&BranchID=' + BranchID + '&Repair=true';
+                        $(this).load(url);
+
+                    },
+                    modal: true,
+                    resizable: false,
+
+                    width: 800,
+                    height: 500,
+                    title: "Actual Start End Times",
+                    buttons: {
+                        Close: function () {
+                            div.remove(); div.dialog("close");
+                        }
+                    },
+                });
+            }
+            catch (ex) {
+                alert('catchall-createpartsservice:' + ex.message);
+            }
+            return false;
+        }
+        function AddEngTime() {
+            try {
+                var BranchID = '@MDS.Controllers.LoginController.BranchID(User.Identity.Name)';
+                var ServiceJobUID = '@Model.RepairId';
+                div.dialog({
+                    closeOnEscape: false,
+                    open: function (event, ui) {
+                        $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                        var url = '@Url.Action("ServiceWorkEngTimes", "Service")?ServiceJobUID=' + ServiceJobUID + '&BranchID=' + BranchID + '&Repair=true';
+                        $(this).load(url);
+
+                    },
+                    modal: true,
+                    resizable: false,
+
+                    width: 800,
+                    height: 500,
+                    title: "Actual Start End Times",
+                    buttons: {
+                        Close: function () {
+                            div.remove(); div.dialog("close");
+                        }
+                    },
+                });
+            }
+            catch (ex) {
+                alert('catchall-createpartsservice:' + ex.message);
+            }
+            return false;
+        }
+
+
+
+        function TimeEngDelete(EngineerID,StartTime) {//
+            try {
+            var BranchID='@MDS.Controllers.LoginController.BranchID(User.Identity.Name)';
+            var ServiceJobID = '@Model.RepairId';
+                var data = { BranchID: BranchID, ServiceJobID: ServiceJobID, EngineerID: EngineerID , StartTime:StartTime,Repair:true };
+                $.post('@Url.Action("ServiceWorkEngTimesDelete","Service")',data
+                ,
+                    function (data) {
+                        if (data.Error == '') {
+                            try {
+                                RefreshServiceWorkTimes();//refresh();
+                            }
+                            catch (ex) {
+                                alert('2-' + ex.message);
+                            }
+                        }
+                        else
+                            alert(data.Error);
+                    }
+                    , 'json');
+            }
+
+            catch (ex) {
+                alert('EngTimedelete:' + ex.message);
+            }
+    }
+
+
+        RefreshServiceWorkTimes();
+
+    function RefreshServiceWorkTimes() {
+        try {
+            var ServiceJobID = '@Model.RepairId';
+            if (ServiceJobID == 0)
+                return;
+            var BranchID='@MDS.Controllers.LoginController.BranchID(User.Identity.Name)';
+            $.ajax({
+                url: '@Url.Content("~/Service/ServiceWorkTimes")',
+                type: 'POST',
+                data: { ServiceJobID: ServiceJobID,BranchID:BranchID,Repair:true },
+                success: doSubmitSuccessServiceWorkTimes
+            });
+        }
+        catch (ex) {
+            alert('Error in init():' + ex.message);
+        }
+    }
+
+   function doSubmitSuccessServiceWorkTimes(result) {
+            try {
+            $('#ServiceWorkTimesX').html(result);
+        }
+        catch (ex) {
+            alert('Error in doSubmitSuccess ServiceWorkTimes():'+ex.message);
+        }
+
+    }
+
+        function OpenEquipmentWindow() {
+
+            try {
+                var Customerid =  $('#spCustomerCode').text();
+                Customerid = Customerid.replace(' ', '~~');
+
+                    var width95 = (screen.width) * 95 / 100;
+                var height90 = (screen.height) * 90 / 100;
+            div.dialog({
+                closeOnEscape: false,
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("SearchEquipmentMain", "Repair")?CustCode=' + Customerid + "&BranchID="+@MDS.Controllers.LoginController.BranchID(User.Identity.Name);
+                    $(this).load(url);
+                },
+                modal: true,
+                resizable: false,
+
+                width: width95,
+                height: height90,
+                title: "Select Equipment",
+                buttons: {
+                    Close: function () {
+                        div.remove(); div.dialog("close");
+                        //CloseEquipmentWindow();
+                    }
+                },
+            });
+        }
+        catch (ex) {
+            alert('catchall-createpartsservice:' + ex.message);
+        }
+        return false;
+    }
+
+        function CloseEquipmentWindow() {
+            if ($("#SelectedEquipment").val() != "") {
+                if (RepairUID != -1) {
+                    if ('@Model.SelectedEquipment' != $("#SelectedEquipment").val()) {
+
+                        swal({
+                            title: "Are you sure?",
+                            text: "You have changed the Equipment associated with  this repair job..  You should only do this when the wrong Equipment record was selected when the job was first added..  Are you SURE you wish to change the Equipment  associated with this repair job now?",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "green",
+                            confirmButtonText: "Yes",
+                            cancelButtonText: "No",
+                            closeOnConfirm: false,
+                            closeOnCancel: true
+                        },
+                            function (isConfirm) {
+                                //  alert('isConfirm');
+
+                                if (isConfirm) {
+                                    $.ajax({
+                                        url: '@Url.Action("StopSupply", "Repair")',
+                                        type: 'POST',
+                                        datatype: "json",
+                                        data: { EquipId: $("#SelectedEquipment").val() },
+                                        success: function (response) {
+                                            if (response.StopSupplymsg == "1") {
+
+                                                swal({
+                                                    title: "Are you sure?",
+                                                    text: "This customer is on STOP SUPPLY.. Are you sure you wish to perform a repair for this customer?",
+                                                    type: "warning",
+                                                    showCancelButton: true,
+                                                    confirmButtonColor: "green",
+                                                    confirmButtonText: "Yes",
+                                                    cancelButtonText: "No",
+                                                    closeOnConfirm: true,
+                                                    closeOnCancel: true
+                                                },
+                                                    function (isConfirm1) {
+                                                        // alert('isConfirm1');
+
+                                                        if (isConfirm1) {
+                                                            RefreshRecord();
+                                                            getEquipInformationEdit($("#SelectedEquipment").val());
+                                                        }
+                                                        else {
+
+                                                            $("#SelectedEquipment").val('@Model.EquipId');
+                                                        }
+                                                    });
+                                            }
+                                            else {
+                                                //   alert('hide');
+                                                document.body.style.overflow = 'scroll';
+                                                $(".sweet-alert").hide();
+                                                $(".sweet-overlay").hide();
+
+                                                RefreshRecord();
+                                                getEquipInformationEdit($("#SelectedEquipment").val());
+                                            }
+                                            //   alert('hide2');
+                                        },
+                                        error: function (req, status, error) {
+                                            //  alert("R: " + req + " S: " + status + " E: " + error);
+                                        }
+                                    });
+                                } else {
+                                    $("#SelectedEquipment").val('@Model.EquipId');
+                                }
+                            });
+                    }
+                    else {
+                        getEquipInformationEdit($("#SelectedEquipment").val());
+                    }
+                }
+                else {
+                    RefreshRecord();
+                    getEquipInformationEdit($("#SelectedEquipment").val());
+                }
+            }
+            else {
+                $("#SelectedEquipment").val('@Model.EquipId');
+            }
+        }
+
+        function RepairCommenced() {
+            //var DateEquipRepair = $("#DateEquipRepair").data("kendoDatePicker").value();
+            //var TimeEquipRepair = $("#TimeEquipRepair").data("kendoTimePicker").value();
+            //if (DateEquipRepair == "" || DateEquipRepair == null) {
+            //    ShowAlert("You must specify a valid date for repair commenced.");
+            //    return false;
+            //}
+            //else {
+            //    return true;
+            //}
+            return true;
+        }
+
+    function LabourHours() {
+        if ($('#ChargeTypeCode').val() != "") {
+            if ($("#LabourHours").val() == "") {
+                ShowAlert("Please enter the labour hours.");
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+        return true;
+    }
+
+        @*function OpenEngineerWindow() {
+            var window = $("#windowEngineer").data("kendoWindow");
+            window.Visible = true;
+            var actionURL = '@Url.Action("IndexPopUp", "Engineer")';
+            window.refresh({
+                url: actionURL
+            });
+            if ($("#hdPopUp").val() == "1") {
+                var width95 = (screen.width) * 75 / 100;
+                var height75 = (screen.height) * 75 / 100;
+                window.setOptions({ width: width95, height: height75 });
+            }
+            else {
+                var width95 = (screen.width) * 95 / 100;
+                var height75 = (screen.height) * 75 / 100;
+                window.setOptions({ width: width95, height: height75 });
+            }
+            window.center();
+            window.open();
+        }*@
+
+
+        function RefreshPhoto() {
+            try {
+
+                var RepairID = '@Model.RepairId';
+
+                $.ajax({
+                    url: '@Url.Content("~/Repair/Photos")',
+                    type: 'POST',
+                    data: { RepairID: RepairID },
+                    success: doSubmitSuccess
+                });
+            }
+            catch (ex) {
+                alert('Error in init():' + ex.message);
+            }
+        }
+
+        function doSubmitSuccess(result) {
+            try {
+                $('#PhotosX').html(result);
+            }
+            catch (ex) {
+                alert('Error in doSubmitSuccess():' + ex.message);
+            }
+        }
+
+        function savedataforphotos() {
+            $.post('@Url.Action("SaveUpdateRepair", "Repair")', $("#AddForm").serialize(), function (data) {
+                var RepairId = data.id;
+                if (data.message != '') {
+                    if (data.Error) {
+                        ShowAlert(data.message);
+ //                       setTimeout('parent.$("#rpwindow").data("kendoWindow").close();', 2000);
+                    }
+                    else {
+                        ShowSuccess(data.message);
+   //                     setTimeout('parent.$("#rpwindow").data("kendoWindow").close();', 2000);
+                    }
+                }
+                var url = '@Url.Action("Edit", "Repair")' + "?id=" + data.id;
+                window.location.href = url;
+            }
+            );
+        }
+
+    @*function uploadfileforQuestion(id,Attach_Audio,field) {
+        try {
+            div.dialog({
+                closeOnEscape: false,
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("UploadFile", "Repair")?RepairID=' + id + '&Attach_Audio='+Attach_Audio+ '&field='+field;
+
+                    $(this).load(url);
+
+                },
+                modal: true,
+                resizable: false,
+
+                width: 800,
+                height: 500,
+                title: "Upload File",
+                buttons: {
+                    Close: function () {
+                                RefreshPhoto();
+                            div.remove(); div.dialog("close");
+
+                    }
+                },
+            });
+        }
+        catch (ex) {
+            alert('catchall:' + ex.message);
+        }
+        return false;
+
+    }*@
+
+    function uploadfileforQuestion(id, Attach_Audio, field) {
+        var hght = screen.height-100;
+
+        var wdth = screen.width-100;
+        try {
+            div.dialog({
+                closeOnEscape: false,
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("UploadFile", "Repair")?RepairID=' + id + '&Attach_Audio=' + Attach_Audio + '&field=' + field;
+                    $(this).load(url);@*'@Url.Action("UploadFile", "Applications")');*@
+
+                },
+                modal: true,
+                resizable: false,
+
+                width: wdth,//creen.width,// 800,//400,
+                height:hght,// screen.height,// 600,//300,
+                title: "Add attachment/audio",
+                buttons: {
+                    Close: function () {
+                        RefreshPhoto();
+                        div.remove(); div.dialog("close");
+                    }
+                },
+            });
+        }
+        catch (ex) {
+            alert('catchall:' + ex.message);
+        }
+        return false;
+
+    }
+
+    function deletefile(PhotosID, url) {
+        if (confirm("Do you want to remove this document / photo / Audio?")) {
+            var data = { PhotosID: PhotosID, url: url }
+            $.post('@Url.Action("DocumentDelete", "Repair")', data,
+                function (data) {
+                    if (data.Error == '') {
+                        RefreshPhoto();
+                    }
+                    else
+                        alert("Could not delete");
+                }
+                , 'json');
+        }
+    }
+
+
+    RefreshPhoto();
+
+</script>
+<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>
+
+@for (int i = 0; i < Model.Engineers.Count(); i++)
+{
+    <script type="text/javascript">
+        setcbo();
+        function setcbo() {
+        var condid = $('#Engineers_' + @i +'_');
+        condid.val(@Model.Engineers[i]);
+    }
+    </script>
+}

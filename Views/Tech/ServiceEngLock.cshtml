@@ -1,0 +1,85 @@
+﻿@model MDS.Models.ServiceEngLock
+@{
+    ViewBag.Title = "";
+}
+
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+@*<script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>*@
+@*<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>*@
+
+
+@using (Html.BeginForm("ServiceEngLock", "Tech", FormMethod.Post, new { id = "ServiceEngLock" }))
+{
+
+    if ((Model.Engineer == "") || (Model.Engineer == null))
+    {
+        <table style="background-color:orange;color:black;height:100%" cellpadding="0" cellspacing="0"  width="100%">
+            <tr style="width:100%;height:100%">
+
+                <td  style="width:100%;height:100%">
+                    <b>No</b>
+                </td>
+            </tr>
+            <tr>
+                    <td>
+                        <input type="checkbox"  onchange="checkOutService('@Model.ServiceID','@Model.BranchID','@Model.Index',false); return false;" />
+                        @*<a href="" onclick="checkOutService('@Model.ServiceID','@Model.BranchID','@Model.Index',false); return false;">Unlock</a>*@
+                    </td>
+                </tr>
+        </table>
+    }
+    else if (Model.EngineerID == MDS.Controllers.LoginController.EngineerID(User.Identity.Name))
+    {
+        <table style="background-color:green;color:white" cellpadding="0" cellspacing="0" width="100%">
+            <tr style="width:100%">
+
+                <td style="width:100%">
+                    <b>Checked out to you</b>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="checkbox" value="true" checked="checked" />
+                </td>
+            </tr>
+            @*<tr>
+                    <td>
+                        <a href="" onclick="checkOutService('@Model.ServiceID','@Model.BranchID','@Model.Index'); return false;">Unlock</a>
+                    </td>
+                </tr>*@
+        </table>
+    }
+    else
+    {
+        <table  style="background-color:red;color:white" cellpadding="0" cellspacing="0">
+            <tr style="width:100%">
+                <td>
+                    <b>locked by @Model.Engineer</b>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="checkbox" checked="checked" onchange="checkOutService('@Model.ServiceID','@Model.BranchID','@Model.Index',false); return false;" />
+
+                    @*<a href="" onclick="checkOutService('@Model.ServiceID','@Model.BranchID','@Model.Index',true); return false;">Unlock</a>*@
+                </td>
+                </tr>
+        </table>
+    }
+}
+@if ((Model.Engineer == "") || (Model.EngineerID == MDS.Controllers.LoginController.EngineerID(User.Identity.Name)))
+{
+    <script type="text/javascript">
+            LockUnlockService('@Model.ServiceID','@Model.BranchID','@Model.Index',false);
+    </script>
+}
+else
+{
+    <script type="text/javascript">
+            LockUnlockService('@Model.ServiceID','@Model.BranchID','@Model.Index',true);
+    </script>
+}
+
+

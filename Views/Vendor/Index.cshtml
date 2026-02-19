@@ -1,0 +1,145 @@
+﻿@model MDS.Models.VendorSearch
+@{
+    ViewBag.Title = "Vendor Search";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<div class="breadcrumb">
+     @Html.ActionLink("Home", "Index", "Dashboard")
+    » @Html.ActionLink("Vendors", "Index", "Vendor")
+</div>*@
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+
+    #rpGrid tbody tr:hover {
+        cursor: pointer !important;
+    }
+</style>
+@if (@Model.PopUp)
+{ 
+    <script type="text/javascript">
+        $("#container-header").hide();
+    </script>
+}
+<h1>Vendor Search</h1>
+@using (Html.BeginForm("Index", "Vendor", FormMethod.Post, new { id = "cForm" }))
+{ @Html.HiddenFor(m => m.PopUp)
+    <div class="contact-info">
+        <div class="content">
+            <table width="100%">
+                <tr>
+                    <td>Vendor Name (contains) 	
+                    </td>
+                    <td>@(Html.Kendo().TextBoxFor(m => m.VendorName)
+                                .Name("VendorName")
+                                .HtmlAttributes(new { style = "width: 150px " })
+                            )
+                    </td>
+                      <td>
+                        <a class="button" onclick="$('#cForm').submit();"><span>Search</span></a>
+                    </td>
+                </tr> 
+            </table>
+            <table width="100%">
+                <tr>
+                    <td colspan="3">
+                        <input type="button" class="inputbuttonbg inputbig" value="Add New Vendor" onclick="add();">
+                        <input type="submit" class="inputbuttonbg inputbig" value="Print List of Vendors" id="btnPrint">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6">
+                        @(Html.Kendo().Grid(Model.Vendors)
+.Name("rpVendor")
+.Columns(columns =>
+{
+    if (ViewBag.PopUp != null) { columns.Bound(p => p.CompanyName).Title("Company Name").ClientTemplate(@Html.ActionLink("#=CompanyName#", "EditPopUp", "Vendor", new { id = "#=VendorUID#" }, null).ToHtmlString()); }
+    else { columns.Bound(p => p.CompanyName).Title("Company Name").ClientTemplate(@Html.ActionLink("#=CompanyName#", "Edit", "Vendor", new { id = "#=VendorUID#" }, null).ToHtmlString()); }    
+   
+    columns.Bound(p => p.Phone).Title("Phone");
+    columns.Bound(p => p.ContactName).Title("Contact Name");    
+})
+.Pageable()
+.Sortable()
+.Filterable()
+.Selectable(s => s.Mode(GridSelectionMode.Single))
+.DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(200)
+        .ServerOperation(false)
+     )
+)
+                    </td>
+                </tr>
+                
+            </table>
+        </div>
+    </div>
+    
+        
+    @*@(Html.Kendo().Window()
+                            .Name("PrintVList")
+                            .Title("Vendor List")
+                            .Width(1000)
+                            .Height(600)
+                            .Visible(false)
+                            .Draggable(true)
+                            .Iframe(true)
+                             .Modal(true)
+                            )*@
+    
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#btnPrint").click(function (event) {
+            event.preventDefault();
+            $.post('@Url.Action("PrintVendorList", "Vendor")', $("#cForm").serialize(), function (data) {
+                //var window = $("#PrintVList").data("kendoWindow");
+                //window.Visible = true;
+                //var actionURL = data.URL;
+                //window.refresh({
+                //    url: actionURL,
+                //    data: {}
+                //});
+                //var width95 = (screen.width) * 95 / 100;
+                //var height75 = (screen.height) * 75 / 100;
+                //window.setOptions({ width: width95, height: height75 });
+                //window.center();
+                //window.open();
+                openCenteredWindow(data.URL);
+            });
+        });
+    });
+</script>
+<script type="text/javascript">
+
+    function add() {
+        var popup = '@Model.PopUp';
+
+        if (popup == "True") {
+            var url = '@Url.Action("AddPopUp", "Vendor")';
+            window.location.href = url;
+        }
+        else {
+            window.location.href = '@Url.Action("Add", "Vendor")';
+        }
+    }
+
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>

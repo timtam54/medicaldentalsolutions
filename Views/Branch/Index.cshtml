@@ -1,0 +1,87 @@
+﻿@model MDS.Models.BranchSearch
+@{
+    ViewBag.Title = "Branch Search";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<div class="breadcrumb">
+     @Html.ActionLink("Home", "Index", "Dashboard")
+    » @Html.ActionLink("Branches", "Index", "Branch")
+</div>*@
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+
+    #rpGrid tbody tr:hover {
+        cursor: pointer !important;
+    }
+</style>
+<h1>Branch Search</h1>
+@using (Html.BeginForm("Index", "Branch", FormMethod.Post, new { id = "brForm" }))
+{
+    <div class="contact-info">
+        <div class="content">
+            <table width="100%">
+                <tr>
+                    <td>Branch Name:
+                    </td>
+                    <td>
+                        @(Html.Kendo().TextBoxFor(m => m.BranchName)
+                                .Name("BranchName")
+                                .HtmlAttributes(new { style = "width: 150px " })
+                            )
+                    </td>
+                    <td>
+                        <a class="button" onclick="$('#brForm').submit();"><span>Search</span></a>
+                    </td>
+                </tr>
+            </table>
+
+            <table width="100%">
+                <tr>
+                    <td colspan="6">
+                        @(Html.Kendo().Grid(Model.Branches)
+.Name("brGrid")
+.Columns(columns =>
+{
+    columns.Bound(p => p.BranchName).Title("Branch Name").ClientTemplate(@Html.ActionLink("#=BranchName#", "Edit", new { id = "#=BranchID#" }).ToHtmlString());
+    
+    columns.Bound(p => p.PrefixCode).Title("Prefix Code");
+   
+})
+.Pageable()
+.Sortable()
+.Filterable()
+.Selectable(s => s.Mode(GridSelectionMode.Single))
+.DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(200)
+        .ServerOperation(false)
+     )
+)
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="button" class="inputbuttonbg inputbig" value="Add New Branch" onclick="window.location.href = '@Url.Action("Add", "Branch")'"></td>
+                   
+                </tr>
+            </table>
+        </div>
+    </div>
+}
+
+<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>

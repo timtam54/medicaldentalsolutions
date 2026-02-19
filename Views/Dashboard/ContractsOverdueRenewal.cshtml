@@ -1,0 +1,49 @@
+﻿@model  IEnumerable<MDS.Models.CustomerForm>
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@Html.ActionLink("Back", "Index")
+
+<h1>Contracts Over due for Renewal (due before this month)</h1>
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+
+    #eqGrid tbody tr:hover {
+        cursor: pointer !important;
+    }
+</style>
+@using (Html.BeginForm("ContractsOverdueRenewal", "Dashhboard", FormMethod.Post, new { id = "ContractsOverdueRenewal" }))
+{
+    <div class="contact-info">
+        <div class="content">
+            <table width="100%">
+                <tr>
+                    <td colspan="6">
+                        @(Html.Kendo().Grid(Model)
+.Name("rpCustomer")
+.Columns(columns =>
+{
+    columns.Bound(p => p.CompanyName).Title("Name").ClientTemplate(@Html.ActionLink("#=CompanyName#", "../Customer/Edit", new { id = "#=CustomerCode#" }).ToHtmlString());
+    columns.Bound(p => p.CustomerCode).Title("Code");
+    columns.Bound(p => p.ContractRenewalDate).Title("Contract Renewal Date").ClientTemplate("#= (ContractRenewalDate == null) ? ' ' : kendo.toString(ContractRenewalDate, 'dd/MM/yyyy') #");
+
+})
+.Pageable()
+.Sortable()
+.Filterable()
+.DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(200)
+        .ServerOperation(false)
+     )
+                        )
+                    </td>
+                </tr>
+            </table>
+
+</div>
+</div>
+}

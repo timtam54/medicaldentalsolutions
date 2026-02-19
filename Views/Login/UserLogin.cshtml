@@ -1,0 +1,107 @@
+﻿@model MDS.DB.UserLogin
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+</style>
+
+<h1>Login Detail</h1>
+@using (Html.BeginForm("UserLogin", "Login", FormMethod.Post, new { id = "UserLogin" }))
+{
+    @Html.AntiForgeryToken()
+    <div id="box2">
+        <table cellspacing="8" cellpadding="0" width="100%" border="0">
+            <tr>
+                <td colspan="2">
+                    @Html.ValidationSummary(true)
+                </td>
+            </tr>
+            <tr>
+                <td class="text">Username (Email)<span style="color: red;">*</span></td>
+                <td>
+                    @(Html.Kendo().TextBoxFor(mbox => mbox.Email)
+                                    .Name("Email")
+                                    .HtmlAttributes(new { data_required_msg = "Email Name is required.", required = "required", style = "width: 240px" })
+                    )
+                </td>
+                <td class="text">Password<span style="color: red;">*</span></td>
+                <td>
+                    @(Html.Kendo().TextBoxFor(mbox => mbox.Password)
+                                    .Name("Password")
+                                    .HtmlAttributes(new { data_required_msg = "Password is required.", required = "required", style = "width: 240px" })
+                    )
+                </td>
+            </tr>
+
+
+        </table>
+
+        <table>
+            <tr>
+                <td width="2%">
+                    &nbsp;
+                </td>
+                <td width="10%" rowspan="3">
+                    <input type="button" class="inputbuttonbg inputbig" value="Cancel" onclick="cancel()">
+                </td>
+                <td width="12%">
+                    &nbsp;
+                </td>
+                <td width="30%" rowspan="3"></td>
+                <td width="7%">
+                    &nbsp;
+                </td>
+                <td width="22%" rowspan="3"></td>
+                <td width="7%">
+                    &nbsp;
+                </td>
+                <td width="7%" rowspan="3">
+                    <input type="button" class="inputbuttonbg inputbig" onclick="$('#UserLogin').submit();" value="Save">
+                </td>
+                <td width="3%">
+                    &nbsp;
+                </td>
+            </tr>
+        </table>
+    </div>
+}
+<script>
+
+    $("#AddForm").kendoValidator({
+    });
+
+</script>
+<script type="text/javascript">
+
+    var somethingChanged = false;
+    $(document).ready(function () {
+        $('input').change(function () {
+            somethingChanged = true;
+        });
+        $('textarea').change(function () {
+            somethingChanged = true;
+        });
+    });
+
+    function cancel() {
+        if (somethingChanged) {
+            var r = confirm("Do you wish to discard any changes you have made?");
+            if (r) {
+                back();
+            }
+        }
+        else {
+            back();
+        }
+    }
+
+    function back() {
+    }
+
+</script>
+

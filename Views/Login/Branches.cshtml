@@ -1,0 +1,35 @@
+﻿@model IList<MDS.Models.UserBranchList>
+    @{
+        ViewBag.Title = "Login";
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+
+    @using (Html.BeginForm("Branches", "Login", FormMethod.Post, new { id = "Branches" }))
+    {
+        <div id="box2">
+            <table style="text-align:center" width="100%">
+                <tr>
+                    <td>
+                        <b style="font-size:18px">
+                            Select Branch
+                        </b>
+                    </td>
+
+                </tr>
+                @foreach (MDS.Models.UserBranchList item in Model)
+    {
+                <tr>
+                   
+                    <td>
+                        @Html.ActionLink(item.BranchName.ToString(), "Select", "Login",new { UserName = item.UserName, BranchID = item.BranchID, Admin = item.Admin },new { @style = "font-size:18px" })
+                        
+                    </td>
+
+                </tr>
+}
+            </table>
+        </div>
+    }
+
+

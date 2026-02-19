@@ -1,0 +1,104 @@
+﻿@model MDS.Models.ChargeTypes
+@{
+    ViewBag.Title = "Add Repair";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/CSS/style.css" rel="stylesheet" />
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
+
+<div id="repair" style="width:100%;height:auto;position:relative;">
+    @if (Model.LabTrav == "Lab")
+    {
+        <h1 style="padding-left:30px">Labour Charge Type</h1>
+    }
+    else
+    {
+        <h1 style="padding-left:30px">Travel Charge Type</h1>
+    }
+    <div class="contact-info">
+        <div class="content">
+
+            @using (Html.BeginForm("EditCharge", "Repair", FormMethod.Post, new { id = "EditCharge" }))
+            {
+                @Html.HiddenFor(i => i.New)
+                @Html.HiddenFor(i => i.LabTrav)
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary()
+                <table width="100%" align="center" cellspacing="0" cellpadding="2">
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <tr>
+                            <td style="color:red" colspan="4">
+                                @ViewBag.Error
+                            </td>
+                        </tr>
+                    }
+
+                    <tr width="100%">
+                        <td style="font-size:16px">
+                            <b>Code</b>
+                        </td>
+                        @if (Model.New)
+                        {
+                            <td style="font-size:16px;text-align:left">
+                                @Html.EditorFor(i => i.ChargeTypeCode)
+                                @Html.ValidationMessageFor(m => m.ChargeTypeCode, "", new { @style = "color:red" })
+                            </td>
+                        }
+                        else
+                        {
+                            <td style="font-size:16px;text-align:left;">
+                                @Html.DisplayFor(i => i.ChargeTypeCode)
+                                @Html.HiddenFor(i => i.ChargeTypeCode)
+                            </td>
+                        }
+                        <td style="font-size:16px">
+                            <b>Description</b>
+                        </td>
+                        <td style="font-size:16px;text-align:left" width="60%">
+                            @Html.EditorFor(i => i.ChargeTypeDesc, new { @style = "width:600px" })
+                            @Html.ValidationMessageFor(m => m.ChargeTypeDesc, "", new { @style = "color:red;" })
+                        </td>
+                    </tr>
+                    <tr width="800px">
+                        <td style="font-size:16px">
+                            <b>Rate</b>
+                        </td>
+                        <td style="font-size:16px;text-align:left">
+                            @Html.EditorFor(i => i.Rate)
+                            @Html.ValidationMessageFor(m => m.Rate, "", new { @style = "color:red" })
+                        </td>
+                        <td>
+                            <input type="button" onclick="zz();return false" value="Close Charge" class="inputbuttonbg inputbig" />
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.ActionLink("Back", "LabourChargeIndex")
+                        </td>
+                        <td>
+                            <input type="submit" value="Submit" class="inputbuttonbg inputbig" />
+                        </td>
+
+                    </tr>
+                </table>
+
+            }
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function zz() {
+        var xx = $('#ChargeTypeDesc').val();
+        //alert(xx);
+        $('#ChargeTypeDesc').val('zz - ' + xx);
+    }
+</script>

@@ -1,0 +1,187 @@
+﻿@model MDS.Models.ServiceParts
+@{
+    ViewBag.Title = "";
+}
+
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+@*<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>*@
+@*<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>*@
+
+
+@using (Html.BeginForm("ServiceParts", "Tech", FormMethod.Post, new { id = "ServiceParts" }))
+{
+    @*@Html.AntiForgeryToken()*@
+    <div id="dialogService"></div>
+
+    <table cellspacing="0" cellpadding="0" width="100%" border="1" frame=void rules=rows>
+            <tbody>
+
+                <tr style="width:100%">
+                    <th>
+                        <b>Part number</b>
+                    </th>
+                    <th>
+                        <b>Part Name</b>
+                    </th>
+                    <th>
+                        <b>Units</b>
+                    </th>
+                    <th>
+                        <b>Price</b>
+                    </th>
+                    @if (ViewBag.Readonly != true)
+                    {
+
+                        <td colspan="2">
+
+                            <a href="" onclick="CreatePartsService('@Model.ServiceID','@Model.BranchID');return false;" title="Add Parts"><img title="Add Parts" height="30" width="30" src="~/Images/Add.png" /></a>
+                        </td>
+                    }
+                </tr>
+            </tbody>
+            @if ((@Model.ServicePartsList == null))
+            {
+                <tr><td colspan="4">No records</td></tr>
+            }
+            else
+            {
+                for (int fi = 0; fi < Model.ServicePartsList.Count(); fi++)
+                {
+                    MDS.DB.ServicePart xxx = Model.ServicePartsList[fi];
+                    <tr>
+                        <td>
+                            @if (ViewBag.Readonly != true)
+                            {
+                                <a href="" onclick="editPart('@xxx.ServicePartId', '@xxx.BranchID'); return false;">@xxx.PartNumber</a>
+                            }
+                            else
+                            {
+                                @xxx.PartNumber
+                            }
+                        </td>
+                        <td>
+                            @xxx.PartDesc
+                        </td>
+                        <td>
+                            @xxx.NumberUsed
+                        </td>
+                        <td>
+                            @xxx.CostPerUnit
+                        </td>
+                        <td>
+                            @if (ViewBag.Readonly != true)
+                            {
+
+                                <a href="" onclick="deletePartService('@xxx.RepairOrServiceUID', '@xxx.ServicePartId', '@xxx.BranchID'); return false;"><img height="30" width="30" src="~/Images/Delete.png" /></a>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+        </table>
+}
+<script type="text/javascript">
+
+    function CreatePartsService(ServiceID, BranchID) {
+        try {
+            dirty(ServiceID, BranchID);
+            var BranchID = '@Model.BranchID';
+            divservice.dialog({
+                closeOnEscape: false,
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("CreatePartsService", "Tech")?ServiceID=' + ServiceID + '&BranchID=' + BranchID;
+                    $(this).load(url);
+
+                },
+                modal: true,
+                resizable: false,
+
+                width: 800,
+                height: 500,
+                title: "Create Parts",
+                buttons: {
+                    Close: function () {
+                        divservice.remove(); divservice.dialog("close");
+                    }
+                },
+            });
+        }
+        catch (ex) {
+            alert('catchall-createpartsservice:' + ex.message);
+        }
+        return false;
+    }
+
+        var divservice = $("#dialogService");
+
+        function closeDivService()
+        {
+            try {
+                divservice.remove();
+            }
+            catch (ex) {
+
+            }
+                        try {
+                 divservice.dialog("close");
+            }
+            catch (ex) {
+
+            }
+
+        }
+
+
+
+    function deletePartService(ServiceID, ServicePartID, BranchID) {
+        if (confirm("Do you want to remove this part?")) {
+            var data = { ServiceID: ServiceID, ServicePartID: ServicePartID, BranchID: BranchID }
+            $.post('@Url.Action("DeletePartService", "Tech")', data,
+                function (result) {
+                    try {
+                       // alert(result.Error);
+                        if (result.Error == '') {
+                            RefreshParts(result.ServiceID);
+                        }
+                        else
+                            alert("Could not delete");
+                    }
+                    catch (ex) {
+                        alert(ex.message);
+                    }
+                }
+                , 'json');
+        }
+    }
+
+                function editPart(ServicePartID, BranchID) {
+
+            divservice.dialog({
+                closeOnEscape: false,
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("EditPartsService", "Tech")?ServicePartID=' + ServicePartID + '&BranchID=' + BranchID;
+                    $(this).load(url);
+
+                },
+                modal: true,
+                resizable: false,
+
+                width: 800,
+                height: 500,
+                title: "Edit Parts",
+                buttons: {
+                    Close: function () {
+                          divservice.remove(); divservice.dialog("close");
+                    }
+                },
+            });
+    }
+
+
+
+</script>
+

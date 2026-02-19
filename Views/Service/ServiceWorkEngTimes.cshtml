@@ -1,0 +1,161 @@
+﻿@model MDS.Models.ServiceWorkTime
+@{
+    ViewBag.Title = "Start End Time";
+}
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+@*<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>*@
+@*<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>*@
+
+<h1>Actual Start End Times</h1>
+@using (Html.BeginForm("ServiceWorkEngTimes", "Service", FormMethod.Post, new { id = "ServiceWorkEngTimes" }))
+{
+    @Html.HiddenFor(m=>m.Exist)
+    @Html.HiddenFor(m => m.BranchID)
+    @Html.HiddenFor(m => m.ServiceJobID)
+    @Html.HiddenFor(m => m.Repair)
+
+    <table cellspacing="8" cellpadding="0" border="0">
+        <tr>
+            <td style="font-size:16px" align="right">
+                <b>Engineer</b>
+            </td>
+            @if (Model.Exist == true)
+            {
+        <td style="font-size:16px;text-align:left" colspan="2">
+            @Html.DropDownListFor(m => m.EngineerID, new SelectList(ViewBag.EngineerIDX, "EngineerID", "EngineerName"), "-Select One-", new { @style = "font-size:16px;text-align:left", @onchange = "travelrate();", @id = "TravelTypecode",@disabled="disabled" })
+            @Html.HiddenFor(m => m.EngineerID)
+        </td>
+
+            }
+            else
+            {
+            <td style="font-size:16px;text-align:left" colspan="2">
+                @Html.DropDownListFor(m => m.EngineerID, new SelectList(ViewBag.EngineerIDX, "EngineerID", "EngineerName"), "-Select One-", new { @style = "font-size:16px;text-align:left", @onchange = "travelrate();", @id = "TravelTypecode" })
+            </td>
+            }
+        </tr>
+        <tr>
+            <td style="font-size:16px" align="right">
+                <b>Start Time</b>
+            </td>
+            @if (Model.Exist == true)
+            {
+        <td style="font-size:16px;text-align:left">
+            @Model.StartTime.Value.ToString("dd/MM/yyyy HH:mm:ss")
+            @Html.HiddenFor(i => i.StartTime)
+            @Html.HiddenFor(i => i.StartTime2)
+        </td>
+                @*<td style="font-size:16px;text-align:left">
+                    @Model.StartTime.Value.ToString("HH:mm:ss")
+             
+                </td>*@
+            }
+            else
+            {
+                <td style="font-size:16px;text-align:left">
+                    @Html.EditorFor(i => i.StartTime, new { @id = "StartTime", @style = "font-size:16px;text-align:left" })
+                </td>
+                <td style="font-size:16px;text-align:left">
+                    @Html.DropDownListFor(i => i.StartTime2, new SelectList(ViewBag.StartTimeX, "Time24Hour", "Desc"))
+                    @Html.ValidationMessageFor(m => m.StartTime2)
+                </td>
+            }
+            </tr>
+        <tr>
+            <td style="font-size:16px" align="right">
+                <b>Travel charge</b>
+            </td>
+            <td style="font-size:16px;text-align:left" colspan="2">
+                @Html.DropDownListFor(m => m.ChargeTypecode, new SelectList(ViewBag.ChargeTypeX, "ChargeTypeCode", "ChargeType"), "-Select One-", new { @style = "font-size:16px;text-align:left", @onchange = "travelrate();", @id = "TravelTypecode" })
+            </td>
+        </tr>
+        <tr width="100%">
+            <td style="font-size:16px;" align="right">
+                <b>End Time</b>
+            </td>
+            @if (Model.Exist == true)
+            {
+        <td style="font-size:16px;text-align:left">
+            @Model.EndTime.Value.ToString("dd/MM/yyyy HH:mm:ss")
+            @Html.HiddenFor(i => i.EndTime)
+            @Html.HiddenFor(i => i.EndTime2)
+        </td>
+                    }
+                    else
+                    {
+                <td style="font-size:16px;text-align:left;">
+                    @Html.EditorFor(i => i.EndTime, new { @id = "EndTime", @style = "font-size:16px;text-align:left" })
+                </td>
+                <td style="font-size:16px;text-align:left;">
+                    @Html.DropDownListFor(i => i.EndTime2, new SelectList(ViewBag.EndTimeX, "Time24Hour", "Desc"))
+                    @Html.ValidationMessageFor(m => m.EndTime2)
+                </td>
+                }
+            </tr>
+        <tr>
+            <td colspan="3"></td>
+            <td align="right">
+                <button class="inputbuttonbg inputbig" onclick="Save(); return false;">save</button>
+            </td>
+        </tr>
+    </table>
+
+}
+<script type="text/javascript">
+
+            //    function SetTimeOutServiceNow() {
+            //    try {
+            //        var today = new Date();
+
+            //        var date = today.getDate()  + '/' + (today.getMonth() + 1)+ '/';
+
+            //        date = date + today.getFullYear() + ' ';
+            //        if (today.getHours() < 10)
+            //          date = date + '0';
+
+            //            date=date+ today.getHours() + ":";
+            //        if (today.getMinutes() < 10)
+            //            date = date + '0';
+            //        date = date + today.getMinutes() + ':00';
+            //        $('#EndTime').val(date);
+            //        Save();
+            //    }
+            //    catch (ex) {
+            //        alert(ex.message);
+            //    }
+            //}
+
+    function Save() {
+        var myData = $('#ServiceWorkEngTimes');
+
+        try {
+                $.post('@Url.Action("ServiceWorkEngTimesSave","Service")', myData.serialize(),
+                    function (data) {
+                        if (data.Error == '') {
+                            try {
+                                closeDiv();
+                            }
+                            catch (ex) {
+                                alert('1-' + ex.message);
+                            }
+                            try {
+                                RefreshServiceWorkTimes();
+                            }
+                            catch (ex) {
+                                alert('2-' + ex.message);
+                            }
+                        }
+                        else
+                            alert(data.Error);
+                    }
+                    , 'json');
+            }
+
+            catch (ex) {
+                alert('createpartsservice-CreatePartsSave2:' + ex.message);
+            }
+    }
+
+</script>

@@ -1,0 +1,53 @@
+﻿@model MDS.Models.LoginDetail
+
+@if (Model.LoggedOn)
+{
+    if ((MDS.Controllers.LoginController.AdminTechCustomer(@User.Identity.Name).Contains("@")))
+    {
+<table>
+    <tr>
+        <td>
+            Welcome:
+        </td>
+        <td>
+            @Html.ActionLink(MDS.Controllers.LoginController.AdminTechCustomer(@User.Identity.Name), "UserLogin", "Login")
+        </td>
+        @if (MDS.Controllers.LoginController.IsSuperUser(@User.Identity.Name))
+    {
+        <td>
+            @Html.ActionLink("(Admin)", "AllUsers", "Login")
+
+
+        </td>
+}
+        @if (MDS.Controllers.LoginController.IsAudit(@User.Identity.Name))
+    {
+        <td>
+            @Html.ActionLink("(Audit)", "Audit", "Login")
+
+
+        </td>
+}
+
+        <td>
+            @Html.ActionLink(@Model.BranchName, "Branches", "Login", new { Email = MDS.Controllers.LoginController.AdminTechCustomer(@User.Identity.Name) }, null)
+        </td>
+        <td>
+            @Html.ActionLink("Log Off", "LogOff", "Login", new { @style = "color:red" })
+        </td>
+    </tr>
+</table>
+    }
+    else if ((MDS.Controllers.LoginController.AdminTechCustomer(@User.Identity.Name).Contains("@")) || (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin) || (MDS.Controllers.LoginController.AdminTechCustomer(@User.Identity.Name) == "Tech"))
+    {
+        <p style="float:left;"><strong>Welcome : @Model.BranchName</strong> </p> @Html.ActionLink("Log Off", "LogOff", "Login")
+    }
+    else
+    {
+        <p style="float:left;"><strong>Customer : @MDS.Controllers.LoginController.AdminTechCustomer(@User.Identity.Name)</strong> </p> @Html.ActionLink("Log Off", "LogOff", "Login")
+    }
+}
+else
+{
+    @: @Html.ActionLink("Log On", "Index", "Login")
+}

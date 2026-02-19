@@ -1,0 +1,133 @@
+﻿@model MDS.Models.BranchForm
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<div class="breadcrumb">
+    @Html.ActionLink("Home", "Index", "Dashboard")
+    » @Html.ActionLink("Branches", "Index", "Branch")
+</div>*@
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+</style>
+<h1>Branch Detail</h1>
+@using (Html.BeginForm("Add", "Branch", FormMethod.Post, new { id = "AddForm" }))
+{
+    @Html.HiddenFor(mbox => mbox.BranchID)
+
+    <div id="box2">
+        <table cellspacing="8" cellpadding="0" width="100%" border="0">
+            <tr>
+                <td colspan="2">
+                    @Html.ValidationSummary(true)
+                </td>
+            </tr>
+            <tr>
+                            <td class="text">Branch Name (login name)<span style="color: red;">*</span></td>
+                            <td>@(Html.Kendo().TextBoxFor(mbox => mbox.BranchName)
+                                            .Name("BranchName")
+                                            .HtmlAttributes(new { data_required_msg = "Branch Name is required.", required = "required", style = "width: 240px" })
+                                            )</td>
+                            <td class="text">Prefix Code<span style="color: red;">*</span></td>
+                            <td>@(Html.Kendo().TextBoxFor(mbox => mbox.PrefixCode)
+                                            .Name("PrefixCode")
+                                            .HtmlAttributes(new { data_required_msg = "Prefix Code is required.", required = "required", style = "width: 240px" })
+                                            )</td>
+            </tr>
+
+            <tr>
+               <td colspan="4">
+                    <div style="background-color:yellow">
+                        <table style="padding:10px"  >
+                            @*<tr style="text-align:center">
+                        
+
+
+                        <td class="text"><b>Admin Password</b><span style="color: red;">*</span></td>
+                            <td>@(Html.Kendo().TextBoxFor(mbox => mbox.Password)
+                                            .Name("Password")
+                                            .Enable(false)
+                                            .HtmlAttributes(new { data_required_msg = "Password is required.", required = "required", style = "width: 240px;background-color:lightgray" })
+                                            )</td>
+                            <td class="text"><b>Admin URL Link (bypass login)</b></td>
+              
+                            <td><a href="@MDS.Controllers.LoginController.GetSiteRootUrl(Request)?uid=@(Model.BranchName)&pwd=@(Model.Password)">@MDS.Controllers.LoginController.GetSiteRootUrl(Request)?uid=@(Model.BranchName)&pwd=@(Model.Password)</a></td>
+                            <td><a class="email" title="Email a friend" href="mailto:?subject=Admin%20Login&amp;body=Admin Login:@MDS.Controllers.LoginController.GetSiteRootUrl(Request)?uid=@(Model.BranchName)%26pwd=@(Model.Password)">Email Admin Link</a></td>
+    </tr>*@
+                            <tr style="text-align:center">
+                        
+                            <td class="text"><b>Tech password (Readonly / Limited Access)</b></td>
+                            <td>@(Html.Kendo().TextBoxFor(mbox => mbox.PasswordROTech)
+                                            .Name("PasswordROTech")
+                                            .Enable(false)
+                                            .HtmlAttributes(new { style = "width: 240px;background-color:lightgray" })
+                                            )</td>
+                            <td class="text"><b>Tech URL Link</b><span style="color: red;">*</span></td>
+                            <td><a href="@MDS.Controllers.LoginController.GetSiteRootUrl(Request)?uid=@(Model.BranchName)&pwd=@(Model.PasswordROTech)">@MDS.Controllers.LoginController.GetSiteRootUrl(Request)?uid=@(Model.BranchName)&pwd=@(Model.PasswordROTech)</a></td>
+                        <td><a class="email" title="Email a friend" href="mailto:?subject=Tech%20Login&amp;body=Tech Login:@MDS.Controllers.LoginController.GetSiteRootUrl(Request)?uid=@(Model.BranchName)%26pwd=@(Model.PasswordROTech)">Email Tech Link</a></td>
+
+                        </tr>
+                            </table>
+                        </div>
+                   </td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td width="2%">&nbsp;
+                    </td>
+                    <td width="10%" rowspan="3">
+                        <input type="button" class="inputbuttonbg inputbig" value="Cancel" onclick="cancel()">
+                    </td>
+                    <td width="12%">&nbsp;
+                    </td>
+                    <td width="30%" rowspan="3"></td>
+                    <td width="7%">&nbsp;
+                    </td>
+                    <td width="22%" rowspan="3"></td>
+                    <td width="7%">&nbsp;
+                    </td>
+                    <td width="7%" rowspan="3">
+                        <input type="button" class="inputbuttonbg inputbig" onclick="$('#AddForm').submit();" value="Save">
+                    </td>
+                    <td width="3%">&nbsp;
+                    </td>
+                </tr>
+            </table>
+
+    </div>
+}
+<script>
+
+    $("#AddForm").kendoValidator({
+    });
+
+</script>
+<script type="text/javascript">
+
+    var somethingChanged = false;
+    $(document).ready(function () {
+        $('input').change(function () {
+            somethingChanged = true;
+        });
+        $('textarea').change(function () {
+            somethingChanged = true;
+        });
+    });
+
+    function cancel() {
+        if (somethingChanged) {
+            var r = confirm("Do you wish to discard any changes you have made?");
+            if (r) {
+                window.location.href =  '@Url.Action("Index", "Branch")';
+            }
+        }
+        else {
+            window.location.href = '@Url.Action("Index", "Branch")';
+        }
+    }
+
+</script>

@@ -354,15 +354,35 @@ namespace MDS.Controllers
             return PartialView(uf);
         }
 
+        // Allowed file extensions for upload security
+        private static readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".txt", ".mp3", ".wav", ".mp4" };
+        private const int MaxFileSizeBytes = 10 * 1024 * 1024; // 10MB limit
+
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
         public JsonResult UploadFileSave(HttpPostedFileBase File, int? RepairID, int? ServiceID, int? BranchID)//,string Title)
         {
             try
             {
-                if (File.ContentLength == 0)
+                if (File == null || File.ContentLength == 0)
                 {
                     return Json(new { Error = "File is empty - 0 size" });
                 }
+
+                // SECURITY: Validate file size
+                if (File.ContentLength > MaxFileSizeBytes)
+                {
+                    return Json(new { Error = "File size exceeds maximum allowed (10MB)" });
+                }
+
+                // SECURITY: Validate file extension
+                var fileExtension = Path.GetExtension(File.FileName)?.ToLowerInvariant();
+                if (string.IsNullOrEmpty(fileExtension) || !AllowedExtensions.Contains(fileExtension))
+                {
+                    return Json(new { Error = "File type not allowed. Permitted types: " + string.Join(", ", AllowedExtensions) });
+                }
+
                 int id;
                 string tpe;
                 if (RepairID != null)
@@ -377,8 +397,11 @@ namespace MDS.Controllers
                 }
                 int brid = Convert.ToInt32(BranchID);
                 var contenttype = File.ContentType;
-                var fileName = Path.GetFileName(File.FileName);
-                fileName = tpe + "_" + id.ToString("######") + "-" + brid.ToString() + "-" + fileName.Replace(' ', '-'); //For TheDock naming convention
+
+                // SECURITY: Sanitize filename - remove path traversal and dangerous characters
+                var originalFileName = Path.GetFileName(File.FileName);
+                var safeFileName = System.Text.RegularExpressions.Regex.Replace(originalFileName, @"[^a-zA-Z0-9_\-\.]", "_");
+                var fileName = tpe + "_" + id.ToString("######") + "-" + brid.ToString() + "-" + safeFileName;
                 var path = Path.Combine(Server.MapPath(uploadfolder), fileName);
                 if (System.IO.File.Exists(path))
                 {
@@ -399,17 +422,43 @@ namespace MDS.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { Error = ex.Message});
+                // SECURITY: Log the actual error server-side, return generic message to user
+                System.Diagnostics.Debug.WriteLine("Upload error: " + ex.ToString());
+                return Json(new { Error = "An error occurred while uploading the file. Please try again."});
 
             }
         }
 
         public static string uploadfolder = "~/App_Data/UploadedFiles";
+
+        [Authorize]
         public FileResult Download(string Fle, string contentType)
         {
-            string fileName = Path.Combine(Server.MapPath(uploadfolder), Fle);//"~/Views/Applications/Uploads"
-                                                                              //string contentType = "jpg";
-            return new FilePathResult(fileName, contentType);
+            // SECURITY: Validate filename to prevent path traversal attacks
+            if (string.IsNullOrEmpty(Fle))
+            {
+                throw new ArgumentException("File name is required");
+            }
+
+            // Get just the filename, stripping any path components (prevents ../ attacks)
+            var safeFileName = Path.GetFileName(Fle);
+
+            // Ensure no path traversal sequences remain
+            if (safeFileName.Contains("..") || safeFileName != Fle)
+            {
+                throw new UnauthorizedAccessException("Invalid file name");
+            }
+
+            string fullPath = Path.Combine(Server.MapPath(uploadfolder), safeFileName);
+
+            // Verify the file exists and is within the upload folder
+            var uploadFolderPath = Server.MapPath(uploadfolder);
+            if (!fullPath.StartsWith(uploadFolderPath) || !System.IO.File.Exists(fullPath))
+            {
+                throw new System.IO.FileNotFoundException("File not found");
+            }
+
+            return new FilePathResult(fullPath, contentType);
         }
 
 

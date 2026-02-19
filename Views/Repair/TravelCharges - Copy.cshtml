@@ -1,0 +1,71 @@
+﻿@{
+    ViewBag.Title = "LabourCharges";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model MDS.Models.LabourChargeList
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+</style>
+<h2 style="text-align: center;">Travel Charges</h2>
+
+@using (Html.BeginForm("TravelChargeIndex", "Repair", FormMethod.Post, new { id = "SiteForm" }))
+{
+   
+    <div class="contact-info">
+        <div class="content">
+            <table style="margin-left: 10px; margin-top: 10px; width: 95%">
+
+                <tr>
+                    <td colspan="2">
+
+                         @(Html.Kendo().Grid(Model.LabourCharges)
+                           .Name("locGrid")
+                           .Columns(columns =>
+{
+    columns.Bound(p => p.ChargeTypeCode).Title("Code");
+    columns.Bound(p => p.ChargeType).Title("Type");
+    columns.Bound(p => p.ChargeRate).Title("Rate");
+    columns.Command(command =>
+    {
+        command.Edit();       
+    });
+
+})
+.ToolBar(t=>t.Create())
+.Pageable()
+.Sortable()
+.Editable(editable => editable.Mode(GridEditMode.InLine))
+.Filterable()
+.DataSource(dataSource => dataSource
+        .Ajax()      
+        .Model(model =>
+{
+model.Id(p => p.ChargeTypeCode);
+model.Field(p => p.ChargeType).Editable(true);
+})
+          .Update(update => update.Action("UpdateTravelCharge",
+                                    "Repair"))                                  
+                                    .Create(create => create.Action("CreateTravelCharge", "Repair")) 
+        .PageSize(200)
+        .ServerOperation(false)
+     )
+)
+                    
+
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+
+    function dropdownlist_change() {
+        $("#SiteForm").submit();
+    }
+
+</script>

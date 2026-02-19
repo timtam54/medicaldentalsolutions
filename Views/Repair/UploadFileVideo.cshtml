@@ -1,0 +1,240 @@
+﻿@model MDS.DB.Photo
+
+<script src="https://cdn.webrtc-experiment.com/commits.js"></script>
+<script src="https://cdn.WebRTC-Experiment.com/MediaStreamRecorder.js"></script>
+<script src="https://cdn.WebRTC-Experiment.com/gumadapter.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+
+@using (Html.BeginForm("UploadFile", "Repair", FormMethod.Post, new { id = "UploadFile", enctype = "multipart/form-data" }))
+{
+    if (Model.Attach_Audio == true)
+    {
+        <h1>Attach Audio File</h1>
+        <button class="btn btn-primary" id="start-recording" onclick="startRecording(); return false;">Recording Start</button>
+        <button class="btn btn-default" id="stop-recording" onclick="stopRecording(); return false;">Stop</button>
+        <button class="btn btn-default" id="save-recording" onclick="saveRecording(); return false;">Save</button>
+        <div id="record-audio"></div>
+        <span id="clicks"></span>
+
+    }
+    else
+    {
+        <h1>Select file from folder</h1>
+        <label for="file">Filename:</label>
+        <!--<input id="File" type="file" name="File" accept="*/*"--> @*class="btn-gbrmpa"*@<!-->-->
+        <input id="File" type="file" name="File" accept="image/*" @*class="btn-gbrmpa"*@>
+        @Html.HiddenFor(m => m.RepairID)
+        @Html.HiddenFor(m => m.ServiceID)
+        @Html.HiddenFor(m => m.BranchID)
+        <span style="text-align: right;">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="button" style="text-decoration:underline" class="inputbuttonbg inputbig" onclick="SubmitButtonOnclick(); return false;" value="Save" />
+        </span>
+    }
+}
+<script type="text/javascript">
+
+    var ServiceID= '@Model.ServiceID';
+
+    var RepairID = '@Model.RepairID';
+    var BranchID='@Model.BranchID';
+
+    function SubmitButtonOnclick() {
+        try {
+            if (document.getElementById("File").files.length == 0) {
+                alert("Please select a file to upload");
+            }
+            else {
+                //alert('w');
+                var formData = new FormData();
+                var urlu = '@Url.Action("UploadFileSave", "Repair")';
+                var allfile = document.getElementById("File").files[0];
+                formData.append("File", allfile);
+                formData.append("RepairID", RepairID);
+                formData.append("ServiceID", ServiceID);
+                formData.append("BranchID", BranchID);
+                //formData.append("Title", Title);
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", urlu, true);
+                xhr.addEventListener("load", function (evt) { UploadComplete(evt); }, false);
+                xhr.addEventListener("error", function (evt) { UploadFailed(evt); }, false);
+                xhr.send(formData);
+            }
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+    function UploadComplete(evt) {
+        var Response = evt.target.responseText;
+        var Error = Response.replace('{"Error":', '');
+        Error = Error.replace('"}', '');
+        Error = Error.replace('"', '');
+        if (Error != '')
+            alert(Error);
+        alert('file uploaded');
+    }
+
+    function UploadFailed(evt) {
+        alert("There was an error attempting to upload the file.");
+
+    }
+</script>
+
+
+<script>
+
+    function captureUserMedia(mediaConstraints, successCallback, errorCallback) {
+        navigator.mediaDevices.getUserMedia(mediaConstraints).then(successCallback).catch(errorCallback);
+    }
+
+    var mediaConstraints = {
+       // audio: true
+        video: true
+    };
+    //https://gist.github.com/anantn/1852070
+    function startRecording(idx) {
+        $('#start-recording').disabled = true;
+        audiosContainer = document.getElementById('audios-container');
+        document.getElementById("clicks").innerHTML = "Recording Started";
+
+        var f = document.getElementById('clicks');
+        setInterval(function () {
+            f.style.display = (f.style.display == 'none' ? '' : 'none');
+        }, 1000);
+        //captureUserMedia(mediaConstraints, onMediaSuccess, onMediaError);
+        captureUserMedia(mediaConstraints,onMediaSuccessVideo, onMediaError);
+    };
+
+    function stopRecording() {
+        $('#stop-recording').disabled = true;
+        document.getElementById("clicks").innerHTML = "Recording Stopped";
+        var f = document.getElementById('clicks');
+        setInterval(function () {
+            f.style.display = (f.style.display == 'none' ? '' : 'none');
+        }, 1000);
+        mediaRecorder.stop();
+        mediaRecorder.stream.stop();
+        $('.start-recording').disabled = false;
+    };
+
+    var fd;
+
+    function saveRecording() {
+        try {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/Tech/AudioProcess", true);
+            xhr.send(fd);
+            alert('audio saved');
+
+
+            //var xhr = new XMLHttpRequest();
+            //xhr.open('GET', bloburl, true);
+            //xhr.responseType = 'blob';
+            //var myBlob;
+            //xhr.onload = function (e) {
+            //    if (this.status == 200) {
+            //        var myBlob = this.response;
+
+
+            //    }
+            //};
+            //xhr.send();
+            //alert(JSON.stringify(myBlob));
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    };
+
+    var mediaRecorder;
+
+    var URLcreateObjectURL = "";
+    function onMediaSuccess(stream) {
+        try {
+            mediaRecorder = new MediaStreamRecorder(stream);
+            mediaRecorder.stream = stream;
+            mediaRecorder.mimeType = 'audio/wav';
+            mediaRecorder.audioChannels = 1;
+            mediaRecorder.ondataavailable = function (blob) {
+                $('#record-audio').html("<audio controls=''><source src=" + URL.createObjectURL(blob) + "></source></audio>");
+                fd = new FormData();
+                 fd.append("blob", blob);
+                 fd.append("RepairID", '@Model.RepairID');//,int ,string
+                 fd.append("ServiceID", '@Model.ServiceID');//,int ,string
+                 fd.append("BranchID", '@Model.BranchID');
+                 fd.append("Field", '@Model.Title');
+
+
+
+            };
+
+            var timeInterval = 360 * 1000;
+
+            mediaRecorder.start(timeInterval);
+
+            $('#stop-recording').disabled = false;
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+    function onMediaSuccessVideo(stream) {
+        try {
+            mediaRecorder = new MediaStreamRecorder(stream);
+            mediaRecorder.stream = stream;
+            mediaRecorder.mimeType = 'video/mp4';
+            //mediaRecorder.audioChannels = 1;
+            mediaRecorder.ondataavailable = function (blob) {
+                $('#record-audio').html("<video controls=''><source src=" + URL.createObjectURL(blob) + "></source></video>");
+                fd = new FormData();
+                 fd.append("blob", blob);
+                 fd.append("RepairID", '@Model.RepairID');//,int ,string
+                 fd.append("ServiceID", '@Model.ServiceID');//,int ,string
+                 fd.append("BranchID", '@Model.BranchID');
+                 fd.append("Field", '@Model.Title');
+
+
+
+            };
+
+            var timeInterval = 360 * 1000;
+
+            mediaRecorder.start(timeInterval);
+
+            $('#stop-recording').disabled = false;
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+    function onMediaError(e) {
+        console.error('media error', e);
+    }
+
+    function bytesToSize(bytes) {
+        var k = 1000;
+        var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        if (bytes === 0) return '0 Bytes';
+        var i = parseInt(Math.floor(Math.log(bytes) / Math.log(k)), 10);
+        return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
+    }
+
+    function getTimeLength(milliseconds) {
+        var data = new Date(milliseconds);
+        return data.getUTCHours() + " hours, " + data.getUTCMinutes() + " minutes and " + data.getUTCSeconds() + " second(s)";
+    }
+
+    window.onbeforeunload = function () {
+        $('#start-recording').disabled = false;
+    };
+
+
+
+</script>
+
+

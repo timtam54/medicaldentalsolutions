@@ -1,0 +1,212 @@
+﻿@model MDS.Models.PartsForm
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<div class="breadcrumb">
+         @Html.ActionLink("Home", "Index", "Dashboard")
+        » @Html.ActionLink("Equipment Type and Test Script", "Index", "EquipType")
+    </div>*@
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+</style>
+<h1>Parts Detail</h1>
+@using (Html.BeginForm("Add", "Parts", FormMethod.Post, new { id = "AddForm" }))
+{
+    @Html.HiddenFor(mbox => mbox.ID)
+    <input id="hdPopUp" type="hidden" />
+    <div id="box2">
+        <table cellspacing="8" cellpadding="0" width="100%" border="0">
+            <tr>
+                <td colspan="2">
+                    @Html.ValidationSummary(true)
+                </td>
+            </tr>
+            <tr>
+                <td width="50%">
+
+                    <table>
+
+                        <tr>
+                            <td class="text">Item <span style="color: red;">*</span></td>
+                            <td>
+                                @(Html.Kendo().TextBoxFor(mbox => mbox.Item)
+                                            .Name("Item")
+                                            .HtmlAttributes(new { data_required_msg = "Item is required.", required = "required", style = "width: 240px" })
+                                            )
+                            </td>
+
+                            <td class="text">Descripription <span style="color: red;">*</span></td>
+                            <td>
+                                @(Html.Kendo().TextBoxFor(mbox => mbox.Descrip)
+                                            .Name("Descrip")
+                                            .HtmlAttributes(new { data_required_msg = "Descrip is required.", required = "required", style = "width: 240px" })
+                                            )
+                            </td>
+                        </tr>
+
+                        <tr>
+
+                            <td class="text">Type <span style="color: red;">*</span></td>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.Type)
+                                               .Name("Type")
+                                                .Filter("startswith")
+                                              .DataTextField("Type")
+                                              .DataValueField("Type")
+                                               .BindTo(Model.TypeList)
+                                              .HtmlAttributes(new { style = "width:62%" })
+                                            )
+
+
+                            </td>
+
+                            <td class="text">Price </td>
+                            <td>
+                                @(Html.Kendo().CurrencyTextBoxFor(m => m.Price)
+                                .Name("Price")
+                                .HtmlAttributes(new { style = "width: 120px" })
+
+                                                         )
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="text red">Active</span>
+                            </td>
+                            <td>
+                                <label>
+                                    @Html.EditorFor(m => m.Active, new { style = "width:80px;height:80px" })
+                                </label>
+
+
+                            </td>
+                        </tr>
+
+
+                        <tr>
+
+                            <td class="text">Account <span style="color: red;">*</span></td>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.Account)
+                                               .Name("Account")
+                                                .Filter("startswith")
+                                              .DataTextField("Name")
+                                              .DataValueField("Name")
+                                               .BindTo(Model.AccountList)
+                                              .HtmlAttributes(new { style = "width:62%" })
+                                            )
+
+
+                            </td>
+
+
+
+
+                            <td class="text">Type <span style="color: red;">*</span></td>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.TaxCode)
+                                               .Name("TaxCode")
+                                                .Filter("startswith")
+                                              .DataTextField("Code")
+                                              .DataValueField("Code")
+                                               .BindTo(Model.TaxCodeList)
+                                              .HtmlAttributes(new { style = "width:62%" })
+                                            )
+
+
+                            </td>
+
+                        </tr>
+                        <tr>
+
+                            <td>
+                                <input type="button" class="inputbuttonbg inputbig" value="Cancel" onclick="cancel()">
+                            </td>
+                            <td>
+                                <input type="submit" class="inputbuttonbg inputbig" value="Ok" id="btnOK">
+
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <table>
+            <tr>
+                <td colspan="6">
+                </td>
+            </tr>
+        </table>
+    </div>
+}
+<script>
+
+    $("#AddForm").kendoValidator({
+    });
+
+</script>
+<script type="text/javascript">
+
+    $("#btnOK").click(function (event) {
+        event.preventDefault();
+        $.post('@Url.Action("SaveUpdateParts", "Parts")', $("#AddForm").serialize(), function (data) {
+            if (data.msg == "1") {
+                ShowSuccess(data.message);
+                setTimeout("window.location.href = '@Url.Action("Index", "Parts")';", 2000);
+            }
+            else {
+                ShowWarning(data.message);
+            }
+        });
+    });
+
+
+    var somethingChanged = false;
+    $(document).ready(function () {
+        $('input').change(function () {
+            somethingChanged = true;
+        });
+        $('textarea').change(function () {
+            somethingChanged = true;
+        });
+    });
+
+    function cancel() {
+        if (somethingChanged) {
+            var r = confirm("Do you wish to discard any changes you have made?");
+            if (r) {
+                back();
+            }
+        }
+        else {
+            back();
+        }
+    }
+    function back() {
+ {
+             window.location.href = '@Url.Action("Index", "Parts")';
+         }
+     }
+</script>
+
+
+<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>
+

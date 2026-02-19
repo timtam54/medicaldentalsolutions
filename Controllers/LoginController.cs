@@ -271,6 +271,7 @@ namespace MDS.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult RetrievePassword(Login model)
         {
             TrackerDataContext db = new TrackerDataContext();
@@ -287,13 +288,8 @@ namespace MDS.Controllers
 
         public ActionResult Index()
         {
-            if ((Request.QueryString["uid"] != null) && (Request.QueryString["pwd"] != null))
-            {
-                var username = Request.QueryString["uid"].ToString();
-                var password = Request.QueryString["pwd"].ToString();
-                return Login(null, username, password);
-            }
-            else if (ControllerContext.HttpContext.User.Identity.IsAuthenticated)
+            // SECURITY: Removed password-in-query-string login - credentials should only be sent via POST
+            if (ControllerContext.HttpContext.User.Identity.IsAuthenticated)
             {
                 var data = HttpContext.User.Identity.Name;
                 ATC atc = IsAdmin(data);
@@ -356,6 +352,7 @@ namespace MDS.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Index(Login model)
         {
             //if (HttpContext.User.Identity.Name!="")
@@ -403,6 +400,7 @@ else
 
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult UserLogin(DB.UserLogin ulEdit)
         {
             Utility.Audit(HttpContext.User.Identity.Name, "Update Password " + ulEdit.Email, 0, Request);
@@ -476,6 +474,7 @@ else
             return View(users);
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult UserDetail(UserDetailBranches us)
         {
 
@@ -484,7 +483,7 @@ else
             {
                 DB.UserLogin user = new DB.UserLogin();
                 user.Email = us.Email;
-                user.Password   = us.Password;
+                user.Password = us.Password;
                 //if (db.Engineers.Where(i => i.UserName == us.Email).Count() > 0)
                 //    user.AdminUserTech = "T";
                 //else if (user.Admin)
@@ -720,6 +719,8 @@ else
             FormsAuthentication.SignOut();
             HttpCookie cookie = new HttpCookie(FormsAuthentication.FormsCookieName, "");
             cookie.Expires = DateTime.Now.AddYears(-1);
+            cookie.HttpOnly = true;
+            cookie.Secure = true;
             Response.Cookies.Add(cookie);
             return RedirectToAction("Index");
         }

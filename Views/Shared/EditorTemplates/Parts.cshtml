@@ -1,0 +1,19 @@
+﻿@(Html.Kendo().AutoComplete()
+                                               .Name("PartName")
+                                               .Placeholder("Search Parts")
+                                               .DataTextField("Descrip")
+                                               .Events(e => e
+                                                             .Select("getPartInformation")
+                                                            )
+                                               .DataSource(source =>
+                                                 {
+                                                     source.Read(read =>
+                                                     {
+                                                         read.Action("GetPartItem", "Repair"); //Set the Action and Controller name
+
+                                                     })
+                                                     .ServerFiltering(true);
+
+                                                 })
+
+                                         )

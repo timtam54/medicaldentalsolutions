@@ -1,0 +1,107 @@
+﻿@model IList<MDS.Models.User>
+    @{
+        ViewBag.Title = "Login";
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+
+    @using (Html.BeginForm("AllUsers", "Login", FormMethod.Post, new { id = "AllUsers" }))
+    {
+        <div id="box2">
+            <table style="text-align:center;font-size:16px;" width="100%">
+                <tr>
+                    <td>
+                        <b>
+                            Users
+                        </b>
+                    </td>
+                    <td>
+                        <b>
+                            Tech
+                        </b>
+                    </td>
+
+                    <td width="50%">
+                        <b>
+                            Branches
+                        </b>
+                    </td>
+                    <td>
+                        <b>
+                            New Equipment Notify
+                        </b>
+                    </td>
+                    <td>
+                        <b>
+                            New Parts Notify
+                        </b>
+                    </td>
+                </tr>
+                @foreach (MDS.Models.User item in Model)
+    {
+            <tr>
+                <td style="font-size:16px;">
+                    @Html.ActionLink(item.Email.ToString(), "UserDetail", "Login", new { UserName = item.Email }, null)
+                </td>
+                <td>
+                    @item.Tech
+                </td>
+                <td>
+                    @item.Branch
+                </td>
+                <td>
+                    @if (@item.NewEquipNotify)
+                    {
+                        <input type="checkbox" name="NewEquipNotify" checked="checked">
+                    }
+                    else
+                    {
+                        <input type="checkbox" name="NewEquipNotify">
+                    }
+                </td>
+                <td>
+                    @if (item.NewPartsNotify)
+                    {
+                        <input type="checkbox" name="NewPartsNotify" checked="checked">
+                    }
+                    else
+                    {
+                        <input type="checkbox" name="NewPartsNotify">
+                    }
+                </td>
+                @if (Convert.ToBoolean(item.Admin))
+                {
+                    <td style="color:red">
+                        ADMIN
+                    </td>
+                }
+
+            </tr>
+}
+                <tr>
+
+                    <td style="font-size:16px;">
+                        @Html.ActionLink("Add New User", "UserDetail", "Login", new { UserName = "New" }, null)
+
+                    </td>
+
+                </tr>
+            </table>
+        </div>
+    }
+
+
+<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>
+

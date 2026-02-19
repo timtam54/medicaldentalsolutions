@@ -1,0 +1,88 @@
+﻿@{
+    ViewBag.Title = "Customer Locations";
+    Layout = "~/Views/Shared/_IframeLayout.cshtml";
+}
+
+@model MDS.Models.CustomerLocationList
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+</style>
+<h2 style="text-align: center;">Customer Location</h2>
+
+@using (Html.BeginForm("GetCustomerLocations", "Customer", FormMethod.Post, new { id = "LocationForm" }))
+{
+   
+    <div class="contact-info">
+        <div class="content">
+            <table style="margin-left: 10px; margin-top: 10px; width: 95%">
+
+                <tr>
+                    <td width="150">Customer :
+                    </td>
+                    <td>
+                        @(Html.Kendo().DropDownListFor(m => m.CustomerCode)
+                                          .Name("CustomerCode")
+                                           .Filter("startswith")
+                                          .DataTextField("CompanyName")
+                                          .DataValueField("CustomerCode")
+                                          .BindTo(Model.CustomerList)
+                                          .Events(e => e
+        .Change("dropdownlist_change")
+  )
+                                          .HtmlAttributes(new { style = "width:100%" })
+                                        )
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+
+                         @(Html.Kendo().Grid(Model.LocationList)
+                           .Name("locGrid")
+                           .Columns(columns =>
+{
+    columns.Bound(p => p.CustomerCode).Title("Customer Code");
+    columns.Bound(p => p.Location).Title("Location");
+    columns.Bound(p => p.LocationID).Title("LocationID").Visible(false);
+    columns.Command(command =>
+    {
+        command.Edit();       
+    });
+
+})
+.ToolBar(t=>t.Create())
+.Pageable()
+.Sortable()
+.Editable(editable => editable.Mode(GridEditMode.InLine))
+.Filterable()
+.DataSource(dataSource => dataSource
+        .Ajax()      
+        .Model(model =>
+{
+model.Id(p => p.LocationID);
+model.Field(p => p.CustomerCode).Editable(false);
+})
+          .Update(update => update.Action("UpdateLocation",
+                                    "Customer"))                                  
+                                    .Create(create => create.Action("CreateLocation", "Customer")) 
+        .PageSize(200)
+        .ServerOperation(false)
+     )
+)
+                    
+
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+
+    function dropdownlist_change() {
+        $("#LocationForm").submit();
+    }
+
+</script>

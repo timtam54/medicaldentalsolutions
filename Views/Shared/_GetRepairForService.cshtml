@@ -1,0 +1,118 @@
+﻿@model MDS.Models.RepairSearch
+<h1>Repair Search</h1>
+@using (Html.BeginForm("SearchRepairData", "Service", FormMethod.Post, new { id = "rpForm" }))
+{
+    <div class="contact-info">
+        <div class="content">
+            <table>
+                <tr>
+                    <td width="100">Equip Type :
+                    </td>
+                    <td>@(Html.Kendo().DropDownListFor(m => m.Equiptype)
+  .Name("Equiptype")
+   .Filter("startswith")
+  .DataTextField("Name")
+  .DataValueField("EquipTypeCode")
+  .BindTo(Model.EquipTypeList)
+  .HtmlAttributes(new { style = "width:300px", data_required_msg = "Equip Type is required." })
+)
+
+                    </td>
+                    <td width="100">Customer :
+                    </td>
+                    <td>@(Html.Kendo().DropDownListFor(m => m.Customerid)
+  .Name("Customerid")
+   .Filter(MDS.Controllers.LoginController.SearchType)
+  .DataTextField("CompanyName")
+  .DataValueField("CustomerCode")
+  .BindTo(Model.CustomerList)
+  .HtmlAttributes(new { style = "width:300px", data_required_msg = "Customer is required." })
+)
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>Date In :
+                    </td>
+                    <td>@(Html.Kendo().DatePickerFor(m => m.FromDate)
+                    .Name("FromDate")
+                    .Value(DateTime.Today)
+                    .Format("dd/MM/yyyy")
+                    .ParseFormats(new string[] { "dd/MM/yyyy" })
+    .HtmlAttributes(new { required = "required", type = "text", data_required_msg = "Date In is required." })
+                    )
+                    </td>
+                    <td>Date Out :
+                    </td>
+                    <td>@(Html.Kendo().DatePickerFor(m => m.ToDate)
+                    .Name("ToDate")
+                    .Value(DateTime.Today)
+                    .Format("dd/MM/yyyy")
+    .HtmlAttributes(new { required = "required", type = "text", data_required_msg = "Date Out is required." })
+                    )
+                        <a class="button" onclick="$('#rpForm').submit();"><span>Search</span></a>
+                         <a onclick="cancel();" class="button"><span>Cancel</span></a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="4">
+                    </td>
+                </tr>
+            </table>
+            <table width="100%">
+                <tr>
+                    <td colspan="4">
+                        @(Html.Kendo().Grid(Model.Repairs)
+.Name("rpGrid")
+.Columns(columns =>
+{
+    columns.Bound(p => p.JobCode).Title("Job No").ClientTemplate(@Html.ActionLink("#=JobCode#", "Edit","Repair", new { id = "#=RepairUID#" },null).ToHtmlString());
+    columns.Bound(p => p.Equipment).Title("Equip Item");
+    columns.Bound(p => p.Customer).Title("Customer");
+    columns.Bound(p => p.OrderNumber).Title("Order No");
+    columns.Bound(p => p.DateIn).Title("Date In");
+    columns.Bound(p => p.DateOut).Title("Date Out");
+})
+.Pageable()
+.Sortable()
+.Filterable()
+ .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(200)
+        .ServerOperation(false)
+     )
+)
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <a onclick="pick();" class="button"><span>Pick</span></a>
+                </tr>
+            </table>
+        </div>
+    </div>
+}
+<script>
+
+    $("#rpForm").kendoValidator({
+    });
+    function pick() {
+        var entityGrid = $("#rpGrid").data("kendoGrid");
+        var selectedItem = entityGrid.dataItem(entityGrid.select());
+        if (selectedItem == undefined) {
+            alert("Please select the row first");
+        }
+        else {
+            parent.$("#ServiceJobID").val(selectedItem.ServiceJobUID);
+            parent.$("#hdServiceId").val(selectedItem.Customer);
+            parent.$("#window").data("kendoWindow").close();
+        }
+    }
+
+    function cancel() {
+        parent.$("#window").data("kendoWindow").close();
+    }
+</script>
+
+

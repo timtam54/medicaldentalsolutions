@@ -1,0 +1,185 @@
+﻿@model MDS.Models.CustomerSearch
+@{
+    ViewBag.Title = "Customer Search";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<div class="breadcrumb">
+     @Html.ActionLink("Home", "Index", "Dashboard")
+    » @Html.ActionLink("Customers", "Index", "Customer")
+
+</div>*@
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+
+    #rpGrid tbody tr:hover {
+        cursor: pointer !important;
+    }
+</style>
+<h1>Customer Search</h1>
+
+@using (Html.BeginForm("Index", "Customer", FormMethod.Post, new { id = "cForm" }))
+{
+    <div class="contact-info">
+        <div class="content">
+            <table width="100%">
+                <tr>
+                    <td>Display only those customers containing
+                    </td>
+                    <td>@(Html.Kendo().TextBoxFor(m => m.CompanyName)
+                                .Name("CompanyName")
+                                .HtmlAttributes(new { style = "width: 150px " })
+                            ) &nbsp; in the company name
+                    </td>
+                </tr>
+                <tr>
+                    <td>And
+                    </td>
+                    <td>@(Html.Kendo().TextBoxFor(m => m.CustomerCode)
+                                .Name("CustomerCode")
+                                .HtmlAttributes(new { style = "width: 150px " })
+                            )
+
+                        &nbsp; in the Customer CODE
+                    </td>
+                </tr>
+                <tr>
+                    <td>And starting with
+                    </td>
+                    <td>@(Html.Kendo().TextBoxFor(m => m.CompanyNameStart)
+                                .Name("CompanyNameStart")
+                                .HtmlAttributes(new { style = "width: 150px " })
+                            )
+
+                        &nbsp; in the company name
+                    </td>
+                </tr>
+                <tr>
+                    <td>Only Show customers whose contracts are overdue or due this month
+                    </td>
+                    <td>@Html.CheckBoxFor(m => m.ContractOverDue, new { Name = "ContractOverDue" })
+                    </td>
+                </tr>
+                <tr>
+                    <td>Branch :
+                    </td>
+                    <td>@(Html.Kendo().DropDownListFor(m => m.Branchid)
+                         .Filter("startswith")
+                          .Name("Branchid")
+                          .Enable(false)
+                          .DataTextField("BranchName")
+                          .DataValueField("BranchID")
+                          .BindTo(Model.BranchList)
+                          .HtmlAttributes(new { style = "width:150px", data_required_msg = "Branch is required." })
+                        )
+                    </td>
+                    <td>
+                        <a class="button" onclick="$('#cForm').submit();"><span>Search</span></a>
+                    </td>
+                </tr>
+            </table>
+            <table width="100%">
+                <tr>
+                    <td colspan="6">
+                        <input type="button" class="inputbuttonbg inputbig" value="Add New Customer" onclick="window.location.href = '@Url.Action("Add", "customer")'">
+                        <input type="button" class="inputbuttonbg inputbig" value="Print List of Customers" id="btnPrint">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6">
+                        @(Html.Kendo().Grid(Model.Customers)
+.Name("rpCustomer")
+.Columns(columns =>
+{
+    columns.Bound(p => p.Code).Title("Code");
+    columns.Bound(p => p.CompanyName).Title("Company Name").ClientTemplate(@Html.ActionLink("#=CompanyName#", "Edit", new { id = "#=CodeHTMLF#" }).ToHtmlString());
+    columns.Bound(p => p.ContactName).Title("Contact Name");
+    columns.Bound(p => p.Phone).Title("Phone");
+    columns.Bound(p => p.ContractDate).Title("Contract Date");
+    columns.Bound(p => p.RenewalDate).Title("Renewal Date");
+})
+.Pageable()
+.Sortable()
+.Filterable()
+.Selectable(s => s.Mode(GridSelectionMode.Single))
+.DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(200)
+        .ServerOperation(false)
+     )
+)
+                    </td>
+                </tr>
+                
+            </table>
+        </div>
+    </div>
+    
+    @*@(Html.Kendo().Window()
+                            .Name("PrintCList")
+                            .Title("Customer List")
+                            .Width(1000)
+                            .Height(600)
+                            .Visible(false)
+                            .Draggable(true)
+                            .Iframe(true)
+                             .Modal(true)
+                            )*@
+}
+<script type="text/javascript">
+
+    $('input').keypress(function (e) {
+        {
+            if (event.which == 13) {
+                //alert('search');
+                //$(this).closest('form').submit();
+                $('#cForm').submit();
+                return false;
+            }
+        }
+    });
+
+
+    $(document).ready(function()
+    {
+        $("#btnPrint").click(function (event) {
+            //event.preventDefault();
+
+            var bid = '@Model.Branchid';
+              var companyNameContains='@Model.CompanyName';
+            var CustomerCode='@Model.CustomerCode';
+            var CompanyNameStart='@Model.CompanyNameStart';
+            var ContractOverDue='@Model.ContractOverDue';
+           if (companyNameContains == null)
+              companyNameContains = "";
+         if (CompanyNameStart == null)
+            CompanyNameStart = "";
+          if (CustomerCode == null)
+              CustomerCode = "";
+          window.open('Reports/CustomerSearchList.aspx?BranchID=' + bid.toString() + '&companyNameContains=' + companyNameContains.toString() + '&customerCodeContains=' + CustomerCode.toString() + '&companyNameStarts=' + CompanyNameStart.toString() + '&contractsOverDueOrDueThisMonth=' + ContractOverDue.toString(), 'Customer', 'scrollbars=yes,fullscreen=yes,left=25,top=25,width=' + (screen.width - 50).toString() + ',height=' + (screen.height - 130).toString())
+          
+            //return Json(new { URL = ConfigurationManager.AppSettings["U_RL"].ToString() + "Reports/CustomerSearchList.aspx?BranchID=" + model.Branchid + "&companyNameContains=" + model.CompanyName + "&customerCodeContains=" + model.CustomerCode + "&companyNameStarts=" + model.CompanyNameStart + "&contractsOverDueOrDueThisMonth=" + model.ContractOverDue + "" });
+    
+
+         //   $.post('@Url.Action("PrintCustomerList", "Customer")', $("#cForm").serialize(), function (data) {
+           //     openCenteredWindow(data.URL);
+           // });
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>

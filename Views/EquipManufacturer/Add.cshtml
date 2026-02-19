@@ -1,0 +1,235 @@
+﻿@model MDS.Models.EMForm
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<div class="breadcrumb">
+    @Html.ActionLink("Home", "Index", "Dashboard")
+    » @Html.ActionLink("Manufacturer", "Index", "EquipManufacturer")
+</div>*@
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+</style>
+@if (ViewBag.Popup != null && ViewBag.Popup == 1)
+{ 
+    <script type="text/javascript">
+        $("#container-header").hide();
+        $("#hdPopUp").val("1");
+    </script>
+}
+<h1>Equipment Manufacturer Detail</h1>
+@using (Html.BeginForm("Add", "EquipManufacturer", FormMethod.Post, new { id = "AddForm" }))
+{
+    @Html.HiddenFor(mbox => mbox.Code)
+       @Html.HiddenFor(m => m.PopUp)
+    <input id="hdPopUp" type="hidden" />
+    <div id="box2">
+        <table cellspacing="8" cellpadding="0" width="100%" border="0">
+            <tr>
+                <td colspan="2">
+                    @Html.ValidationSummary(true)
+                </td>
+            </tr>
+            <tr>
+                <td width="50%">
+
+                    <table>
+
+                        <tr>
+                            <td class="text">Manufacturer <span style="color: red;">*</span></td>
+                            <td>
+                                @(Html.Kendo().TextBoxFor(mbox => mbox.Manufacturer)
+                                            .Name("Manufacturer")
+                                            .HtmlAttributes(new { data_required_msg = "Manufacturer Name is required.", required = "required", style = "width: 240px" })
+                                            )
+                            </td>
+                            @if (ViewBag.MergeCodeX != null)
+                            {
+                            <td>Merge with</td>
+                            <td>@Html.DropDownListFor(i => i.MergeCode, new SelectList(ViewBag.MergeCodeX, "Manufacturer", "Manufacturer"), "-Select One-", htmlAttributes: new { @class = "form-control" })</td>
+                            <td><button onclick="Merge(); return false;">Merge</button></td>
+                            <td>(and delete this one)</td>
+                            }
+                        </tr>
+
+
+
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+
+                    <table>
+                        <tr>
+                            <td width="2%">
+                                &nbsp;
+                            </td>
+                            <td width="10%" rowspan="3">
+                                <input type="button" class="inputbuttonbg inputbig" value="Cancel" onclick="cancel()">
+                            </td>
+                            <td width="12%">
+                                &nbsp;
+                            </td>
+                            <td width="30%" rowspan="3"></td>
+                            <td width="7%">
+                                &nbsp;
+                            </td>
+                            <td width="22%" rowspan="3"></td>
+                            <td width="7%">
+                                &nbsp;
+                            </td>
+                            <td width="7%" rowspan="3">
+                                <input type="button" class="inputbuttonbg inputbig" onclick="$('#AddForm').submit();" value="Save">
+                            </td>
+                            @if (Model.Code != "")
+                            {
+                                <td width="10%" rowspan="3">
+                                    <input type="button" class="inputbuttonbg inputbig" value="Delete" onclick="DeleteRecord();">
+                                </td>
+                            }
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+        </table>
+    </div>
+}
+<script>
+
+    $("#AddForm").kendoValidator({
+    });
+
+</script>
+<script type="text/javascript">
+
+    var somethingChanged = false;
+    $(document).ready(function () {
+        $('input').change(function () {
+            somethingChanged = true;
+        });
+        $('textarea').change(function () {
+            somethingChanged = true;
+        });
+    });
+
+    function cancel() {
+        if (somethingChanged) {
+            var r = confirm("Do you wish to discard any changes you have made?");
+            if (r) {
+                back();
+            }
+        }
+        else {
+            back();
+        }
+    }
+    function back() {
+        var popup = '@Model.PopUp';
+         if (popup == "True") {
+             var url = '@Url.Action("IndexPopUp", "EquipManufacturer")';
+            window.location.href = url;
+        }
+        else {
+            window.location.href = '@Url.Action("Index", "EquipManufacturer")';
+        }
+    }
+
+    function DeleteRecord() {
+        try {
+            var r = confirm("Do you wish to delete this record?");
+            if (r) {
+
+
+                var data = { id: '@Model.Code' };
+                $.post('@Url.Action("DeleteRecord", "EquipManufacturer")', data,
+                    function (data) {
+                        if (data.Error == '') {
+                            alert('Record Deleted')
+                            back();
+                        }
+                        else
+                            alert(data.Error);
+                    }
+                    , 'json');
+
+
+            }
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+</script>
+
+<script>
+
+    function Merge() {
+        var keep = $('#Manufacturer').val();
+        var Mrg= $('#MergeCode').val();
+        var r = confirm('Are you sure you wish to merge ' + Mrg + ' into ' + keep + ' and delete ' + Mrg + ' ?');
+        if (r) {
+
+            $.ajax({
+                url: '@Url.Action("Merge", "EquipManufacturer")',
+                type: 'POST',
+                datatype: "json",
+                data: { Mrg: Mrg, Keep: keep },
+
+                success: function (response) {
+                    alert(response.message);
+                    if (response.Deleted) {
+                        back();
+                        //window.location.href = '@Url.Action("Index", "EquipManufacturer")';
+                    }
+
+                },
+                error: function (req, status, error) {
+                    alert("R: " + req + " S: " + status + " E: " + error);
+                }
+            });
+        }
+    }
+
+    function Delete(ModelUID, ModelDesc) {
+        var r = confirm("Are you sure you wish to delete this Model " + ModelDesc +"?");
+        if (r) {
+
+            $.ajax({
+                url: '@Url.Action("CheckRefAndDelete", "EquipModel")',
+                type: 'POST',
+                datatype: "json",
+                data: { ModelID: ModelUID },
+
+                success: function (response) {
+                    alert(response.message);
+                    if (response.Delete) {
+                        window.location.href = '@Url.Action("Index", "EquipModel")';
+                    }
+
+                },
+                error: function (req, status, error) {
+                    alert("R: " + req + " S: " + status + " E: " + error);
+                }
+            });
+        }
+    }
+
+
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>

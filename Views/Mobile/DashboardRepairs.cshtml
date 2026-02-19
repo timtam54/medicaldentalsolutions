@@ -1,0 +1,227 @@
+﻿@model MDS.Models.MobRepair
+@{
+    ViewBag.Title = "Repairs";
+    Layout = null;
+}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+<style>
+    a.my-class {
+        color: #333333
+    }
+
+        a.my-class:active {
+            color: #666666
+        }
+
+        a.my-class:link {
+            color: #999999
+        }
+
+        a.my-class:visited {
+            color: #CCCCCC
+        }
+
+    body {
+        font-family: Arial;
+    }
+</style>
+<script type="text/javascript">
+
+    //alert(device);
+    function selectx(num,ord) {
+        try {
+            $('#Typ').val(ord);
+            $('#ID').val(num);
+            document.forms[0].submit();
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+        return false;
+    }
+
+    function autosearch() {
+        try {
+            var searchString = $('#YourSearchElementID').val();// $(this).val(); //Get the value from this TextBox
+            //alert(searchString);
+            var data = { searchString: searchString }
+            $.post('@Url.Action("Search","Mobile")', data,
+                function (data) {
+                    if (data.results == null)
+                        alert('no results');
+                    else {
+                        var divstring = '';
+                        divstring = ''
+                        for (var i = 0; i < data.results.length; i++) {
+                            divstring = divstring + "<a id='" + data.results[i].ID + "' href='' onclick='selectx(" + data.results[i].ID + ","+data.results[i].Ord+");return false;'>" + data.results[i].Desc + "</a><br/>"
+                        }
+                        $("#searchresults").html(divstring);
+                    }
+                });
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+
+</script>
+<body>
+    @using (Html.BeginForm("DashboardRepairs", "Mobile", FormMethod.Post, new { id = "DashboardRepairs" }))
+    {
+        <table cellpadding="0" cellspacing="0" style="width:100%" align="center">
+            <tr>
+                <td style="width:50%">
+                    <table>
+                        <tr>
+                            <td style="width:100%">
+                                <table style="width:100%">
+                                    <tr style="width:100%">
+                                        <td style="background-color:white"><img alt="@MDS.Controllers.LoginController.CompanyName" title="@MDS.Controllers.LoginController.CompanyName" class="logo-image" src="@Url.Action("../images/logo.png")"></td>
+                                        @*<td align="right">@Html.ActionLink("Services", "Dashboard", null, new { @class = "my-class" })</td>*@
+                                        <td  style="vertical-align:top" align="right">@Html.ActionLink("Log Off", "LogOff", "Login", null, new { @class = "my-class" })</td>
+                                    </tr>
+                                </table>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:50%">
+                                <table style="width:100%">
+                                    <tr>
+                                        <td style="width:250px">
+                                            <h4><span style="width:250px;color:#000080">Repairs for @MDS.Controllers.MobileController.EngineerName(User.Identity.Name)</span></h4>
+                                        </td>
+
+                                    </tr>
+                                </table>
+                            </td>
+
+                        </tr>
+                                </table>
+                            </td>
+                            <td valign="top" style="width:50%">
+                                <table style="vertical-align:top">
+                                    <tr style="vertical-align:top">
+                                        <td style="vertical-align:top">
+                                            <input style="width:100%" autocomplete="off" onblur="autosearch();" type="text" name="YourSearchElementID" onkeyup="autosearch();" id="YourSearchElementID" value="" size="30" maxlength="30" />
+                                        </td>
+                                        <td>
+                                            @Html.ActionLink("Services","DashboardServiceJobs")
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div style="width:100%"  id="searchresults">
+
+                                            </div>
+
+                                        </td>
+
+                                    </tr>
+                                </table>
+                            </td>
+
+                        </tr>
+        </table>
+               
+
+        <table cellspacing="0" style="width:100%" align="center">
+            <tr>
+                <th>
+                    Job No
+                </th>
+                <th>
+                    Equipment
+                </th>
+                <th>
+                    Serviced Date
+                </th>
+                @*<th>
+                    Amount
+                </th>*@
+
+            </tr>
+            @{
+                //string Customer = ""; DateTime? dte = DateTime.MinValue;
+                for (int ii = 0; ii < Model.reps.Count(); ii++)
+                {
+                    MDS.Models.MobRepairs item = Model.reps[ii];
+                    string color;
+                    if (ii % 2 != 0)
+                    {
+                        color = "white";
+                    }
+                    else
+                    {
+                        color = "silver";
+                    }
+                    @*if ((Customer != item.Customer) || (dte != item.DateServiced))
+
+                        {
+                            Customer = item.Customer; dte = item.DateServiced;
+                            <tr style="background-color:#000080;color:white;width:100%;">
+                                <td style="border:1px solid black;" border-collapse="collapse;">
+                                    <b>Customer</b>
+                                </td>
+                                <td style="border:1px solid black;" border-collapse="collapse;">
+                                    @item.Customer
+                                </td>
+                                <td style="border:1px solid black;" border-collapse="collapse;">
+                                    <b>
+                                        Date Serviced
+                                    </b>
+                                </td>
+                                <td style="border:1px solid black;" border-collapse="collapse;" colspan="2">
+                                    @Convert.ToDateTime(item.DateServiced).ToString("dd-MMM-yy")
+                                </td>
+
+                            </tr>
+                        }*@
+
+                    <tr style="background-color:@color" align="center">
+                        <td>
+                            @Html.ActionLink(item.JobNo, "Repair", new { RepairID = item.RepairID }, null)
+                        </td>
+
+                        <td>
+                            @Html.ActionLink(item.Equipment, "Equipment", new { EquipmentID = item.EquipmentID }, null)
+                        </td>
+                        @if (@item.DateServiced == null)
+                        {
+                            <td></td>
+                        }
+                        else
+                        {
+                            <td>
+                                @Convert.ToDateTime(item.DateServiced).ToString("dd-MMM-yy")
+                            </td>
+                        }
+                        @*<td>
+                            @if (item.Amount != null)
+                            {
+                                <div>@Convert.ToDecimal(item.Amount).ToString("c")</div>
+                            }
+                        </td>*@
+                    </tr>
+                }
+            }
+        </table>
+        <table>
+            <tr>
+                <td>
+                    @Html.EditorFor(m => m.ID, new { htmlAttributes = new { style = "border:none;color:white", width = "0px" } })
+                </td>
+                <td>
+                    @Html.EditorFor(m => m.Typ, new { htmlAttributes = new { style = "border:none;color:white", width = "0px" } })
+                </td>
+
+            </tr>
+        </table>
+    }
+</body>

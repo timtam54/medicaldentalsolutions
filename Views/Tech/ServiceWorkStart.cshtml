@@ -1,0 +1,201 @@
+﻿@model MDS.Models.ServiceWorkTime
+@{
+    ViewBag.Title = "Start End Time";
+}
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+
+<h1>Start Time</h1>
+@using (Html.BeginForm("ServiceWorkStartSave", "Tech", FormMethod.Post, new { id = "ServiceWorkStart" }))
+{
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(m => m.EngineerID)
+    @Html.HiddenFor(m => m.BranchID)
+    @Html.HiddenFor(m => m.ServiceJobID)
+    @Html.HiddenFor(m => m.Repair)
+
+<table cellspacing="8" cellpadding="0" width="100%" border="0">
+    <tr width="100%">
+        <td style="font-size:16px;color:red">
+            <b>Start</b>
+        </td>
+        <td style="font-size:16px;text-align:left;color:red">
+            @Html.TextBoxFor(i => i.StartTime, new { @onkeyup = "manual();return false;", @id = "StartTime", @style = "width:180px;font-size:16px;text-align:left" })
+        </td>
+        <td>
+            <button onclick="SetTimeInServiceNow(); return false;" class="inputbuttonbg inputbig"><--Time</button>
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size:16px;color:red">
+            <b>Manual</b>
+        </td>
+        <td>@Html.CheckBoxFor(i => i.ManualTime)</td>
+    </tr>
+    @if (MDS.Controllers.LoginController.TechTravelTime)
+    {
+    <tr>
+        <td colspan="3" align="center">
+            <table align="center">
+                <tr>
+                    <td style="font-size:16px;">
+                        <input style="background-color:orange" type="button" id="btnSaveExit" onclick="SaveStartTimeTRV();return false;" value="Submit Travel start" class="inputbuttonbg inputbig" />
+                    </td>
+                    <td>
+                        <img src="~/Content/images/Travel.png" />
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    }
+    <tr>
+        <td colspan="3" align="center">
+            <table align="center">
+                <tr>
+                    <td align="right" style="font-size:16px;">
+                        <input type="button" id="btnSaveExit" onclick="SaveStartTime();return false;" value="Submit job start" class="inputbuttonbg inputbig" />
+                    </td>
+                    <td>
+                        <img src="~/Content/images/Work.png" />
+                    </td>
+
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+}
+<script type="text/javascript">
+    function manual() {
+
+        $('#ManualTime').prop("checked", true);
+    }
+
+    function SetTimeInServiceNow() {
+        try {
+            var today = new Date();
+
+            var date = today.getDate() + '/' + (today.getMonth() + 1) + '/';
+
+            date = date + today.getFullYear() + ' ';
+            if (today.getHours() < 10)
+                date = date + '0';
+
+            date = date + today.getHours() + ":";
+            if (today.getMinutes() < 10)
+                date = date + '0';
+            date = date + today.getMinutes() + ':00';
+            $('#StartTime').val(date);
+            $('#ManualTime').prop("checked", false);
+
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+    //function Save() {
+    //    try {
+    //        var timein = $('#StartTime').val();
+    //        if (timein == '')
+    //            alert('Please enter start date/time');
+    //        else {
+    //            $('#ServiceWorkStartEndTime').submit();
+    //        }
+    //    }
+    //    catch (ex) {
+    //        alert(ex.message);
+    //    }
+    //}
+
+    function SaveStartTimeTRV() {
+        var timein = $('#StartTime').val();
+        if (timein == '') {
+            alert('Please enter start date/time');
+            return;
+        }
+        var ChargeTypecode = $('#ChargeTypecodeX').prop('selectedIndex');// option:selected').text();
+        if ((ChargeTypecode == 0)) {
+            alert('Please enter a Charge Type');
+            return;
+        }
+        try {
+            var myData = $('#ServiceWorkStart');
+            $.post('@Url.Action("ServiceWorkStartSaveTRV","Tech")', myData.serialize(),
+                function (data) {
+                    if (data.Error == '') {
+                        try {
+                            setTimeStarted(true);
+                            closeDiv();
+
+                        }
+                        catch (ex) {
+                            alert('1-' + ex.message);
+                        }
+                        try {
+
+                            RefreshTimes();
+                            autosaveTimer();
+
+                        }
+                        catch (ex) {
+                            alert('2-' + ex.message);
+                        }
+                    }
+                    else
+                        alert(data.Error);
+                }
+                , 'json');
+        }
+
+        catch (ex) {
+            alert('createpartsservice-CreatePartsSave2:' + ex.message);
+        }
+    }
+
+    function SaveStartTime() {
+        var timein = $('#StartTime').val();
+        if (timein == '') {
+            alert('Please enter start date/time');
+            return;
+        }
+        var ChargeTypecode = $('#ChargeTypecodeX').prop('selectedIndex');// option:selected').text();
+        if ((ChargeTypecode == 0)) {
+            alert('Please enter a Charge Type');
+            return;
+        }
+
+        try {
+            var myData = $('#ServiceWorkStart');
+            $.post('@Url.Action("ServiceWorkStartSave","Tech")', myData.serialize(),
+                function (data) {
+                    if (data.Error == '') {
+                        try {
+                            setTimeStarted(false);
+                            closeDiv();
+                        }
+                        catch (ex) {
+                            alert('1-' + ex.message);
+                        }
+                        try {
+                            RefreshTimes();
+                            autosaveTimer();
+                        }
+                        catch (ex) {
+                            alert('2-' + ex.message);
+                        }
+                    }
+                    else
+                        alert(data.Error);
+                }
+                , 'json');
+        }
+        catch (ex) {
+            alert('createpartsservice-CreatePartsSave2:' + ex.message);
+        }
+    }
+</script>

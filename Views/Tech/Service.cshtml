@@ -1,0 +1,2407 @@
+@model MDS.Models.ServiceJobService
+
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/Shared/_LayoutTech.cshtml";
+}
+
+<link href="~/CSS/style.css" rel="stylesheet" />
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
+
+<div id="service" style="width:100%;height:auto;position:relative;">
+    <h1 style="padding-left:30px">Service Job Detail</h1>
+    <div id="dialog"></div>
+    <div class="contact-info">
+        <div class="content">
+            @using (Html.BeginForm("Service", "Tech", FormMethod.Post, new { id = "Service" }))
+            {
+                @Html.ValidationSummary()
+                @Html.HiddenFor(m => m.ServiceJob.BranchID)
+                @Html.HiddenFor(m => m.ServiceJob.JobCode)
+                @Html.HiddenFor(m => m.ServiceJob.CustomerCode)
+                @Html.HiddenFor(m => m.Command)
+                @Html.HiddenFor(m => m.ServiceJob.ServiceJobUID)
+                @Html.CheckBoxFor(m => m.ServiceJob.CustomerSignature, new { @id = "CustomerSignature", @style = "display:none" })
+                if (Model.Error != null)
+                {
+                    <h4 style="color:red">@Model.Error</h4>
+                }
+                <table width="100%" align="center" cellspacing="0" cellpadding="2">
+                    <tr width="100%">
+                        <td style="font-size:16px">
+                            <b>Service Job#</b>
+                        </td>
+                        <td style="font-size:16px;text-align:left">
+                            @MDS.Helper.Utility.GetBranchCode()S @Model.ServiceJob.JobCode
+                        </td>
+                        <td colspan="2">
+                            <table width="500px">
+                                <tr style="width:100%">
+                                    <td style="font-size:16px">
+                                        <b>Date of Booking</b>
+                                    </td>
+                                    <td style="font-size:16px">
+                                        @MDS.Controllers.TechController.FormatDate(Model.ServiceJob.DateProgrammed)
+                                    </td>
+                                    <td style="color:green">
+                                        <b>From</b>
+                                    </td>
+                                    <td style="color:green">
+                                        @MDS.Controllers.TechController.FormatTime(Model.ServiceJob.DateProgrammed)
+                                    </td>
+                                    <td style="color:green">
+                                        <b>To</b>
+                                    </td>
+                                    <td style="color:green">
+                                        @MDS.Controllers.TechController.FormatTime(Model.ServiceJob.DateProgrammedEnd)
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-size:16px">
+                            <b>Customer Name</b>
+                        </td>
+                        <td colspan="2" style="font-size:16px">
+                            <a target="_blank" style="font-size:16px" href="\Tech\ServiceSearch?Customerid=@Model.ServiceJob.CustomerCode">@Model.Customer.CompanyName</a>
+                        </td>
+                        <td>
+                            <table>
+                                <tr>
+                                    <td>
+                                        <div style="color:red" id="AutoTimerMessage"></div>
+                                    </td>
+                                    @if (Model.TechClockOnPrompt == MDS.Models.TechClockOnOffStatus.ClockOn_NoActiveShifts)
+                                    {
+                                        <td id="BtnClockOn">
+                                            <img style="cursor: pointer;" onmouseover="" src="~/Content/Images/Start.png" onclick="ClockOn(); return false;" title="Clock On" />
+
+                                            @*<input type="button" onclick="ClockOn(); return false;" value="Clock On"></input>*@
+                                        </td>
+                                    }
+                                    <td id="BtnClockOff">
+                                        <img style="cursor: pointer;" width="50" height="50" onmouseover="" src="~/Content/Images/Travel.png" />
+                                        <img style="cursor: pointer;" width="50" height="50" onmouseover="" src="~/Content/Images/Clocksmall.gif" onclick="ClockOff(); return false;" title="Clock Off Travel" />
+                                        <img style="cursor: pointer;" onmouseover="" src="~/Content/Images/Stop.png" onclick="ClockOff(); return false;" title="Clock Off Travel" />
+
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-size:16px">
+                            <b>Address</b>
+                        </td>
+                        <td colspan="3" style="font-size:16px">
+                            <table>
+                                <tr>
+                                    <td id="Address">
+                                        @if (Request.UserAgent.ToLower().Contains("ios"))
+                                        {
+                                            <a href="maps://maps.google.com/maps?daddr=@Model.Address">@Model.Address (IOS Maps)</a>
+                                        }
+                                        else
+                                        {
+                                            <a style="font-size:16px;" href="@Url.Action("Map", new { Address = Model.Address })"
+                                               type="submit"
+                                               id="runReport"
+                                               target="_blank">
+                                                @Model.Address
+                                            </a>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a style="font-size:16px;" href="@Url.Action("Map", new { Address = Model.Address })" id="runReport"
+                                           target="_blank">
+                                            <img src="~/Images/googlemaps.png" />
+                                        </a>
+                                    </td>
+                                    @*<td id="Address">
+            @if (Request.UserAgent.ToLower().Contains("ios"))
+            {
+                <a href="maps://maps.google.com/maps?daddr=@Model.Address">@Model.Address (IOS Maps)</a>
+            }
+            else
+            {
+
+
+        <a style="font-size:16px;" href="@Url.Action("MapsCustDept", new { CustomerCode = Model.Customer.CustomerCode, DeptID = Model.ServiceJob.DeptID, BranchID = Model.ServiceJob.BranchID })"
+           type="submit"
+           id="runReport"
+           target="_blank">
+            @Model.Address
+        </a>
+            }
+            </td>
+        <td>
+
+                <img src="~/Images/googlemaps.png" onclick="GoogleMaps();" />
+        </td>*@
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-size:16px">
+                            <b>Booking Notes</b>
+                        </td>
+                        <td colspan="3" style="font-size:16px">
+                            @*.ServiceJob.BookingNotes*@
+
+                            <table>
+                                <tr>
+                                    <td id="divNotes" style="font-size:16px">
+                                        @Html.DisplayFor(m => m.Notes)
+                                    </td>
+                                    @*@if ((Model.ser.TechConfirmedEquipDetails) && (Model.SafetyTestDone) && (Model.Engineers.Select(ii => ii.EngineerID).Contains(MDS.Controllers.LoginController.EngineerID(User.Identity.Name))))
+                                        {*@
+                                    <td>
+                                        <button onclick="openNotes(); return false;" class="inputbuttonbg inputbig">...</button>
+                                    </td>
+                                    <td width="3%">
+                                        <img src="~/Images/MicDictat.png" style="cursor: pointer;" onmouseover="" title="Add Dictation" onclick="uploadfileforQuestion('@Model.ServiceJob.ServiceJobUID','Audio','Notes')" />
+                                    </td>
+                                    @*}*@
+                                </tr>
+                            </table>
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-size:16px">
+                            <b>Special Notes</b>
+                        </td>
+                        <td colspan="3" style="font-size:16px">
+                            @Model.ServiceJob.ServiceNotes
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-size:16px">
+                            <b>Location</b>
+                        </td>
+                        <td colspan="2" style="font-size:16px">
+                            @MDS.Controllers.TechController.GetLocation(Model.ServiceJob.LocationID, Model.ServiceJob.BranchID)
+                        </td>
+                        <td>
+                            <table>
+                                <tr>
+
+                                    <td style="font-size:16px">
+                                        <b>On Site Contact</b>
+                                    </td>
+                                    <td style="font-size:16px">
+                                        @MDS.Controllers.TechController.GetCustomerContactCu(Model.ServiceJob.CustomerCode, MDS.Controllers.LoginController.BranchID(User.Identity.Name))
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+
+                    </tr>
+                    <tr width="100%">
+                        <td style="font-size:16px">
+                            <b>Technician</b>
+                        </td>
+                        <td colspan="3">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    @for (int ii = 0; ii < Model.Engineers.Count(); ii++)
+                                    {
+                                        @*@Html.HiddenFor(m => Model.Engineers[ii].BranchID)*@
+                                        <td>
+                                            @Html.DropDownListFor(m => Model.Engineers[ii].EngineerID, new SelectList(ViewBag.EngineerIDX, "EngineerID", "EngineerName"), "-Select One-", new { @style = "font-size:16px;text-align:left" })
+                                        </td>
+                                    }
+                                </tr>
+                            </table>
+                        </td>
+                        @*<td style="font-size:16px;text-align:left">
+                                @Html.DropDownListFor(m => m.ServiceJob.EngineerID, new SelectList(ViewBag.EngineerIDX, "EngineerID", "EngineerName"), "-Select One-", new { @style = "font-size:16px;text-align:left" })
+                            </td>*@
+
+                    </tr>
+                    <tr width="100%" align="center">
+                        <td style="font-size:16px;color:red">
+                            <b>My Work Times</b>
+                        </td>
+                        <td colspan="3" align="left">
+                            <div id="TimesX" />
+                        </td>
+                    </tr>
+
+                    @*@if ((Model.ServiceJob.ActualDateStart == null) && (Model.Engineers.Select(i => i.EngineerID).Contains(MDS.Controllers.LoginController.EngineerID(User.Identity.Name))))
+                        {
+                            <tr width="100%" align="center">
+                                <td style="font-size:16px;color:red">
+                                    <b>Start Time</b>
+                                </td>
+                                <td style="font-size:16px;text-align:left;color:red" colspan="3">
+                                    @Html.TextBoxFor(i => i.ServiceJob.ActualDateStart, new { @id = "ActualDateStart", @readonly = "readonly", @style = "font-size:16px;text-align:left" }) <button onclick="SetTimeInServiceNow();" class="inputbuttonbg inputbig">Start</button>
+                                </td>
+                            </tr>
+
+                        }
+                        else
+                        {
+                            @Html.HiddenFor(i => i.ServiceJob.ActualDateStart)
+                            <tr width="100%" align="center">
+                                <td style="font-size:16px">
+                                    <b>Start Time</b>
+                                </td>
+                                <td style="font-size:16px;text-align:left" colspan="3">
+                                    @Html.DisplayFor(i => i.ServiceJob.ActualDateStart, new { @id = "TimeIn", @readonly = "readonly", @style = "font-size:16px;text-align:left" })
+                                </td>
+                            </tr>
+                        }*@
+                    <tr>
+                        <td colspan="4">
+                            <table id="eqtable" border="1" @*frame=void rules=rows*@ cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td colspan="14" style="background-color:gainsboro">
+                                        <table @*width="100%"*@>
+                                            <tr>
+                                                <td>
+                                                    <b>
+                                                        Equipment Search (Serial #, Model or Type):
+                                                    </b>
+                                                </td>
+                                                <td>
+                                                    @Html.EditorFor(i => i.Search, new { htmlAttributes = new { @style = "width:120px;vertical-align:top", @onkeypress = "searchonenter(event);" } })
+                                                </td>
+                                                <td>
+                                                    <img style="cursor: pointer;" onmouseover="" onclick="search(); return false;" title="Search Equipment" src="~/Images/search.png" />
+                                                </td>
+                                                <td>
+                                                    <img style="cursor: pointer;" onmouseover="" onclick="Searchclear(); return false;" title="Clear / Show all" src="~/Images/Clear.png" />
+                                                </td>
+                                                <td>
+                                                    <img style="cursor: pointer;" onmouseover="" onclick="AddEquipment(); return false;" title="Add Equipment" src="~/Images/AddIcon.png" />
+
+                                                </td>
+                                            </tr>
+                                        </table>
+
+
+                                    </td>
+                                </tr>
+                                <tr style="background-color:black;color:white">
+                                    <th rowspan="2" width="50px">Item Seen</th>
+                                    @if (MDS.Controllers.LoginController.RecordRiskAccessSafety)
+                                    {
+                                        <th rowspan="2" width="50px">Risk Assess</th>
+                                    }
+                                    <th rowspan="2" @*valign="top"*@>
+                                        Equipment
+                                    </th>
+                                    @if (MDS.Controllers.LoginController.RecordRiskAccessSafety)
+                                    {
+
+                                        <th rowspan="2" width="50px">Safety Test</th>
+                                    }
+                                    <th rowspan="2" width="350px">Parts</th>
+                                    <th rowspan="2" width="350px">Condition Report/<br />Notes</th>
+                                    @if (MDS.Controllers.LoginController.ItemServiceableElseJobCompleted)
+                                    {
+                                        <th rowspan="2" title="Was the item of equipment Serviceable?" width="200px">Was the item of equipment Serviceable?</th>
+                                    }
+                                    else
+                                    {
+                                        <th rowspan="2" title="Completed?" width="200px">Completed</th>
+                                    }
+                                </tr>
+                                <tbody>
+                                    @for (int i = 0; i < Model.Services.Count(); i++)
+                                    {
+                                        <tr id="@string.Format("ServiceLine{0}", Model.Services[i].Service.ServiceUID)">
+                                            @if (Model.Services[i].Service.EngineerID == null)
+                                            {
+                                                <td rowspan="2" id="@string.Format("EngCheckouttr{0}", Model.Services[i].Service.ServiceUID)" style="padding:0;height:100%;background-color:red">
+                                                    <a href="" style="color:red" onclick="DelService(@Model.Services[i].Service.ServiceUID,'@Model.Services[i].EquipDesc.EqSerial');return false;"><img title="Remove Equipment" src="~/Images/delete-icon.jpg" /></a>
+                                                    <div id="@string.Format("EngNameLock{0}", Model.Services[i].Service.ServiceUID)"><b>Not Seen</b></div>
+                                                    @if (MDS.Controllers.LoginController.RecordRiskAccessSafety)
+                                                    {
+                                                        <input name="@string.Format("Seen{0}", Model.Services[i].Service.ServiceUID)" value="0" type="radio" id="@string.Format("EngCheckout{0}", Model.Services[i].Service.ServiceUID)" onchange="checkOutServiceNo('@Model.Services[i].Service.ServiceUID','@Model.Services[i].Service.BranchID','@i',false,this); return false;" />
+                                                        <b>No</b>
+                                                        <br />
+                                                        <input value="1" name="@string.Format("Seen{0}", Model.Services[i].Service.ServiceUID)" type="radio" id="@string.Format("EngCheckout{0}", Model.Services[i].Service.ServiceUID)" onchange="checkOutService('@Model.Services[i].Service.ServiceUID','@Model.Services[i].Service.BranchID','@i',false,this); return false;" />
+                                                        <b>Yes</b>
+                                                    }
+                                                </td>
+                                            }
+                                            else if (Model.Services[i].Service.EngineerID == 0)
+                                            {
+
+                                                <td rowspan="2" id="@string.Format("EngCheckouttr{0}", Model.Services[i].Service.ServiceUID)" style="padding:0;height:100%;background-color:red">
+                                                    <a href="" style="color:red" onclick="DelService(@Model.Services[i].Service.ServiceUID,'@Model.Services[i].EquipDesc.EqSerial');return false;"><img title="Remove Equipment" src="~/Images/delete-icon.jpg" /></a>
+                                                    <div id="@string.Format("EngNameLock{0}", Model.Services[i].Service.ServiceUID)"><b>Not Seen</b></div>
+
+                                                    @if (MDS.Controllers.LoginController.RecordRiskAccessSafety)
+                                                    {
+
+                                                        <input name="@string.Format("Seen{0}", Model.Services[i].Service.ServiceUID)" value="0" checked="checked" type="radio" id="@string.Format("EngCheckout{0}", Model.Services[i].Service.ServiceUID)" onchange="checkOutServiceNo('@Model.Services[i].Service.ServiceUID','@Model.Services[i].Service.BranchID','@i',false,this); return false;" />
+                                                        <b>No</b>
+                                                        <br />
+                                                        <input value="1" name="@string.Format("Seen{0}", Model.Services[i].Service.ServiceUID)" type="radio" id="@string.Format("EngCheckout{0}", Model.Services[i].Service.ServiceUID)" onchange="checkOutService('@Model.Services[i].Service.ServiceUID','@Model.Services[i].Service.BranchID','@i',false,this); return false;" />
+                                                        <b>Yes</b>
+                                                    }
+                                                </td>
+                                            }
+                                            else if (Model.Services[i].Service.EngineerID == MDS.Controllers.LoginController.EngineerID(User.Identity.Name))
+                                            {
+                                                <td rowspan="2" id="@string.Format("EngCheckouttr{0}", Model.Services[i].Service.ServiceUID)" style="padding:0;height:100%;background-color:white">
+                                                    <a href="" style="color:red" onclick="DelService(@Model.Services[i].Service.ServiceUID,'@Model.Services[i].EquipDesc.EqSerial');return false;"><img title="Remove Equipment" src="~/Images/delete-icon.jpg" /></a>
+                                                    @if (MDS.Controllers.LoginController.RecordRiskAccessSafety)
+                                                    {
+                                                        <input type="checkbox" id="@string.Format("EngCheckout{0}", Model.Services[i].Service.ServiceUID)" disabled="disabled" value="true" checked="checked" />
+                                                    }
+                                                    <div id="@string.Format("EngNameLock{0}", Model.Services[i].Service.ServiceUID)"><b>Checked out to you</b></div>
+
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                        <td rowspan="2" id="@string.Format("EngCheckouttr{0}", Model.Services[i].Service.ServiceUID)" style="padding:0;height:100%;background-color:lightgray">
+
+                                            @*@if (MDS.Controllers.LoginController.RecordRiskAccessSafety)
+                                            {
+                                            }*@
+                                            <input type="checkbox" id="@string.Format("EngCheckout{0}", Model.Services[i].Service.ServiceUID)" checked="checked" onchange="checkOutService('@Model.Services[i].Service.ServiceUID','@Model.Services[i].Service.BranchID',@i,true,this); return false;" />
+                                            <div id="@string.Format("EngNameLock{0}", Model.Services[i].Service.ServiceUID)"><b>Locked by @Model.Services[i].EngNameLock</b></div>
+                                        </td>
+                                            }
+                                            @if (MDS.Controllers.LoginController.RecordRiskAccessSafety)
+                                            {
+                                                if (Model.Services[i].Service.EngineerID == null)
+                                                {
+                                                    <td rowspan="2" style="background-color:white" id="@string.Format("RiskAssessmentDone{0}", Model.Services[i].Service.ServiceUID)">
+                                                        @Html.CheckBoxFor(m => m.Services[i].Service.RiskAssessmentDone, new { @id = string.Format("RiskAssessmentDoneX{0}", Model.Services[i].Service.ServiceUID), @onclick = "RiskAssessmentDoneSet(this,'" + @Model.Services[i].Service.ServiceUID + "','" + @i + "');" })
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    <td rowspan="2" style="background-color:red" id="@string.Format("RiskAssessmentDone{0}", Model.Services[i].Service.ServiceUID)">
+                                                        @Html.CheckBoxFor(m => m.Services[i].Service.RiskAssessmentDone, new { @id = string.Format("RiskAssessmentDoneX{0}", Model.Services[i].Service.ServiceUID), @onclick = "RiskAssessmentDoneSet(this,'" + @Model.Services[i].Service.ServiceUID + "','" + @i + "');" })
+                                                    </td>
+
+                                                }
+                                            }
+                                            else
+                                            {
+                                                @Html.HiddenFor(m => m.Services[i].Service.RiskAssessmentDone)
+                                            }
+                                            <td rowspan="2">
+
+                                                Equipment:@Model.Services[i].EquipDesc.EqType<br />
+                                                Manufacturer:@Model.Services[i].EquipDesc.EqManu<br />
+                                                Model;@Model.Services[i].EquipDesc.EqModel<br />
+                                                <b>Serial:</b>@Model.Services[i].EquipDesc.EqSerial | <b>Our#:</b>@Model.Services[i].EquipDesc.MDSNo | <b>Cust#:</b>@Model.Services[i].EquipDesc.CustomerNo<br />
+
+                                                <b>History: </b><a href="~/Tech/ServiceSearch?BranchID=@Model.Services[i].Service.BranchID&EquipID=@Model.Services[i].Service.EquipUID&Resolved=E" target="_blank">Services</a>
+                                                |<a href="~/Tech/RepairSearch?BranchID=@Model.Services[i].Service.BranchID&EquipID=@Model.Services[i].Service.EquipUID&Resolved=E" target="_blank">Repairs</a><br />
+                                                @Html.HiddenFor(m => m.Services[i].Service.ServiceWorkDone, new { @id = string.Format("ServiceWorkDone{0}", Model.Services[i].Service.ServiceUID) })
+                                                @*<div title="@Model.Services[i].EquipDesc.TechWorkDone">@Html.CheckBoxFor(m => m.Services[i].Service.ServiceWorkDone, new { @id = string.Format("ServiceWorkDone{0}", Model.Services[i].Service.ServiceUID) })<a href="" onclick="alert('The service work to be done for this equipment type is: '+'@Model.Services[i].EquipDesc.TechWorkDone'); return false;">Service done</a></div>*@
+                                            </td>
+                                            @if (MDS.Controllers.LoginController.RecordRiskAccessSafety)
+                                            {
+
+                                                <td rowspan="2">
+                                                    @Html.CheckBoxFor(m => m.Services[i].Service.TSPassFail, new { @id = string.Format("TSPassFail{0}", Model.Services[i].Service.ServiceUID) })
+                                                </td>
+                                            }
+                                            <td rowspan="2">
+                                                <div id="@string.Format("PartsX{0}", Model.Services[i].Service.ServiceUID)" />
+                                            </td>
+                                            @Html.HiddenFor(m => m.Services[i].Service.ServiceUID)
+                                            @Html.HiddenFor(m => m.Services[i].Service.BranchID)
+                                            <td rowspan="2">
+                                                <table style="width:100%" align="center">
+                                                    @if (MDS.Controllers.LoginController.TechCondition)
+                                                    {
+                                                        <tr align="center">
+                                                            <td colspan="2">
+                                                                @Html.DropDownListFor(m => m.Services[i].Service.ConditionID, new SelectList(ViewBag.ConditionIDX, "ConditionID", "ConditionDesc"), "-Select one-", new
+                                                           {
+                                                               @style = "font-size:16px;text-align:left"
+                                                           })
+                                                            </td>
+
+                                                        </tr>
+                                                    }
+                                                    <tr style="width:100%">
+                                                        <td width="3%">
+                                                            <img src="~/Images/MicDictat.png" style="cursor: pointer;" onmouseover="" title="Add Dictation" onclick="uploadfileforQuestion('@Model.ServiceJob.ServiceJobUID','Audio','Notes')" />
+                                                        </td>
+                                                        <td style="font-size:16px" width="97%">
+                                                            @Html.TextAreaFor(m => m.Services[i].Service.Notes, 5, 10, new { @style = "width:330px;font-size:16px", @onkeypress = "dirty('" + Model.Services[i].Service.ServiceUID.ToString() + "','" + @Model.Services[i].Service.BranchID.ToString() + "',"+@i+")", @id = string.Format("Notes{0}", Model.Services[i].Service.ServiceUID) })
+                                                            <input type="button" id="btnSaveRow" onclick="Save();" value="save draft" class="inputbuttonbg inputbig" />
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+
+                                            @if (MDS.Controllers.LoginController.ItemServiceableElseJobCompleted)
+                                            {
+                                                <td rowspan="2">
+                                                    @Html.CheckBoxFor(m => m.Services[i].Service.SafetyTestDone, new { @id = string.Format("SafetyTestDone{0}", Model.Services[i].Service.ServiceUID) })
+                                                    <b>T & T</b>
+                                                    <br />
+                                                    <div id=@string.Format("Svcbl{0}", Model.Services[i].Service.ServiceUID)>
+                                                        @Html.RadioButtonFor(m => m.Services[i].Servicable, "Y", new { @onclick = "Serviceablefn(this,'" + @Model.Services[i].Service.ServiceUID + "',"+@i+");", @id = string.Format("Servicable{0}", Model.Services[i].Service.ServiceUID) })
+                                                        <b>Yes Carried out calibration to Aus Std and deemed serviceable</b>
+                                                        <br />
+                                                        at <span id="@string.Format("DateServicedDte{0}", Model.Services[i].Service.ServiceUID)">@((Model.Services[i].DateServiced == null) ? "" : Model.Services[i].DateServiced.Value.ToString("dd/MM/yy"))</span>
+                                                        <span id="@string.Format("DateServicedTme{0}", Model.Services[i].Service.ServiceUID)">@((Model.Services[i].DateServiced == null) ? "" : Model.Services[i].DateServiced.Value.ToString("HH:mm tt"))</span>
+                                                        <br />
+                                                        @Html.RadioButtonFor(m => m.Services[i].Servicable, "C", new { @onclick = "Serviceablefn(this,'" + @Model.Services[i].Service.ServiceUID + "'," + @i + ");", @id = string.Format("Servicable{0}", Model.Services[i].Service.ServiceUID) })
+                                                        <b>Yes with Conditions</b><br />
+                                                        @Html.RadioButtonFor(m => m.Services[i].Servicable, "N", new { @onclick = "Serviceablefn(this,'" + @Model.Services[i].Service.ServiceUID + "'," + @i + ");", @id = string.Format("Servicable{0}", Model.Services[i].Service.ServiceUID) })
+                                                        <b>No Failed - see Notes</b><br />
+                                                        @Html.RadioButtonFor(m => m.Services[i].Servicable, "X", new { @onclick = "Serviceablefn(this,'" + @Model.Services[i].Service.ServiceUID + "'," + @i + ");", @id = string.Format("Servicable{0}", Model.Services[i].Service.ServiceUID) })
+                                                        <b>Not done</b>
+                                                        <br />
+                                                        @Html.TextAreaFor(m => m.Services[i].Service.ServConditions, 2, 10, new { @style = "width:300px;font-size:16px", @id = string.Format("ServConditions{0}", Model.Services[i].Service.ServiceUID) })
+                                                    </div>
+                                                    @Html.HiddenFor(m => m.Services[i].DateServiced, new { @id = string.Format("DateServiced{0}", Model.Services[i].Service.ServiceUID) })
+                                                    @Html.HiddenFor(m => m.Services[i].Service.DataEntryComplete, new { @id = string.Format("DataEntryComplete{0}", Model.Services[i].Service.ServiceUID) })
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td rowspan="2">
+                                                    <div id=@string.Format("Svcbl{0}", Model.Services[i].Service.ServiceUID)>
+                                                        @Html.RadioButtonFor(m => m.Services[i].Servicable, "Y", new { @onclick = "Serviceablefn(this,'" + @Model.Services[i].Service.ServiceUID + "'," + @i + ");", @id = string.Format("Servicable{0}", Model.Services[i].Service.ServiceUID) })
+                                                        <b>Completed</b>
+                                                        <br />
+                                                        @Html.RadioButtonFor(m => m.Services[i].Servicable, "C", new { @onclick = "Serviceablefn(this,'" + @Model.Services[i].Service.ServiceUID + "'," + @i + ");", @id = string.Format("Servicable{0}", Model.Services[i].Service.ServiceUID) })
+                                                        <b>Completed / Return visit</b><br />
+                                                        <br />
+                                                        at <span id="@string.Format("DateServicedDte{0}", Model.Services[i].Service.ServiceUID)">@((Model.Services[i].DateServiced == null) ? "" : Model.Services[i].DateServiced.Value.ToString("dd/MM/yy"))</span>
+
+                                                        <span id="@string.Format("DateServicedTme{0}", Model.Services[i].Service.ServiceUID)">@((Model.Services[i].DateServiced == null) ? "" : Model.Services[i].DateServiced.Value.ToString("HH:mm tt"))</span>
+                                                        <br />
+                                                        @Html.RadioButtonFor(m => m.Services[i].Servicable, "X", new { @onclick = "Serviceablefn(this,'" + @Model.Services[i].Service.ServiceUID + "'," + @i + ");", @id = string.Format("Servicable{0}", Model.Services[i].Service.ServiceUID) })
+                                                        <b>Not done</b>
+                                                        @*<br />
+                                                        @Html.HiddenFor(m => m.Services[i].Service.ServConditions, new { @id = string.Format("ServConditions{0}", Model.Services[i].Service.ServiceUID) })*@
+                                                        <br />
+                                                        @Html.TextAreaFor(m => m.Services[i].Service.ServConditions, 2, 10, new { @style = "width:300px;font-size:16px", @id = string.Format("ServConditions{0}", Model.Services[i].Service.ServiceUID) })
+
+                                                    </div>
+                                                    @Html.HiddenFor(m => m.Services[i].DateServiced, new { @id = string.Format("DateServiced{0}", Model.Services[i].Service.ServiceUID) })
+                                                    @Html.HiddenFor(m => m.Services[i].Service.DataEntryComplete, new { @id = string.Format("DataEntryComplete{0}", Model.Services[i].Service.ServiceUID) })
+                                                </td>
+                                            }
+
+                                        </tr>
+                                        <tr id="@string.Format("ServiceLine2{0}", Model.Services[i].Service.ServiceUID)">
+                                            @*<td rowspan="1">
+                                                    <table style="width:100%">
+                                                        <tr style="width:100%">
+                                                            <td width="3%">
+                                                                <b>Notes</b><br />
+                                                                <img src="~/Images/MicDictat.png" style="cursor: pointer;" onmouseover="" title="Add Dictation" onclick="uploadfileforQuestion('@Model.ServiceJob.ServiceJobUID','Audio','ServiceNotes')" />
+                                                            </td>
+                                                            <td style="font-size:16px" width="97%">
+                                                                @Html.TextAreaFor(m => m.Services[i].Service.Notes, 3, 10, new { @style = "width:300px;font-size:16px", @id = string.Format("Notes{0}", Model.Services[i].Service.ServiceUID) })
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>*@
+
+
+                                            @*<td rowspan="1">
+                                                    @Html.EditorFor(m => m.Services[i].DateServiced, new { @id = string.Format("DateServiced{0}", Model.Services[i].Service.ServiceUID) })
+                                                </td>*@
+
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    @if (MDS.Controllers.LoginController.TechTravelCharge)
+                    {
+                    <tr width="100%" align="center">
+                        <td style="font-size:16px">
+                            <b>Travel charge</b>
+                        </td>
+                        @if ((Model.Engineers.Select(ii => ii.EngineerID).Contains(MDS.Controllers.LoginController.EngineerID(User.Identity.Name))))
+                        {
+                            <td style="font-size:16px;text-align:left" colspan="3">
+                                @Html.DropDownListFor(m => m.ServiceJob.TravelTypecode, new SelectList(ViewBag.TravelTypecodeX, "ChargeTypeCode", "ChargeType"), "-Select One-", new { @style = "font-size:16px;text-align:left", @onchange = "travelrate();", @id = "TravelTypecode" })
+                                @Html.TextBoxFor(i => i.ServiceJob.TravelChargeRate, new { @style = "font-size:16px;text-align:left", @id = "TravelChargeRate" })
+                                @Html.TextBoxFor(i => i.ServiceJob.TravelHours, new { @style = "font-size:16px;text-align:left", @onchange = "travelhours();", @id = "TravelHours" })
+                                <input type="text" id="TravelCharge" style="font-size:16px;" />
+                            </td>
+                        }
+                        else
+                        {
+                            <td style="font-size:16px;text-align:left" colspan="3">
+                                @Html.DropDownListFor(m => m.ServiceJob.TravelTypecode, new SelectList(ViewBag.TravelTypecodeX, "ChargeTypeCode", "ChargeType"), "", new { @disabled = "disabled" })
+                                @Html.DisplayFor(i => i.ServiceJob.TravelChargeRate, new { @style = "font-size:16px;text-align:left", @id = "TravelChargeRate" })
+                                @Html.DisplayFor(i => i.ServiceJob.TravelHours, new { @style = "font-size:16px;text-align:left", @id = "TravelHours" })
+                                @Html.HiddenFor(m => m.ServiceJob.TravelTypecode)
+                                @Html.HiddenFor(i => i.ServiceJob.TravelChargeRate)
+                                @Html.HiddenFor(i => i.ServiceJob.TravelHours)
+                                <input type="text" id="TravelCharge" style="font-size:16px;" />
+                            </td>
+                        }
+                    </tr>
+                    }
+                    <tr width="100%" align="center">
+                        <td style="font-size:16px">
+                            <b>Notes</b>
+                        </td>
+                        @Html.HiddenFor(i => i.Status, new { @id = "Status" })
+
+                        @if (@*(Model.ServiceJob.ActualDateStart != null) &&*@ /**/
+                        /**/
+                        /**/
+                        /**/
+                        /**/
+                        /**/
+                        /**/
+                        /**/
+                        /**/
+                        /**/
+                        /**/
+                        /**/
+                        /**/
+                        /**/
+                        (Model.Engineers.Select(ii => ii.EngineerID).Contains(MDS.Controllers.LoginController.EngineerID(User.Identity.Name))))
+                        {
+                            <td colspan="3">
+                                <table style="width:100%">
+                                    <tr style="width:100%">
+                                        <td width="3%">
+                                            <img src="~/Images/MicDictat.png" style="cursor: pointer;" onmouseover="" title="Add Dictation" onclick="uploadfileforQuestion('@Model.ServiceJob.ServiceJobUID','Audio','ServiceNotes')" />
+                                        </td>
+                                        <td style="font-size:16px" width="97%">
+                                            @Html.TextAreaFor(i => i.ServiceJob.ServiceNotes, 4, 10, new { @style = "width:100%;font-size:16px;text-align:left" })
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        }
+                        else
+                        {
+                            <td colspan="3" style="text-align:left">
+                                @Html.DisplayFor(i => i.ServiceJob.ServiceNotes, new { @style = "width:100%;font-size:16px;text-align:left" })
+                                @Html.HiddenFor(i => i.ServiceJob.ServiceNotes)
+                            </td>
+                            
+                        }
+                    </tr>
+                    @if (MDS.Controllers.LoginController.TechNotes)
+                    {
+                    <tr>
+                        <td>Tech Notes</td>
+                        <td style="font-size:16px" width="70%">
+                            @Html.TextAreaFor(i => i.TechNotes, 4, 10, new { @style = "width:100%;font-size:16px;text-align:left" })
+                        </td>
+                        <td>
+                            @Html.DisplayFor(i => i.OtherNotes, new { @style = "width:100%;font-size:16px;text-align:left" })
+                        </td>
+                    </tr>
+                    }
+                    <tr width="100%" align="center">
+                        <td style="font-size:16px">
+                            <b>Attachments</b>
+                        </td>
+                        <td colspan="3" align="left">
+                            <div id="PhotosX" />
+                        </td>
+                    </tr>
+
+
+                    @if (@*(Model.ServiceJob.ActualDateStart != null) &&*@ /**/
+                    /**/
+                    /**/
+                    /**/
+                    /**/
+                    /**/
+                    /**/
+                    /**/
+                    /**/
+                    /**/
+                    /**/
+                    /**/
+                    /**/
+                    (Model.Engineers.Select(ii => ii.EngineerID).Contains(MDS.Controllers.LoginController.EngineerID(User.Identity.Name))))
+                    {
+                        <tr width="100%" align="center" id="StatusLine">
+                            <td style="font-size:16px">
+                                <b>Status</b>
+                            </td>
+
+                            <td style="font-size:16px;text-align:left" colspan="3">
+                                @Html.RadioButton("Status", "Ongoing", new { @id = "rbOngoing", onchange = "setStatus('Ongoing');" }) Ongoing
+                                @Html.RadioButton("Status", "CompletedOK", new { onchange = "setStatus('CompletedOK');return false;" }) Completed - all items repaired
+                                @Html.RadioButton("Status", "OutstandingRepairs", new { onchange = "setStatus('OutstandingRepairs');return false;" }) Completed - with outstanding repairs
+                                @Html.RadioButton("Status", "CompletedBER", new { onchange = "setStatus('CompletedBER');return false;" }) Completed - some items were BERED
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr width="100%" align="center">
+                            <td style="font-size:16px">
+                                <b>Status</b>
+                            </td>
+
+                            <td style="font-size:16px;text-align:left" colspan="3">
+                                @Html.RadioButton("Status", "Ongoing", new { @id = "rbOngoing", @disabled = "disabled" }) Ongoing
+                                @Html.RadioButton("Status", "CompletedOK", new { @disabled = "disabled" }) Completed - all items repaired
+                                @Html.RadioButton("Status", "OutstandingRepairs", new { @disabled = "disabled" }) Completed - with outstanding repairs
+                                @Html.RadioButton("Status", "CompletedBER", new { @disabled = "disabled" }) Completed - some items were BERED
+                            </td>
+                        </tr>
+                    }
+
+                    @*@if ((Model.ServiceJob.ActualDateStart != null) && (Model.Engineers.Select(ii => ii.EngineerID).Contains(MDS.Controllers.LoginController.EngineerID(User.Identity.Name))))
+                        {
+                            <tr width="100%" align="center" id="TimeOutLine">
+                                <td style="font-size:16px">
+                                    <b>End Time</b>
+                                </td>
+                                <td style="font-size:16px;text-align:left" colspan="3">
+                                    @Html.TextBoxFor(i => i.ServiceJob.ActualDateEnd, new { @id = "ActualDateEnd", @readonly = "readonly", @style = "font-size:16px;text-align:left" }) <button onclick="SetTimeOutServiceNow(); return false;" class="inputbuttonbg inputbig">End</button>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr width="100%" align="center">
+                                <td style="font-size:16px">
+                                    <b>End Time</b>
+                                </td>
+                                <td style="font-size:16px;text-align:left" colspan="3">
+                                    @Html.DisplayFor(i => i.ServiceJob.ActualDateEnd)
+                                    @Html.HiddenFor(i => i.ServiceJob.ActualDateEnd)
+                                </td>
+                            </tr>
+                        }*@
+
+                    @if (@*(Model.ServiceJob.ActualDateStart != null) &&*@ /**/
+                    /**/
+                    /**/
+                    /**/
+                    /**/
+                    /**/
+                    /**/
+                    /**/
+                    /**/
+                    /**/
+                    /**/
+                    /**/
+                    /**/
+                    (Model.Engineers.Select(ii => ii.EngineerID).Contains(MDS.Controllers.LoginController.EngineerID(User.Identity.Name))))
+                    {
+
+                        <tr width="100%" align="center" id="CustSignLine">
+                            <td style="font-size:16px">
+                                <b>Customer Signature</b>
+                            </td>
+                            <td style="font-size:16px;text-align:left" colspan="3">
+                                @Html.CheckBoxFor(m => m.ServiceJob.CustomerSignature, new
+                                {
+                                    @id = "CustomerSignatureX",
+                                    @disabled = "disabled"@*@onclick = "CustomerSignatureSet();"*@})
+                                @if (MDS.Controllers.LoginController.CustomerSign_ElseName)
+                                {
+                                    <input class="inputbuttonbg inputbig" type="button" onclick="opencustsign(); return false;" value="Signature" />
+                                }
+                                else
+                                {
+                                    <b>Customer Name</b>
+                                    @Html.TextBoxFor(m => m.ServiceJob.CustName, new { id = "CustName" })
+                                    <input class="inputbuttonbg inputbig" type="button" onclick="SetCustName(); return false;" value="Submit Name" />
+                                }
+
+
+                                I have ensured that I have assessed and removed or minimized all hazards to a safe working level as per @MDS.Controllers.LoginController.CompanyName WHS Policy, Risk Management Procedures, Safety Take 5, JSA’s and relevant electrical legislation/regulations
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr width="100%" align="center">
+                            <td style="font-size:16px">
+                                <b>Customer Signature</b>
+                            </td>
+                            <td style="font-size:16px;text-align:left" colspan="3">
+                                @Html.CheckBoxFor(m => m.ServiceJob.CustomerSignature, new { @disabled = "disabled" })
+                                @Html.DisplayFor(m => m.ServiceJob.CustName)
+                                I have ensured that I have assessed and removed or minimized all hazards to a safe working level as per @MDS.Controllers.LoginController.CompanyName WHS Policy, Risk Management Procedures, Safety Take 5, JSA’s and relevant electrical legislation/regulations
+                            </td>
+                        </tr>
+                    }
+                </table>
+                <table width="100%">
+                    <tr width="100%">
+                        @if (Model.Engineers.Select(ii => ii.EngineerID).Contains(MDS.Controllers.LoginController.EngineerID(User.Identity.Name)))
+                        {
+                            if (Model.TechClockOnPrompt == MDS.Models.TechClockOnOffStatus.NoClockOn_ActiveShiftExists)
+                            {
+                                <td>
+                                    <input type="button" id="btnSaveExit" onclick="SaveDetailsSoFar();return false;" value="Clock off Job (save without submit/complete)" class="inputbuttonbg inputbig" />
+                                </td>
+                            }
+                            <td>
+                                <input type="button" id="btnSaveNext" onclick="autosave();return false;" value="Save and Continue" class="inputbuttonbg inputbig" />
+                            </td>
+                            <td align="right">
+                                <input type="button" id="btnSave" onclick="Save();" value="Next" class="inputbuttonbg inputbig" />
+                            </td>
+                        }
+                        else
+                        {
+
+                            <td align="left">
+                            </td>
+                            <td></td>
+                            <td align="right">
+                                @Html.ActionLink("Back", "ServiceSearch", "Tech")
+                            </td>
+                        }
+                    </tr>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+@if (MDS.Controllers.LoginController.ItemServiceableElseJobCompleted)
+{
+    <script type="text/javascript">
+        function Serviceablefn(ths, ServiceUID,Index) {
+            var svc = $(ths).filter(':checked').val();
+            if (svc == 'X') {
+                $('#DataEntryComplete' + ServiceUID).val(false);
+                $('#ServiceWorkDone' + ServiceUID).val(false);
+
+                $('#DateServicedDte' + ServiceUID).hide();
+                $('#DateServicedTme' + ServiceUID).hide();
+            }
+            else {
+//                var branchid=
+                DataEntryCompleteSet(ServiceUID);
+
+            }
+            if (svc == 'C') {
+                $('#ServConditions' + ServiceUID).show();
+            }
+            else {
+                $('#ServConditions' + ServiceUID).val('');
+                $('#ServConditions' + ServiceUID).hide();
+            }
+        }
+
+        function ServiceablefnHide(ServiceUID) {
+            $('#ServConditions' + ServiceUID).hide();
+        }
+
+        function ServiceablefnShow(ServiceUID) {
+            $('#ServConditions' + ServiceUID).show();
+        }
+
+    </script>
+}
+else
+{
+<script type="text/javascript">
+    function ServiceablefnHide(ServiceUID) {
+        ;//        $('#ServConditions' + ServiceUID).hide();
+    }
+
+    function ServiceablefnShow(ServiceUID) {
+        ;// $('#ServConditions' + ServiceUID).show();
+    }
+
+        function Serviceablefn(ths, ServiceUID,Index) {
+            var svc = $(ths).filter(':checked').val();
+         //   alert(svc);
+            if (svc == 'X') {
+                $('#DataEntryComplete' + ServiceUID).val(false);
+                $('#ServiceWorkDone' + ServiceUID).val(false);
+
+                $('#DateServicedDte' + ServiceUID).hide();
+                $('#DateServicedTme' + ServiceUID).hide();
+            }
+            else {
+
+            var BranchID = '@Model.ServiceJob.BranchID';
+                //alert(BranchID);
+                dirty(ServiceUID, BranchID,Index);//todotim Index instead of -1
+
+                DataEntryCompleteSet(ServiceUID);
+
+            }
+            if (svc == 'C') {
+                $('#ServConditions' + ServiceUID).val('Return visit required');
+            }
+            else {
+                $('#ServConditions' + ServiceUID).val('');
+            }
+        }
+
+</script>
+}
+<script type="text/javascript">
+
+    function setNotes(notes) {
+        // alert(notes);
+        $('#divNotes').text(notes);
+    }
+
+    var TechClockOnPrompt;
+    var div = $("#dialog");
+    $('#btnSaveNext').hide();
+
+    function openNotes() {
+        var RepairID = '@Model.ServiceJob.ServiceJobUID';
+        if (RepairID == 0) {
+            alert('First specify the customer and the equipment to be servied and then save the record before parts can be added');
+            return;
+        }
+        var BranchID = '@Model.ServiceJob.BranchID';
+
+        try {
+            div.dialog({
+                closeOnEscape: false,
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("Notes", "Repair")?ID=' + RepairID + '&BranchID=' + BranchID + '&SourceAdmin_Tech=false&Repair=false';
+                    $(this).load(url); @*'@Url.Action("UploadFile", "Applications")');*@
+                },
+                modal: true,
+                resizable: false,
+                width: 800,
+                height: 500,
+                title: "Notes",
+                buttons:
+                {
+                    Close: function () {
+                        div.remove(); div.dialog("close");
+                    }
+                },
+            });
+        }
+        catch (ex) {
+            alert('catchall:' + ex.message);
+        }
+        return false;
+    }
+
+</script>
+@if (Model.TechClockOnPrompt == MDS.Models.TechClockOnOffStatus.ClockOn_NoActiveShifts)
+{
+    <script type="text/javascript">
+        TechClockOnPrompt = 'ClockOn_NoActiveShifts';
+    </script>
+}
+else if (Model.TechClockOnPrompt == MDS.Models.TechClockOnOffStatus.NoClockOn_ActiveShiftExists)
+{
+    <script type="text/javascript">
+        TechClockOnPrompt = 'NoClockOn_ActiveShiftExists';
+    </script>
+}
+else if (Model.TechClockOnPrompt == MDS.Models.TechClockOnOffStatus.TravelActive)
+{
+    <script type="text/javascript">
+        TechClockOnPrompt = 'TravelActive';
+    </script>
+}
+
+else
+{
+    <script type="text/javascript">
+        TechClockOnPrompt = 'NoClock_JobCompleted';
+    </script>
+}
+
+
+@if (!Model.Engineers.Select(i => i.EngineerID).Contains(MDS.Controllers.LoginController.EngineerID(User.Identity.Name)))
+{
+    <script type="text/javascript">
+        function Save() {
+            alert('not required');
+        }
+
+        function DelService(id,  eq) {
+            alert('you are not an assigned engineer');
+        }
+
+    function RefreshPhoto() {
+        try {
+
+            var ServiceJobID = '@Model.ServiceJob.ServiceJobUID';
+
+            $.ajax({
+                url: '@Url.Content("~/ServiceWorkOrder/Photos")',
+                type: 'POST',
+                data: { ServiceID: ServiceJobID,Readonly:true },
+                success: doSubmitSuccess
+            });
+        }
+        catch (ex) {
+            alert('Error in init():' + ex.message);
+        }
+    }
+
+
+        function RefreshParts(ServiceID) {
+            try {
+//                alert('RefreshParts');
+                PartsServiceID = ServiceID;
+                var BranchID = '@Model.ServiceJob.BranchID';
+                $.ajax({
+                    url: '@Url.Content("~/Tech/ServiceParts")',
+                    type: 'POST',
+                    data: { ServiceID: ServiceID, BranchID: BranchID, Readonly:true},
+                    success: function (result) {
+                        $('#PartsX' + ServiceID).html(result);
+
+                    }
+                });
+            }
+            catch (ex) {
+                alert('Error in init():' + ex.message);
+            }
+        }
+
+    </script>
+}
+@*else if ((Model.ServiceJob.ActualDateStart == null))
+    {
+        <script type="text/javascript">
+
+                function RefreshPhoto() {
+            try {
+
+                var ServiceJobID = '@Model.ServiceJob.ServiceJobUID';
+
+                $.ajax({
+                    url: '@Url.Content("~/ServiceWorkOrder/Photos")',
+                    type: 'POST',
+                    data: { ServiceID: ServiceJobID,Readonly:true },
+                    success: doSubmitSuccess
+                });
+            }
+            catch (ex) {
+                alert('Error in init():' + ex.message);
+            }
+        }
+
+            function RefreshParts(ServiceID) {
+                try {
+                    PartsServiceID = ServiceID;
+                    var BranchID = '@Model.ServiceJob.BranchID';
+                    // alert('refreshparts');
+                    $.ajax({
+                        url: '@Url.Content("~/Tech/ServiceParts")',
+                        type: 'POST',
+                        data: { ServiceID: ServiceID, BranchID: BranchID, Readonly: true },
+                        success: function (result) {
+                            $('#PartsX' + ServiceID).html(result);
+
+                        }
+                    });
+                }
+                catch (ex) {
+                    alert('Error in init():' + ex.message);
+                }
+            }
+
+
+            function Save() {
+                try {
+                    var timein = $('#ActualDateStart').val();
+                    if (timein == '')
+                        alert('Please enter start date/time');
+                    else {
+                        $('#Service').submit();
+                    }
+                }
+                catch (ex) {
+                    alert(ex.message);
+                }
+            }
+        </script>
+    }*@
+else if ((!Model.ServiceJob.CompletedBERs) && (!Model.ServiceJob.CompletedOK) && (!Model.ServiceJob.CompletedOutstanding))
+{
+    <script type="text/javascript">
+
+            function RefreshPhoto() {
+        try {
+
+            var ServiceJobID = '@Model.ServiceJob.ServiceJobUID';
+
+            $.ajax({
+                url: '@Url.Content("~/ServiceWorkOrder/Photos")',
+                type: 'POST',
+                data: { ServiceID: ServiceJobID,Readonly:false },
+                success: doSubmitSuccess
+            });
+        }
+        catch (ex) {
+            alert('Error in init():' + ex.message);
+        }
+    }
+
+        function RefreshParts(ServiceID) {
+            try {
+                PartsServiceID = ServiceID;
+                var BranchID = '@Model.ServiceJob.BranchID';
+                // alert('refreshparts');
+                $.ajax({
+                    url: '@Url.Content("~/Tech/ServiceParts")',
+                    type: 'POST',
+                    data: { ServiceID: ServiceID, BranchID: BranchID, Readonly: false },
+                    success: function (result) {
+                        $('#PartsX' + ServiceID).html(result);
+
+                    }
+                });
+            }
+            catch (ex) {
+                alert('Error in init():' + ex.message);
+            }
+        }
+
+
+        function DelService(id,  eqsn) {
+            var pp = 'Are you wish to remove equipment ' + eqsn + ' from this service job';
+            var cn = confirm(pp);
+            if (cn) {
+                alert('click save or next to complete action.')
+                $('#ServiceLine' + id).css('background-color', 'Black');
+                $('#Notes' + id).removeAttr("disabled");
+                 $('#Notes' + id).val('deletethisequipmentfromservice');
+                $('#Notes' + id).hide();
+            }
+            return false;
+
+        }
+
+            function Save() {
+                try {
+                    var Status = $('#Status').val();
+
+                    if (Status == 'Ongoing') {
+                        var saveval = $('#btnSave').val();
+                        if (saveval== 'Submit/Complete')
+                        {
+                            alert('Please set complete status if you wish to submit/complete service');
+                            return;
+                        }
+                    }
+                }
+                catch (ex) {
+                    alert(ex.message);
+                }
+                try {
+                    var saveval = $('#btnSave').val();
+                    if (saveval == 'Submit/Complete')
+                        $('#Command').val('Submit');
+                    $('#Service').submit();
+
+                }
+                catch (ex) {
+                    alert('save.submit:'+ex.message);
+                }
+
+            }
+    </script>
+}
+else
+{
+    <script type="text/javascript">
+    function RefreshPhoto() {
+        try {
+
+            var ServiceJobID = '@Model.ServiceJob.ServiceJobUID';
+
+            $.ajax({
+                url: '@Url.Content("~/ServiceWorkOrder/Photos")',
+                type: 'POST',
+                data: { ServiceID: ServiceJobID,Readonly:false },
+                success: doSubmitSuccess
+            });
+        }
+        catch (ex) {
+            alert('Error in init():' + ex.message);
+        }
+    }
+
+        function RefreshParts(ServiceID) {
+            try {
+                PartsServiceID = ServiceID;
+                var BranchID = '@Model.ServiceJob.BranchID';
+                // alert('refreshparts');
+                $.ajax({
+                    url: '@Url.Content("~/Tech/ServiceParts")',
+                    type: 'POST',
+                    data: { ServiceID: ServiceID, BranchID: BranchID, Readonly:false},
+                    success: function (result) {
+                        $('#PartsX' + ServiceID).html(result);
+
+                    }
+                });
+            }
+            catch (ex) {
+                alert('Error in init():' + ex.message);
+            }
+        }
+
+        function DelService(id, eqsn) {
+            var pp = 'Are you wish to remove equipment ' + eqsn + ' from this service job';
+            var cn = confirm(pp);
+            if (cn) {
+                alert('click save or next to complete action.')
+                $('#ServiceLine' + id).css('background-color', 'Black');
+                $('#Notes' + id).removeAttr("disabled");
+
+                $('#Notes' + id).val('deletethisequipmentfromservice');
+                //alert(xxx);
+             }
+            return false;
+
+        }
+
+
+            function Save() {
+                try {
+                    ////alert('not required');
+                    var ConditionID = $('#ConditionID').val();
+                    if (ConditionID == '') {
+                        alert('select a condition');
+                        return;
+                    }
+                    var frm = $('#Service');
+                    try {
+                        var xxx = frm.valid();
+                        if (!xxx) {
+                            return;
+                        }
+                    }
+                    catch (ex) {
+                        ;
+                    }
+                    var saveval = $('#btnSave').val();
+                    if (saveval == 'Submit/Complete')
+                        $('#Command').val('Submit');
+                    $('#Service').submit();
+
+                    frm.submit();
+                }
+                catch (ex) {
+                    alert(ex.message);
+                }
+            }
+
+
+    </script>
+}
+
+<script type="text/javascript">
+
+    function autosaveTimer() {
+        try {
+        ;
+            //setTimeout(autosave, 600000);
+           // $('#AutoTimerMessage').text('Auto save on');
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+    function autosave() {
+       // $('#AutoTimerMessage').text('Saving Now');
+
+       ;// $('#Service').submit();
+
+    }
+
+</script>
+
+@if (MDS.Controllers.LoginController.RecordRiskAccessSafety)
+{
+    <script type="text/javascript">
+
+    function checkOutServiceNo(ServiceID, BranchID, Index, overwriting, ths) {
+            if (TechClockOnPrompt == 'NoClockOn_ActiveShiftExists') {
+               /* if (overwriting) {
+                    var cnf = confirm('Do you wish to take over the service of this equipment item which is check out to be serviced by another technician');
+                    if (cnf != true)
+                        return;
+                } */
+                var myData = { ServiceID: ServiceID, BranchID: BranchID,Check:false };
+                $.post('@Url.Action("CheckOutServiceToEng", "Tech")', myData,
+                    function (data) {
+                        if (data.Error == '') {
+                    //        alert('xxx');
+                          /*  try {
+
+                                LockUnlockService(ServiceID, BranchID, Index, false);
+                                RefreshEngLocked(ServiceID, Index);
+                            }
+                            catch (ex) {
+                                alert(ex.message);
+                            }*/
+                        }
+                        else
+                            alert(data.Error);
+                    }
+                    , 'json');
+
+            }
+            else {
+                alert('You must clock on first before you can check out equipment'); ClockOn();
+                $(ths).prop("checked", false);
+
+            }
+    }
+
+
+        function checkOutService(ServiceID, BranchID, Index, overwriting, ths) {
+            var chkd = $(ths).prop("checked");
+        //    alert(chkd);
+            if (TechClockOnPrompt == 'NoClockOn_ActiveShiftExists') {
+                if (overwriting) {
+                    if (chkd) {
+                        var cnf = confirm('Do you wish to remove the lock from this equipment item which is check out to be serviced by another technician');
+                        if (cnf != true)
+                            return;
+                    }
+                    else {
+                        var cnf = confirm('Do you wish to take over the service of this equipment item which is check out to be serviced by another technician');
+                        if (cnf != true)
+                            return;
+                    }
+                }
+                var myData = { ServiceID: ServiceID, BranchID: BranchID, Check:chkd };
+                $.post('@Url.Action("CheckOutServiceToEng", "Tech")', myData,
+                    function (data) {
+                        if (data.Error == '') {
+                            try {
+        //                        alert('x')
+                                LockUnlockService(ServiceID, BranchID, Index, false);
+                                RefreshEngLocked(ServiceID, Index);
+                            }
+                            catch (ex) {
+                                alert(ex.message);
+                            }
+                        }
+                        else
+                            alert(data.Error);
+                    }
+                    , 'json');
+
+            }
+            else {
+                alert('You must clock on first before you can check out equipment'); ClockOn();
+                $(ths).prop("checked", false);
+
+            }
+    }
+    </script>
+}
+else
+{
+    <script type="text/javascript">
+
+    function checkOutServiceNo(ServiceID, BranchID, Index, overwriting, ths) {
+            if (TechClockOnPrompt == 'NoClockOn_ActiveShiftExists') {
+               /* if (overwriting) {
+                    var cnf = confirm('Do you wish to take over the service of this equipment item which is check out to be serviced by another technician');
+                    if (cnf != true)
+                        return;
+                } */
+                var myData = { ServiceID: ServiceID, BranchID: BranchID,Check:false };
+                $.post('@Url.Action("CheckOutServiceToEng", "Tech")', myData,
+                    function (data) {
+                        if (data.Error == '') {
+                            //alert('xx')
+                            ;//EnableCells();
+                        }
+                        else
+                            alert(data.Error);
+                    }
+                    , 'json');
+
+            }
+            else {
+                alert('You must clock on first before you can check out equipment'); ClockOn();
+                $(ths).prop("checked", false);
+
+            }
+    }
+
+
+        function checkOutService(ServiceID, BranchID, Index, overwriting, ths) {
+        //    alert(Index);
+            var chkd = $(ths).prop("checked");//modifying this one
+          //  alert(chkd);
+            if (TechClockOnPrompt == 'NoClockOn_ActiveShiftExists') {
+                if (overwriting) {
+                    if (!chkd) {
+                        var cnf = confirm('Do you wish to remove the lock from this equipment item which is check out to be serviced by another technician');
+                        if (cnf != true)
+                            return;
+                    }
+                    else {
+                        var cnf = confirm('Do you wish to take over the service of this equipment item which is check out to be serviced by another technician');
+                        if (cnf != true)
+                            return;
+                    }
+                }
+                var myData = { ServiceID: ServiceID, BranchID: BranchID };
+                $.post('@Url.Action("CheckOutServiceToEng", "Tech")', myData,
+                    function (data) {
+                        if (data.Error == '') {
+                            try {
+                                if (chkd) {
+
+                                    $('#EngNameLock' + ServiceID.toString()).text('Checked out to you');
+                                }
+                                else {
+                                    $('#EngNameLock' + ServiceID.toString()).text('Not Seen');
+                                    //ths.hide();
+                                    $('#EngCheckout' + ServiceID).hide();
+
+
+                                }
+                                //alert('xxxx');
+                                LockUnlockService(ServiceID, BranchID, Index, chkd);
+//                                alert('LockUnlockService'); alert(Index);
+                                RefreshEngLocked(ServiceID, Index);
+  //                              alert('RefreshEngLocked'); alert(Index);
+                                EnableCells(ServiceID, chkd, Index)
+    //                            alert('EnableCells'); alert(Index);
+                            }
+                            catch (ex) {
+                                alert(ex.message);
+                            }
+                        }
+                        else
+                            alert(data.Error);
+                    }
+                    , 'json');
+
+            }
+            else {
+                alert('You must clock on first before you can check out equipment'); ClockOn();
+                $(ths).prop("checked", !chkd);
+
+            }
+    }
+    </script>
+}
+
+<script type="text/javascript">
+
+    function dirty(ServiceID, BranchID, Index) {
+       // alert('dirty');
+        try {
+            var lock = $('#EngNameLock' + ServiceID.toString()).text();
+//            alert(lock);
+            if (lock != 'Not Seen')
+                return;
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+        if (TechClockOnPrompt == 'NoClockOn_ActiveShiftExists') {
+               /* if (overwriting) {
+                    var cnf = confirm('Do you wish to take over the service of this equipment item which is check out to be serviced by another technician');
+                    if (cnf != true)
+                        return;
+                } */
+                var myData = { ServiceID: ServiceID, BranchID: BranchID,Check:true };
+                $.post('@Url.Action("CheckOutServiceToEng", "Tech")', myData,
+                    function (data) {
+                        if (data.Error == '') {
+                            //$('#EngNameLock' + ServiceID.toString()).val('locked by you');
+                            $('#EngNameLock' + ServiceID.toString()).text('Checked out to you');
+         //                   alert(Index);
+                            LockUnlockService(ServiceID, BranchID, Index, false);
+                            RefreshEngLocked(ServiceID, Index);
+           
+                          /*  try {
+
+                            }
+                            catch (ex) {
+                                alert(ex.message);
+                            }*/
+                        }
+                        else
+                            alert(data.Error);
+                    }
+                    , 'json');
+
+            }
+            else {
+                alert('You must clock on first before you can check out equipment'); ClockOn();
+                //$(ths).prop("checked", false);
+
+            }
+    }
+    function LockUnlockService(ServiceID, BranchID, Index, Lock) {
+        //alert('LockUnlockService' + Lock.toString());
+        try {
+            if (Lock) {
+                $('#EngCheckouttr' + ServiceID).css('background-color', 'Red');
+                try {
+                    $('#RiskAssessmentDone' + ServiceID).css('background-color', 'White');
+                }
+                catch (ex) {
+                    ;
+                }
+                EnableCells(ServiceID, true, Index)
+                try {
+                    $('#RiskAssessmentDoneX' + ServiceID.toString()).attr("disabled", "disabled");
+                }
+                catch (ex) {
+                    ;
+                }
+            }
+            else {
+                $('#EngCheckouttr' + ServiceID).css('background-color', 'White');
+                try {
+                    $('#RiskAssessmentDone' + ServiceID).css('background-color', 'Red');
+                    $('#RiskAssessmentDoneX' + ServiceID.toString()).removeAttr("disabled");
+                }
+                catch (ex) {
+                    ;
+                }
+
+                //var safety = true;
+                try {
+                    var safety = $('#RiskAssessmentDoneX' + ServiceID.toString()).is(":checked");
+                }
+                catch (ex) {
+                    EnableCells(ServiceID, false, Index)
+                }
+
+
+            }
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+        function RefreshEngLocked(ServiceID,i) {
+            try {
+                var BranchID = '@Model.ServiceJob.BranchID';
+                $.ajax({
+                    url: '@Url.Content("~/Tech/ServiceEngLock")',
+                    type: 'POST',
+                    data: { ServiceID: ServiceID, BranchID: BranchID,Index:i},
+                    success: function (result) {
+                        $('#EngLockedX' + ServiceID).html(result);
+                    }
+                });
+            }
+            catch (ex) {
+                alert('Error in init():' + ex.message);
+            }
+        }
+
+        function redosignature() {
+            try {
+                div.remove(); div.dialog("close");
+                            }
+            catch (ex) {
+                ;//   alert(ex.message);
+            }
+            try {
+                $('#CustomerSignatureX').prop("checked", false);
+                $('#CustomerSignature').prop("checked", false);
+                            //alert('CustomerSignature'+ $('#CustomerSignature').is(":checked").toString());
+
+                opencustsign();
+            }
+            catch (ex) {
+                alert(ex.message);
+            }
+        }
+        function opencustsign() {
+            try {
+                var BranchID = '@Model.ServiceJob.BranchID';
+                var id = '@Model.ServiceJob.ServiceJobUID';
+                //var cs = $('#CustomerSignatureX').prop("checked");
+                var cs = $('#CustomerSignatureX').is(":checked");
+
+                div.dialog({
+                    closeOnEscape: false,
+                    open: function (event, ui) {
+                        $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                        var url = '@Url.Action("Signature", "Tech")?cs='+cs+'&ID=' + id + '&RepairOrService=S&BranchID=' + BranchID;
+                        $(this).load(url);@*'@Url.Action("UploadFile", "Applications")');*@
+                    },
+                    modal: true,
+                    resizable: false,
+                    width: 700,
+                    height: 600,
+                    title: "Customer Signature",
+                    buttons: {
+                        Close: function () {
+                            ;//RefreshPhoto();
+                            div.remove(); div.dialog("close");
+                        }
+                    },
+                });
+            }
+            catch (ex) {
+                alert('catchall:' + ex.message);
+            }
+            return false;
+        }
+
+
+    function AllWorkTimes() {
+        try {
+            var BranchID = '@Model.ServiceJob.BranchID';
+            var ServiceJobID = '@Model.ServiceJob.ServiceJobUID';
+            div.dialog({
+                closeOnEscape: false,
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("ServiceAllWorkTimes", "Tech")?ID=' + ServiceJobID + '&BranchID=' + BranchID + "&Repair=false";
+                    $(this).load(url);
+
+                },
+                modal: true,
+                resizable: false,
+
+                width: 800,
+                height: 500,
+                title: "Work Times",
+                buttons: {
+                    Close: function () {
+                        div.remove(); div.dialog("close");
+                    }
+                },
+            });
+        }
+        catch (ex) {
+            alert('catchall-createpartsservice:' + ex.message);
+        }
+        return false;
+
+    }
+        //function CloseDialogRefreshParts() {
+        //    divservice.dialog("close");
+        //    $("#dialog").remove();
+        //    RefreshParts(ServiceID);
+        //}
+    var Command='Submit';
+    function ResumeClockOff() {
+        if (Command == 'Dashboard') {
+            var frm = $('#Service');
+            $('#Command').val('Dashboard');
+            frm.submit();
+        }
+        else {
+            ShowStatusTImeOutCustSign();// Save();
+        }
+    }
+
+
+    function closeDiv() {
+        try {
+            div.remove();
+        }
+        catch (ex) {
+
+        }
+        try {
+            div.dialog("close");
+        }
+        catch (ex) {
+
+        }
+    }
+
+    function ClockOn() {
+        try {
+            //alert('clockon');
+            var BranchID = '@Model.ServiceJob.BranchID';
+            var ServiceJobUID = '@Model.ServiceJob.ServiceJobUID';
+            //alert('clockon2');
+
+            div.dialog({
+                closeOnEscape: false,
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("ServiceWorkStart", "Tech")?ServiceJobUID=' + ServiceJobUID + '&BranchID=' + BranchID;
+                    $(this).load(url);
+
+                },
+                modal: true,
+                resizable: false,
+
+                width: 400,
+                height: 400,
+                title: "Clock On",
+                buttons: {
+                    Close: function () {
+                        try {
+                            div.remove(); div.dialog("close");
+                        }
+                        catch (ex) { ; }
+                        try {
+                                autosaveTimer();
+                        }
+                        catch (ex) { ;}
+
+                    }
+                },
+            });
+        }
+        catch (ex) {
+            alert('catchall-createpartsservice:' + ex.message);
+        }
+        return false;
+    }
+
+    function SaveDetailsSoFar() {
+        Command = 'Dashboard';
+        ClockOff();
+    }
+
+    function ClockOff() {
+        try {
+            var BranchID = '@Model.ServiceJob.BranchID';
+            var ServiceJobUID = '@Model.ServiceJob.ServiceJobUID';
+            div.dialog({
+                closeOnEscape: false,
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("ServiceWorkEnd", "Tech")?ID=' + ServiceJobUID + '&BranchID=' + BranchID  + "&Repair=false";
+                    $(this).load(url);
+                },
+                modal: true,
+                resizable: false,
+                width: 400,
+                height: 300,
+                title: "End Work",
+                buttons: {
+                    Close: function () {
+                        div.remove(); div.dialog("close");
+                    }
+                },
+            });
+        }
+        catch (ex) {
+            alert('catchall-createpartsservice:' + ex.message);
+        }
+        return false;
+    }
+    function SetCustName() {
+        var CustName = $('#CustName').val();
+        if (CustName == '') {
+            alert('Please enter a non empty customer name');
+            return;
+        }
+        var RepairID = '@Model.ServiceJob.ServiceJobUID';
+        var BranchID = '@Model.ServiceJob.BranchID';
+
+        var data = { CustName: CustName, id: RepairID, BranchID: BranchID }
+        $.post('@Url.Action("SetCustNameService", "Tech")', data,
+            function (data) {
+                if (data.Error == '') {
+                    CustomerSignatureSet();
+                }
+                else
+                    alert("Error updating customer name");
+            }
+            , 'json');
+
+    }
+
+    function CustomerSignatureSet() {
+        //alert('CustomerSignatureSet()');
+        try {
+            $('#CustomerSignatureX').prop("checked", true);
+            $('#CustomerSignature').prop("checked", true);
+           // alert('CustomerSignature'+ $('#CustomerSignature').is(":checked").toString());
+
+            ShowStatusTImeOutCustSign();
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+    function setStatus(status)
+    {
+        if (status != 'Ongoing') {
+            if (!ServiceWorkOrderComplete()) {
+                alert('Check "Data Entry complete" for all equipment you have serviced - see red');
+                $('#rbOngoing').prop('checked', true);
+                return false;
+            }
+        }
+        $('#Status').val(status);
+        ShowStatusTImeOutCustSign();
+        }
+
+    function setTimeStarted(IsTravel) {
+        if (IsTravel) {
+            TechClockOnPrompt = 'NoClockOn_ActiveShiftExists';
+            $('#BtnClockOn').hide();
+            $('#BtnClockOff').show();
+            TechClockOnPrompt = 'TravelActive';
+        }
+        else if (TechClockOnPrompt != 'NoClock_JobCompleted') {
+            TechClockOnPrompt = 'NoClockOn_ActiveShiftExists';
+            $('#BtnClockOn').hide();
+        }
+    }
+
+    function setTimeFinished(isTravel) {
+        if (isTravel) {
+            $('#BtnClockOn').show();
+            $('#BtnClockOff').hide();
+            TechClockOnPrompt = 'ClockOn_NoActiveShifts';
+            RefreshTimes();
+            ClockOn();
+        }
+        else if (TechClockOnPrompt != 'NoClock_JobCompleted') {
+            TechClockOnPrompt = 'ClockOn_NoActiveShifts';
+            RefreshTimes();
+            ClockOn();
+        }
+    }
+
+        ShowStatusTImeOutCustSign();
+    function ShowStatusTImeOutCustSign() {
+        if ($('#Status').val() == 'Ongoing') {
+            $('#StatusLine').css("color", "red");
+            $('#CustSignLine').hide();
+        }
+        else {
+            $('#StatusLine').css("color", "black");
+            {
+                $('#CustSignLine').show();
+                var checked = $('#CustomerSignatureX').prop("checked");
+                if (checked) {
+                   // alert('custsign checked')
+                    $('#CustSignLine').css("color", "black");
+                    if (TechClockOnPrompt=='NoClockOn_ActiveShiftExists') {
+                        ClockOff();
+                        $('#btnSave').prop('value', 'Next');
+                    }
+                    else {
+                        //alert('CustomerSignature'+ $('#CustomerSignature').is(":checked").toString());
+                        $('#btnSaveNext').show();
+                        $('#btnSave').prop('value', 'Submit/Complete');
+                    }
+                }
+                else {
+                    //alert('custsign not checked')
+                    $('#btnSaveNext').hide();
+                    $('#btnSave').prop('value', 'Next');
+                    $('#CustSignLine').css("color", "red");
+                }
+
+            }
+        }
+    }
+
+
+    function totalcharge() {
+        var rate = parseFloat($('#TravelChargeRate').val());
+        var Qty = parseFloat($("#TravelHours").val());
+        var TravelCharge = rate * Qty;
+        $('#TravelCharge').val('$' + TravelCharge.toString());
+    }
+
+
+            totalcharge();
+            function travelrate() {
+                try {
+                    var vl = $("#TravelTypecode option:selected").text();
+                    var amt = vl.substr(vl.indexOf("$") + 1)
+                    var ttc = $('#TravelChargeRate').val(amt);
+                    totalcharge();
+                }
+                catch (ex) {
+                    alert(ex.message);
+                }
+            }
+
+            function travelhours() {
+                try {
+                    totalcharge();
+                }
+                catch (ex) {
+                    alert(ex.message);
+                }
+            }
+
+            function SetTimeInServiceNow() {
+                try {
+                    var today = new Date();
+
+                    var date = today.getDate()  + '/' + (today.getMonth() + 1)+ '/';
+
+                    date = date + today.getFullYear() + ' ';
+                    if (today.getHours() < 10)
+                      date = date + '0';
+
+                        date=date+ today.getHours() + ":";
+                    if (today.getMinutes() < 10)
+                        date = date + '0';
+                    date = date + today.getMinutes() + ':00';
+                    $('#ActualDateStart').val(date);
+                   // alert('save');
+
+                    Save();
+                }
+                catch (ex) {
+                    alert(ex.message);
+                }
+            }
+
+            //function SetTimeOutServiceNow() {
+            //    try {
+            //        var today = new Date();
+
+            //        var date = today.getDate()  + '/' + (today.getMonth() + 1)+ '/';
+
+            //        date = date + today.getFullYear() + ' ';
+            //        if (today.getHours() < 10)
+            //          date = date + '0';
+
+            //            date=date+ today.getHours() + ":";
+            //        if (today.getMinutes() < 10)
+            //            date = date + '0';
+            //        date = date + today.getMinutes() + ':00';
+            //        $('#ActualDateEnd').val(date);
+            //        ShowStatusTImeOutCustSign();
+            //    }
+            //    catch (ex) {
+            //        alert(ex.message);
+            //    }
+            //}
+    var PartsServiceID = 0;
+
+//    function DataEntryCompleteSet(ths, ServiceUID,i) {
+    function DataEntryCompleteSet(ServiceUID) {
+       try {
+      //      var DEC = ths.checked;
+            //    if (DEC)
+           {
+               $('#DataEntryComplete' + ServiceUID).val(true);
+               $('#ServiceWorkDone' + ServiceUID).val(true);
+
+                var today = new Date();
+                var date = today.getDate() + '/' + (today.getMonth() + 1) + '/';
+                date = date + today.getFullYear() + ' ';
+                if (today.getHours() < 10)
+                    date = date + '0';
+                date = date + today.getHours() + ":";
+                if (today.getMinutes() < 10)
+                    date = date + '0';
+                date = date + today.getMinutes() + ':00';
+                //alert(ServiceUID);
+                //alert($('#Services_'+i+'__DateServiced').val());
+                $('#DateServiced' + ServiceUID).val(date);
+                var fullDate = new Date();
+//                alert(fullDate.getMonth().toString().length);
+                var twoDigitMonth = ((fullDate.getMonth().toString().length) == 1) ? ('0'+(fullDate.getMonth() + 1).toString()) : (fullDate.getMonth() + 1).toString();
+                var currentDate = fullDate.getDate() + "/" + twoDigitMonth + "/" + fullDate.getFullYear().toString().substring(2,4);
+
+           $('#DateServicedDte' + ServiceUID).show();
+            $('#DateServicedTme' + ServiceUID).show();
+
+                $('#DateServicedDte' + ServiceUID).html(currentDate);
+                var hours = fullDate.getHours();
+                var minutes = fullDate.getMinutes();
+                var ampm = hours >= 12 ? 'pm' : 'am';
+                hours = hours % 12;
+                hours = hours ? hours : 12; // the hour '0' should be '12'
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                var strTime = hours + ':' + minutes + ' ' + ampm;
+                $('#DateServicedTme' + ServiceUID).html(strTime);
+
+            }
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+        function RiskAssessmentDoneSet(ths, ServiceUID,i) {
+            try {
+            var safety = ths.checked;
+            EnableCells(ServiceUID, !safety,i)
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+
+    function deletefile(PhotosID, url) {
+        if (confirm("Do you want to remove this document / photo?")) {
+            var data = { PhotosID: PhotosID, url: url }
+            $.post('@Url.Action("DocumentDelete", "Repair")', data,
+                function (data) {
+                    if (data.Error == '') {
+                        RefreshPhoto();
+                    }
+                    else
+                        alert("Could not delete");
+                }
+                , 'json');
+        }
+    }
+
+
+
+        function doSubmitSuccessTimes(result) {
+        try {
+            $('#TimesX').html(result);
+        }
+        catch (ex) {
+            alert('Error in doSubmitSuccessTimes():'+ex.message);
+        }
+
+    }
+
+        function doSubmitSuccess(result) {
+        try {
+            $('#PhotosX').html(result);
+        }
+        catch (ex) {
+            alert('Error in doSubmitSuccess():'+ex.message);
+        }
+
+    }
+
+        RefreshPhoto();
+    RefreshTimes();
+
+
+    function ServiceWorkOrderComplete() {
+        var ServicesIDs = '@Model.ServicesIDs';
+        var sids = ServicesIDs.split(',');
+        for (var i = 0; i < sids.length; i++) {
+            var sc = $('#RiskAssessmentDoneX' + sids[i]).is(":checked");
+            if (sc) {
+                var decx = $('#DataEntryComplete' + sids[i]);
+                var dec = decx.val();//.is(":checked");
+                //alert(dec);
+                if (dec == false || dec.toLowerCase() == 'false') {
+                    $('#ServiceLine' + sids[i]).css('background-color', 'Red');
+                    $('#ServiceLine2' + sids[i]).css('background-color', 'Red');
+                    return false;
+                }
+                else {
+                    $('#ServiceLine' + sids[i]).css('background-color', 'White');
+                    $('#ServiceLine2' + sids[i]).css('background-color', 'White');
+                }
+            }
+        }
+    @*@for (int i = 0; i < Model.Services.Count(); i++)
+        {
+            var ServiceUID = Model.Services[i].Service.DataEntryComplete;
+            var DataEntryComplete=$('#DataEntryComplete' + ServiceUID);
+            if (DataEntryComplete)
+            {
+                return false;
+            }
+        }*@
+        return true;
+    }
+
+    function uploadfileforQuestion(id, Attach_Audio, field) {
+        var hght = screen.height-100;
+
+        var wdth = screen.width-100;
+        try {
+            div.dialog({
+                closeOnEscape: false,
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("UploadFile", "Repair")?ServiceID=' + id + '&Attach_Audio=' + Attach_Audio + '&field=' + field;
+                    $(this).load(url);@*'@Url.Action("UploadFile", "Applications")');*@
+
+                },
+                modal: true,
+                resizable: false,
+
+                width: wdth,//creen.width,// 800,//400,
+                height:hght,// screen.height,// 600,//300,
+                title: "Add attachment/audio",
+                buttons: {
+                    Close: function () {
+                        RefreshPhoto();
+                        div.remove(); div.dialog("close");
+                    }
+                },
+            });
+        }
+        catch (ex) {
+            alert('catchall:' + ex.message);
+        }
+        return false;
+
+    }
+    @*function uploadfileforQuestion(id,Attach_Audio,field) {
+                    try {
+                    div.dialog({
+                    closeOnEscape: false,
+                    open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("UploadFile", "Repair")?ServiceID=' + id + '&Attach_Audio='+Attach_Audio+ '&field='+field;
+                    $(this).load(url);
+
+                    },
+                    modal: true,
+                    resizable: false,
+
+                    width: 400,
+                    height: 300,
+                    title: "Add attachment/audio",
+                    buttons: {
+                        Close: function () {
+                            RefreshPhoto();
+                            div.remove(); div.dialog("close");
+                    }
+                    },
+                    });
+                    }
+                    catch (ex) {
+                    alert('catchall:' + ex.message);
+                    }
+                    return false;
+
+                    }*@
+
+
+    function DisableCells(ServiceUID, enable, i) {
+        //alert(enable);
+        if (enable.toString() != 'true') {
+          //  alert('enable = true - disable');
+            EnableCells(ServiceUID, true, i);
+        }
+        else {
+            EnableCells(ServiceUID, false, i);
+            //            alert('enable = false - enable');
+
+        }
+    }
+    function EnableCells(ServiceUID, disable, i) {
+        try {
+          //  alert('EnableCells:'+ServiceUID.toString()+':'+disable.toString()+':'+i.toString());
+            var condid = $('#Services_' + i + '__Service_ConditionID');
+            var modid = $('#Services_' + i + '__Equipment_ModelUID');
+           // alert(disable);
+            if (disable) {
+                $('#ServiceLine' + ServiceUID).css('background-color', 'White');
+
+               // $('#RiskAssessmentDone' + ServiceUID).css('background-color', 'Red');
+
+                modid.attr("disabled", "disabled");
+                try {
+                    $('#SafetyTestDone' + ServiceUID).attr("disabled", "disabled");
+                }
+                catch (ex) {
+                    ;
+                }
+
+                $('#SerialNumber' + ServiceUID).attr("disabled", "disabled");
+                $('#BNQItemCode' + ServiceUID).attr("disabled", "disabled");
+                $('#TSPassFail' + ServiceUID).attr("disabled", "disabled");
+                condid.attr("disabled", "disabled");
+               // $('#Servicable' + ServiceUID).attr("disabled", "disabled");
+                $('#ServiceFunction' + ServiceUID).attr("disabled", "disabled");
+                //$('#EquipUID' + ServiceUID).attr("disabled", "disabled");
+                $('#Services_' + i +'__Service_EquipUID').attr("disabled", "disabled");
+                var RecordRiskAccessSafety = '@MDS.Controllers.LoginController.RecordRiskAccessSafety';
+                //alert(RecordRiskAccessSafety);
+                if (RecordRiskAccessSafety != 'False') {
+                    $('#Svcbl' + ServiceUID).hide();//.attr("disabled", "disabled");
+                    $('#Notes' + ServiceUID).attr("disabled", "disabled");
+                }
+            }
+            else {
+//                $('#EngCheckouttr' + ServiceUID).css('background-color', 'LightGray');
+                $('#RiskAssessmentDone' + ServiceUID).css('background-color', 'White');
+                $('#ServiceLine' + ServiceUID).css('background-color', 'Yellow');
+
+                modid.removeAttr("disabled");
+                try {
+                $('#SafetyTestDone' + ServiceUID).removeAttr("disabled");
+                }
+                catch (ex) {
+                    ;
+                }
+                $('#SerialNumber' + ServiceUID).removeAttr("disabled");
+                $('#BNQItemCode' + ServiceUID).removeAttr("disabled");
+                $('#TSPassFail' + ServiceUID).removeAttr("disabled");
+                condid.removeAttr("disabled");
+                $('#Notes' + ServiceUID).removeAttr("disabled");
+                $('#Svcbl' + ServiceUID).show();//.removeAttr("disabled");
+                $('#ServiceFunction' + ServiceUID).removeAttr("disabled");
+                //$('#EquipUID' + ServiceUID).removeAttr("disabled");
+                $('#Services_' + i +'__Service_EquipUID').removeAttr("disabled");
+               // $('#Servicable' + ServiceUID).show().removeAttr("disabled");
+                //$('#Notes' + ServiceUID).show().removeAttr("disabled");
+               // $('#DataEntryComplete' + ServiceUID).removeAttr("disabled");
+               // $('#Servicable' + ServiceUID).removeAttr("disabled");
+            }
+        }
+        catch (ex) {
+            alert('Error in enabledcells():' + ex.message);
+        }
+    }
+
+    //function doSubmitSuccessParts(result) {
+    //    try {
+    //        //alert(result);
+    //        $('#PartsX' + PartsService).html(result);
+    //    }
+    //    catch (ex) {
+    //        alert('Error in doSubmitSuccessParts():' + ex.message);
+    //    }
+    //}
+
+    //function doSubmitSuccessParts(result) {
+    //    try {
+    //        //alert(result);
+    //        $('#PartsX' + PartsServiceID).html(result);
+    //    }
+    //    catch (ex) {
+    //        alert('Error in doSubmitSuccessParts():' + ex.message);
+    //    }
+    //}
+
+    function RefreshTimes() {
+        try {
+            var ServiceJobID = '@Model.ServiceJob.ServiceJobUID';
+            var BranchID = '@Model.ServiceJob.BranchID';
+            $.ajax({
+                url: '@Url.Content("~/Tech/ServiceTimes")',
+                type: 'POST',
+                data: { ServiceJobID: ServiceJobID, BranchID: BranchID,Repair:false },
+                success: doSubmitSuccessTimes
+            });
+        }
+        catch (ex) {
+            alert('Error in initTime():' + ex.message);
+        }
+    }
+
+
+
+    $(document).ready(function(){
+    function RefreshPartial(){
+        //this will wait 60000 seconds and then fire the load partial function
+       // setTimeout(function(){
+           // RefreshEngLockedAll();
+           // RefreshPartial();
+       ;// }, 60000);
+    }
+    //initialize the loop
+    RefreshPartial();
+    });
+
+    function RefreshEngLockedAll() {
+       // alert('RefreshEngLockedAll');
+        var ServicesIDs = '@Model.ServicesIDs';
+        var sids = ServicesIDs.split(',');
+        for (var i = 0; i < sids.length; i++) {
+            RefreshEngLocked(sids[i], i);
+        }
+    }
+
+    function AddEquipment() {
+        //$('#Search').val('');
+        $('#Command').val('AddEquipment');
+        $('#Service').submit();
+    }
+
+
+
+    function Searchclear() {
+        $('#Search').val('');
+
+        $('#Service').submit();
+    }
+    function searchonenter(e) {
+        if (e.keyCode === 13) {
+            e.preventDefault();
+            search();
+        }
+    }
+    function search() {
+        var srch = $('#Search').val();
+        if (srch == '') {
+            alert('Please enter text in the search box'); return;
+        }
+
+        $('#Service').submit();
+
+    }
+</script>
+
+@for (int i = 0; i < Model.Services.Count(); i++)
+{
+
+    if (Model.Services[i].Service.ServConditions == "" || Model.Services[i].Service.ServConditions == null)
+    {
+        <script type="text/javascript">
+            ServiceablefnHide('@Model.Services[i].Service.ServiceUID');
+        </script>
+    }
+    else
+    {
+        <script type="text/javascript">
+            ServiceablefnShow('@Model.Services[i].Service.ServiceUID');
+ //           $('#ServConditions' + Model.Services[i].Service.ServiceUID).hide();
+        </script>
+    }
+
+
+    if (Model.Services[i].Service.EngineerID == null)
+    {
+        <script type="text/javascript">
+            LockUnlockService('@Model.Services[i].Service.ServiceUID','@Model.Services[i].Service.BranchID','@i',true);
+        </script>
+
+    }
+    else if (Model.Services[i].Service.EngineerID == MDS.Controllers.LoginController.EngineerID(User.Identity.Name))
+    {
+        <script type="text/javascript">
+                LockUnlockService('@Model.Services[i].Service.ServiceUID','@Model.Services[i].Service.BranchID','@i',false);
+        </script>
+
+    }
+    else
+    {
+        <script type="text/javascript">
+            LockUnlockService('@Model.Services[i].Service.ServiceUID','@Model.Services[i].Service.BranchID','@i',true);
+        </script>
+
+    }
+
+
+
+    if (!Model.Services[i].Service.DataEntryComplete)
+    {
+        <script type="text/javascript">
+
+$('#DateServicedDte' + @Model.Services[i].Service.ServiceUID.ToString()).hide();
+            $('#DateServicedTme' + @Model.Services[i].Service.ServiceUID.ToString()).hide();
+        </script>
+    }
+
+    <script type="text/javascript">
+                test();
+        function test() {
+            var condid = $('#Services_' + @i +'__Service_ConditionID');
+            condid.val(@Model.Services[i].Service.ConditionID);
+            //Service.EquipUID
+            var modid = $('#Services_' + @i +'__Service_EquipUID');
+            modid.val(@Model.Services[i].Service.EquipUID);
+            }
+
+
+            RefreshParts('@Model.Services[i].Service.ServiceUID');
+            RefreshEngLocked('@Model.Services[i].Service.ServiceUID','@i');
+
+
+                @*function doSubmitSuccessParts(result) {
+                    try {
+                        //alert(result);
+                        $('#PartsX'+@Model.Services[i].Service.ServiceUID).html(result);
+                    }
+                    catch (ex) {
+                        alert('Error in doSubmitSuccessParts():' + ex.message);
+                    }
+                }*@
+
+        RiskAssessmentDonefn();
+
+        function RiskAssessmentDonefn() {
+            try {
+                var RiskAss ='@MDS.Controllers.LoginController.RecordRiskAccessSafety';
+//                alert(RiskAss);
+                if (RiskAss!='False') {
+                    DisableCells(@Model.Services[i].Service.ServiceUID, @Model.Services[i].Service.RiskAssessmentDone.ToString().ToLower(),@i);
+                }
+            }
+            catch (ex) {
+                alert('Error in RiskAssessmentDoneSet():' + ex.message);
+            }
+        }
+
+    </script>
+
+
+}
+@if (Model.TechClockOnPrompt == MDS.Models.TechClockOnOffStatus.TravelActive)
+{
+    <script type="text/javascript">
+        $('#BtnClockOff').show()
+    </script>
+
+}
+else
+{
+    <script type="text/javascript">
+        $('#BtnClockOff').hide()
+    </script>
+
+}
+
+
+@for (int i = 0; i < Model.Engineers.Count(); i++)
+{
+    <script type="text/javascript">
+setcbo();
+        function setcbo() {
+            //Engineers_0__EngineerID
+            var condid = $('#Engineers_' + @i +'__EngineerID');
+
+        condid.val(@Model.Engineers[i].EngineerID);
+    }
+    </script>
+}
+
+
+
+
+@if (Model.TechClockOnPrompt == MDS.Models.TechClockOnOffStatus.ClockOn_NoActiveShifts)
+{
+    <script type="text/javascript">
+        ClockOn();
+    </script>
+}
+else if (Model.TechClockOnPrompt == MDS.Models.TechClockOnOffStatus.TravelActive)
+{
+    <script type="text/javascript">
+        ClockOff();
+    </script>
+}
+else
+{
+    <script type="text/javascript">
+
+        autosaveTimer();
+    </script>
+}
+
+

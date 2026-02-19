@@ -1,0 +1,172 @@
+﻿@model MDS.Models.Notes
+@{
+    ViewBag.Title = "Notes";
+    Layout = null;// "~/Views/Shared/_Layout.cshtml";
+}
+@*<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+<script src="~/Scripts/jquery.validate.js"></script>*@
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+
+    #rpGrid tbody tr:hover {
+        cursor: pointer !important;
+    }
+</style>
+<h1>Notes</h1>
+@using (Html.BeginForm("Notes", "Repair", FormMethod.Post, new { id = "xNotes" }))
+{
+    <table border="1" cellpadding="0" cellspacing="0" width="100%">
+        <tr style="background-color:black;color:white">
+            <th>
+                <b>
+                    Date
+                </b>
+            </th>
+            <th>
+                <b>
+                    Admin or Tech
+                </b>
+            </th>
+            <th>
+                <b>
+                    Notes
+                </b>
+            </th>
+            <th>
+
+            </th>
+        </tr>
+        @foreach (var item in Model.Data)
+        {
+            <tr>
+                <td>
+                    @item.Dte.ToString("dd-MMM-yyyy HH:mm")
+                </td>
+                @if (item.Admin_Tech == true)
+                {
+                    <td>
+                        Admin Only
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        Tech & Admin
+                    </td>
+                }
+                <td>
+                    @item.Notes
+                </td>
+                <td>
+                    <button onclick="DeleteNoteX(@item.NotesID); return false;">X</button>
+                </td>
+            </tr>
+        }
+    </table>
+    <table width="100%">
+        <tr>
+            <td colspan="2">Add New</td>
+        </tr>
+        <tr>
+            <td width="30%"><b>Notes</b></td>
+            <td width="70%">
+                @Html.TextAreaFor(i => i.Note, 3, 5, new { @style = "width:100%;font-size:16px;text-align:left" })
+            </td>
+        </tr>
+        @if (Model.SourceAdmin_Tech)
+        {
+            <tr>
+                <td><b>Admin Only</b></td>
+                <td>
+                    @Html.CheckBoxFor(i => i.Admin_Tech)
+                </td>
+            </tr>
+        }
+        <tr>
+            <td>
+                <button value="Save" onclick="Save(); return false;">Save</button>
+            </td>
+        </tr>
+        @Html.HiddenFor(i => i.BranchID)
+        @Html.HiddenFor(i => i.ID)
+        @Html.HiddenFor(i => i.SourceAdmin_Tech)
+        @Html.HiddenFor(i => i.Repair)
+    </table>
+
+}
+
+<script type="text/javascript">
+
+    function DeleteNoteX(id) {
+        try {
+            //var SourceAdmin_Tech='@Model.SourceAdmin_Tech';
+            var mydata = { id: id, SourceAdmin_Tech: '@Model.SourceAdmin_Tech' };
+           // alert('deletenote');
+            $.post('@Url.Action("DeleteNote", "Repair")', mydata,
+                function (data) {
+                    if (data.Error == '') {
+                        try {
+                            setNotes(data.Data);
+
+                            closeDiv();
+                            $("#dialog").remove();
+                            openNotes();
+                        }
+                        catch (ex) {
+                            alert(ex.message);
+                        }
+                    }
+                    else
+                        alert(data.Error);
+                }
+            );
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+    function Save() {
+            try {
+                var myData = $('#xNotes')
+                try {
+                    var xxx = myData.valid();
+                    if (!xxx) {
+                        alert('form is not valid');
+                        return;
+                    }
+                }
+                catch (ex) {
+                    ;
+                }
+                $.post('@Url.Action("Notes", "Repair")', myData.serialize(),
+                    function (data) {
+                        if (data.Error == '') {
+                            try {
+                                setNotes(data.Data);
+                                closeDiv();
+                                $("#dialog").remove();
+                                openNotes();
+                            }
+                            catch (ex) {
+                                alert(ex.message);
+                            }
+                        }
+                        else
+                            alert(data.Error);
+                    }
+                    , 'json');
+            }
+            catch (ex) {
+                alert(ex.message);
+            }
+
+        }
+
+
+</script>

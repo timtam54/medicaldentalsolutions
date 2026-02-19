@@ -1,0 +1,166 @@
+﻿@model MDS.Models.ServiceTestScript
+<h2 style="text-align: center;">Test Script Service</h2>
+
+@using (Html.BeginForm("TestScript", "ServiceWorkOrder", FormMethod.Post, new { id = "TSForm" }))
+{ 
+    @Html.HiddenFor(model => model.ServiceTestScriptID)
+    @Html.HiddenFor(model => model.ServiceUID)
+    @Html.HiddenFor(model => model.EquipmentTypeCode)
+    <div class="contact-info" style="margin: 25px;">
+        <div class="content">
+            <table>
+                <tr>
+                    <td width="120">Serial Number:
+                    </td>
+                    <td>@(Html.Kendo().TextBoxFor(mbox => mbox.SerialNo)
+                                            .Name("SerialNo")
+                                            .HtmlAttributes(new { style = "width: 100px" })
+                                            )
+
+                    </td>
+                    <td width="110">Customer Equipment Code:
+                    </td>
+                    <td width="130">@(Html.Kendo().TextBoxFor(mbox => mbox.CustEquipCode)
+                                            .Name("CustEquipCode")
+                                            .HtmlAttributes(new { style = "width: 100px" })
+                                            )
+
+                    </td>
+                    <td width="70">Item Code:
+                    </td>
+                    <td>@(Html.Kendo().TextBoxFor(mbox => mbox.ItemCode)
+                                            .Name("ItemCode")
+                                            .HtmlAttributes(new { style = "width: 100px" })
+                                            )
+                    </td>
+                </tr>
+                <tr>
+                    <td>Type Code :
+                    </td>
+                    <td>@(Html.Kendo().TextBoxFor(mbox => mbox.TypeCode)
+                                            .Name("TypeCode")
+                                            .HtmlAttributes(new { style = "width: 100px" })
+                                            )
+                    </td>
+                    <td>Service job Code :
+                    </td>
+                    <td>@(Html.Kendo().TextBoxFor(mbox => mbox.ServiceJobCode)
+                                            .Name("ServiceJobCode")
+                                            .HtmlAttributes(new { style = "width: 100px" })
+                                            )
+                    </td>
+                    <td></td>
+                    <td>
+                        <input type="submit" id="btnScriptClear" class="inputbuttonbg inputbig" name="command" value="Clear and rebuild Check List"></td>
+                </tr>
+                <tr>
+                    <td colspan="6">
+                        @(Html.Kendo().Grid(Model.TS)
+.Name("scriptGrid")
+.Columns(columns =>
+{
+
+    columns.Bound(p => p.TestScriptID).Title("Test").EditorTemplateName("TestScriptDropdown").ClientTemplate("#=TestScriptText#");
+    columns.Bound(p => p.ServiceTestScriptID).Title("ServiceTestScriptID").Visible(false);
+    columns.Bound(p => p.CheckedScript).Title("Checked").ClientTemplate("#=CheckedScriptText#"); ;
+    columns.Bound(p => p.Comment).Title("Comment").EditorTemplateName("ScriptTextArea");
+    columns.Command(command =>
+    {
+        command.Edit();
+        command.Destroy();
+    });
+
+})
+.Pageable()
+.Sortable()
+.Editable(editable => editable.Mode(GridEditMode.InLine))
+.Filterable()
+ .DataSource(dataSource => dataSource
+        .Ajax()
+        .Model(model => model.Id(p => p.ServiceTestScriptID))
+          .Update(update => update.Action("UpdateScript",
+                                    "ServiceWorkOrder"))
+                                     .Destroy(update => update.Action("DeleteScript",
+                                    "ServiceWorkOrder"))
+        .PageSize(200)
+        .ServerOperation(false)
+     )
+)
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        @Html.EditorFor(m => m.PassFail) <span class="text fontsize12">Pass/Fail</span>
+                    </td>
+
+                    <td colspan="5">Parts : @(Html.Kendo().TextBoxFor(mbox => mbox.Parts)
+                                            .Name("Parts")
+                                            .HtmlAttributes(new { style = "width: 745px" })
+                                            )
+                    </td>
+
+
+                </tr>
+                <tr>
+                    <td>Remarks
+                    </td>
+                    <td colspan="5">
+                        @(Html.TextAreaFor(m => m.Remarks, new { style = "width: 775px;height:50px" })
+                          )
+                    </td>
+                </tr>
+                <tr>
+                    <td>Calibration Date :
+                    </td>
+                    <td>@(Html.Kendo().DatePickerFor(m => m.CalibrationDate)
+                            .Name("CalibrationDate")
+            .HtmlAttributes(new { style = "width:120px", type = "text" })
+                          )
+                    </td>
+
+                    <td colspan="2">@(Html.Kendo().TextBoxFor(mbox => mbox.TSLabel)
+                                            .Name("TSLabel")
+                                            .HtmlAttributes(new { style = "width: 235px" })
+                                            )
+                    </td>
+
+                    <td colspan="2">@(Html.Kendo().TextBoxFor(mbox => mbox.TSSN)
+                                                .Name("TSSN")
+                                            .HtmlAttributes(new { style = "width: 235px" })
+                                            )
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6" align="center">
+                        <input type="submit" id="btnScriptSubmit" class="inputbuttonbg inputbig" name="command" value="Ok">
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <td colspan="6">&nbsp;
+                    </td>
+
+                </tr>
+            </table>
+        </div>
+
+    </div>
+}
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#btnScriptSubmit").click(function (event) {
+            event.preventDefault();
+            $.post('@Url.Action("TestScript", "ServiceWorkOrder")', $("#TSForm").serialize(), function (data) {
+                parent.$("#window").data("kendoWindow").close();
+            });
+        });
+    });
+</script>
+
+
+
+

@@ -1,0 +1,48 @@
+﻿<h1>Enter Programmed Date</h1>
+@using (Html.BeginForm(new { id = "rpForm" }))
+{
+    <div class="contact-info">
+        <div class="content">
+            <table>
+                <tr>
+                    <td>Please enter the programmed date of Service Job:
+                    </td>
+                    <td>
+                        @(Html.Kendo().DatePicker()
+                    .Name("ToDate")
+                    .Value(DateTime.Now)
+                    .Format("dd/MM/yyyy")
+                    .HtmlAttributes(new { required = "required", data_required_msg = "Date is required." })
+                     .ParseFormats(new string[] { "dd/MM/yyyy" , "dd/MM/yy" })
+                    )
+                    </td>
+                </tr>
+                <tr>
+                    <td> </td>
+                    <td>
+                        <a onclick="pick();" class="button"><span>OK</span></a> </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+}
+
+<script>
+
+    $("#rpForm").kendoValidator({
+    });
+    function pick() {
+        var Pdate = $("#ToDate").data("kendoDatePicker");
+        if (Pdate == "") {
+            alert("Please Enter the Date");
+            return false;
+        }
+
+        parent.$("#hdProgrammeDate").val(Pdate.value());
+//        alert(Pdate.value());
+        parent.$("#POwindow").data("kendoWindow").close();
+  //      alert(Pdate.value());
+        //parent.$("#ESMwindow").data("kendoWindow").close();
+
+    }
+</script>

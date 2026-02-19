@@ -1,0 +1,178 @@
+﻿@model MDS.Models.ServiceWorks
+@{
+    ViewBag.Title = "";
+}
+
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+
+@using (Html.BeginForm("ServiceAllWorkTimes", "Tech", FormMethod.Post, new { id = "ServiceAllWorkTimes" }))
+{
+
+<table cellspacing="0" cellpadding="0" width="100%" border="1" frame=void rules=rows>
+
+    @foreach (var eng in Model.Engineers)
+    {
+
+    <tr>
+        <td>@eng</td>
+        @if ((Model.ServiceWorkTimes == null))
+        {
+            <td>No records</td>
+        }
+        else if ((Model.ServiceWorkTimes.Count() == 0))
+        {
+            <td>No records</td>
+        }
+        else
+        {
+            foreach (MDS.Models.ServiceWorkTime xxx in Model.ServiceWorkTimes.Where(i => i.Engineer == eng).ToList())
+            {
+
+                //}
+                //for (int fi = 0; fi < Model.Count(); fi++)
+                //{
+                //    MDS.Models.ServiceWorkTime xxx = Model[fi];
+                <td>
+                    <table cellspacing="0" cellpadding="0" style="background-color:@((xxx.EndTime == null) ? "lightgreen" : "lightgray")">
+
+                        <tr>
+                            <td>
+                                @xxx.StartTime.Value.ToString("HH:mm tt")
+                            </td>
+                            @if (xxx.EndTime == null)
+                            {
+                                <td colspan="2">Still Active</td>
+                            }
+                            else
+                            {
+                                <td>to</td>
+                                <td>
+                                    @Convert.ToDateTime(xxx.EndTime).ToString("HH:mm tt")
+                                </td>
+                            }
+                            @if (xxx.ManualTime)
+                            {
+                                <td>
+                                    (Man'l)
+                                </td>
+                            }
+                            else
+                            {
+                                <td></td>
+                            }
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                @xxx.ChargeType
+                            </td>
+                            <td colspan="2">
+                               @MDS.Controllers.LoginController.GetTime(@xxx.StartTime.Value,(xxx.EndTime == null)?DateTime.Now: xxx.EndTime.Value)
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            }
+
+        }
+    </tr>
+    }
+</table>
+}
+@*<script type="text/javascript">
+
+                function CreatePartsService(ServiceID) {
+               try {
+            var BranchID = '@Model.BranchID';
+            divservice.dialog({
+                closeOnEscape: false,
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("CreatePartsService", "Tech")?ServiceID=' + ServiceID + '&BranchID=' + BranchID;
+                    $(this).load(url);
+
+                },
+                modal: true,
+                resizable: false,
+
+                width: 800,
+                height: 500,
+                title: "Create Parts",
+                buttons: {
+                    Close: function () {
+                        divservice.remove(); divservice.dialog("close");
+                    }
+                },
+            });
+        }
+        catch (ex) {
+            alert('catchall-createpartsservice:' + ex.message);
+        }
+        return false;
+        }
+
+
+        var divservice = $("#dialogService");
+
+        function closeDivService()
+        {
+            try {
+                divservice.remove();
+            }
+            catch (ex) {
+
+            }
+                        try {
+                 divservice.dialog("close");
+            }
+            catch (ex) {
+
+            }
+
+        }
+
+
+
+            function deletePartService(ServiceID,ServicePartID, BranchID) {
+        if (confirm("Do you want to remove this part?")) {
+            var data = {ServiceID:ServiceID, ServicePartID: ServicePartID, BranchID: BranchID }
+            $.post('@Url.Action("DeletePartService", "Tech")', data,
+                function (data) {
+                    if (data.Error == '') {
+                        RefreshParts(data.ServiceID);
+                    }
+                    else
+                        alert("Could not delete");
+                }
+                , 'json');
+        }
+    }
+
+                function editPart(ServicePartID, BranchID) {
+
+            divservice.dialog({
+                closeOnEscape: false,
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("EditPartsService", "Tech")?ServicePartID=' + ServicePartID + '&BranchID=' + BranchID;
+                    $(this).load(url);
+
+                },
+                modal: true,
+                resizable: false,
+
+                width: 800,
+                height: 500,
+                title: "Edit Parts",
+                buttons: {
+                    Close: function () {
+                          divservice.remove(); divservice.dialog("close");
+                    }
+                },
+            });
+    }
+
+
+
+</script>*@
+

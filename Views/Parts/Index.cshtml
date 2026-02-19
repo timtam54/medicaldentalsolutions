@@ -1,0 +1,145 @@
+﻿@model MDS.Models.PartsSearch
+@{
+    ViewBag.Title = "Parts";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+
+    #rpGrid tbody tr:hover {
+        cursor: pointer !important;
+    }
+</style>
+<h1>Parts Search</h1>
+
+
+@using (Html.BeginForm("Index", "Parts", FormMethod.Post, new { id = "brForm" }))
+{
+
+        <div class="contact-info">
+        <div class="content">
+            <table width="100%">
+                
+                <tr>
+                    <td>Search (Item, Desc, Type):
+                    </td>
+                    <td>
+                        @(Html.Kendo().TextBoxFor(m => m.Item)
+                                .Name("Item")
+                                .HtmlAttributes(new { style = "width: 150px " })
+                            )
+                    </td>
+                                       <td>
+                        <input type="button" class="inputbuttonbg inputbig" value="Add New Part" onclick="window.location.href = '@Url.Action("Add", "Parts")    '">
+                    <input type="button" class="inputbuttonbg inputbig" value="Delete Part" id="btnDelete">
+      
+                        <a class="button" onclick="$('#brForm').submit();"><span>Search</span></a>
+                    </td>
+ 
+</tr>
+                <tr>
+                    <td colspan="6">
+                        @(Html.Kendo().Grid(Model.Parts)
+.Name("brGrid")
+.Columns(columns =>
+{
+    columns.Bound(p => p.Item).Title("Item").ClientTemplate(@Html.ActionLink("#=Item#", "Edit", new { id = "#=ID#" }).ToHtmlString());
+    columns.Bound(p => p.ID).Title("ID").Visible(false);
+    columns.Bound(p => p.Type).Title("Type");
+    columns.Bound(p => p.Descrip).Title("Description");
+    columns.Bound(p => p.Price).Title("Price");
+    columns.Bound(p => p.Account).Title("Account");
+    
+    columns.Bound(p => p.Active).Title("Active");
+    
+})
+.Pageable()
+.Sortable()
+.Filterable()
+.Selectable(s => s.Mode(GridSelectionMode.Single))
+.DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(200)
+        .ServerOperation(false)
+     )
+)
+                    </td>
+                </tr>
+
+</table>
+            </div>
+            </div>
+}
+
+<script type="text/javascript">
+
+    function add() {
+            var url = '@Url.Action("Add", "Parts")';
+            window.location.href = url;
+    }
+
+    $(document).ready(function () {
+
+        $("#btnDelete").click(function () {
+            var entityGrid = $("#brGrid").data("kendoGrid");
+        var selectedItem = entityGrid.dataItem(entityGrid.select());
+        if (selectedItem == undefined) {
+            ShowAlert("Please select the part first");
+        }
+         else {
+            swal({
+               title: "",
+                text: "Are you SURE you want to delete this part now?",
+                type: "warning",
+               showCancelButton: true,
+              confirmButtonColor: "green",
+              confirmButtonText: "Yes",
+              cancelButtonText: "No",
+             closeOnConfirm: true,
+            closeOnCancel: true
+            },
+function (isConfirm) {
+    if (isConfirm) {
+        var PartID = selectedItem.ID;
+        $.ajax({
+            url: '@Url.Action("DeletePart", "Parts")',
+            type: 'POST',
+            datatype: "json",
+           data: { PartID: PartID },
+         success: function (response) {
+              alert(response.msg);
+             if (response.msg.indexOf("Successfully") >= 0) {
+                   $("#rpForm").submit();
+                }
+      },
+           error: function (req, status, error) {
+          }
+      });
+    }
+    else {
+    }
+});
+
+       }
+    });
+
+    });
+
+
+
+</script>
+<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>

@@ -1,0 +1,50 @@
+﻿@model  IEnumerable<MDS.Models.EquipmentCustNextServiceList>
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+
+    #rpGrid tbody tr:hover {
+        cursor: pointer !important;
+    }
+</style>
+@Html.ActionLink("Back", "Index")
+
+<h1>Equipment with unscheduled services that were due BEFORE this month</h1>
+<table width="100%">
+    <tr>
+        <td colspan="6">
+            @(Html.Kendo().Grid(Model)
+.Name("rpCustomer")
+.Columns(columns =>
+{
+    columns.Bound(p => p.EquipDesc).Title("Serial No").ClientTemplate(@Html.ActionLink("#=EquipDesc#", "../Equipment/Edit", new { id = "#=EquipID#" }).ToHtmlString());
+    columns.Bound(p => p.NextServiceMonth).Title("Next Service Month");
+    columns.Bound(p => p.NextServiceYear).Title("Year");
+    columns.Bound(p => p.Customer).Title("Customer").ClientTemplate(@Html.ActionLink("#=Customer#", "../Customer/Edit", new { id = "#=CustomerCode#" }).ToHtmlString());
+    columns.Bound(p => p.MDSItemNo).Title(@MDS.Controllers.LoginController.CompanyName + " Item No");
+    columns.Bound(p => p.WarrantyExpirationDate).Title("WarrantyExpirationDate").ClientTemplate("#= (WarrantyExpirationDate == null) ? ' ' : kendo.toString(WarrantyExpirationDate, 'dd/MM/yyyy') #");
+    columns.Bound(p => p.Model).Title("Model");//.ClientTemplate(@Html.ActionLink("#=Model#", "../EquipModel/Edit", new { id = "#=ModelUID#" }).ToHtmlString());
+    columns.Bound(p => p.EquipementType).Title("Type");
+
+})
+.Pageable()
+.Sortable()
+.Filterable()
+.DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(200)
+        .ServerOperation(false)
+     )
+            )
+        </td>
+    </tr>
+</table>
+
+}

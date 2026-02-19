@@ -1,0 +1,147 @@
+﻿@model MDS.Models.Diary
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm("SchedulerDayTech", "Dashboard", FormMethod.Post, new { id = "SchedulerDayTech" }))
+{
+    <div class="contact-info">
+        <div class="content">
+            <table width="100%">
+                <tr>
+                    <td>
+                        <img src="~/Images/Back.png" href="" style="cursor: pointer;" onmouseover="" onclick="Refresh('@Model.FromDate.Date.AddDays(-7).Year','@Model.FromDate.Date.AddDays(-7).Month','@Model.FromDate.Date.AddDays(-7).Day')" />
+                    </td>
+                    <td>
+                        <h1>Diary / Schedule for @MDS.Controllers.LoginController.BranchName(User.Identity.Name)</h1>
+                    </td>
+                    <td>
+                        <img src="~/Images/Fore.png" href="" style="cursor: pointer;" onmouseover="" onclick="Refresh('@Model.FromDate.Date.AddDays(7).Year','@Model.FromDate.Date.AddDays(7).Month','@Model.FromDate.Date.AddDays(7).Day')" />
+
+                        @*@Html.ActionLink(">>", "Scheduler", new { dt = Model.FromDate.Date.AddDays(7) })*@
+                    </td>
+                </tr>
+            </table>
+            <table width="100%" style="border-collapse:collapse;" border="1" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td style="color:white;background-color:black"></td>
+                    @foreach (var eng in Model.Engineers)
+                    {
+                        <td align="center" style="color:white;background-color:black" colspan="7">@eng.EngineerName</td>
+                    }
+                </tr>
+                <tr>
+                    <td style="color:white;background-color:black"></td>
+                    @foreach (var eng in Model.Engineers)
+                    {
+                        foreach (MDS.Models.DayEng item in Model.Days)
+                        {
+                            <td style="background-color:lightgray" align="center">@item.Day.DayOfWeek.ToString().Substring(0, 3)</td>
+                        }
+                    }
+                </tr>
+                <tr>
+                    <td style="color:white;background-color:black"></td>
+                    @foreach (var eng in Model.Engineers)
+                    {
+                        foreach (MDS.Models.DayEng item in Model.Days)
+                        {
+                            <td style="background-color:lightgray" align="center">@item.Day.ToString("dd-MMM")</td>
+                        }
+                    }
+                </tr>
+                @*@{
+                        int RowsRun = 0;
+                    }*@
+                @foreach (int Hour in Model.Hours)
+                {
+                    foreach (int Minute in Model.Minutes)
+                    {
+                        <tr>
+                            <td style="color:white;background-color:black" width="30px"><b>@Hour.ToString():@Minute.ToString("00")</b></td>
+                            @foreach (var eng in Model.Engineers)
+                            {
+                                foreach (MDS.Models.DayEng item in Model.Days)
+                                {
+                                    {
+                                        var reps = Model.Bookings.Where(rp => ((rp.ScheduledStart.Value.Hour * 100 + rp.ScheduledStart.Value.Minute) <= (Hour * 100 + Minute)) && ((rp.ScheduledEnd.Value.Hour * 100 + rp.ScheduledEnd.Value.Minute) > (Hour * 100 + Minute)) && rp.ScheduledStart.Value.Date == item.Day.Date.Date && rp.EngineerID == eng.EngineerID).ToList();
+
+                                        if (reps.Count() > 1)
+                                        {
+                                            DateTime MaxEnd = reps.Max(i => i.ScheduledEnd).Value;
+                                            foreach (var rp in reps)
+                                            {
+                                                rp.ScheduledEnd = MaxEnd;
+                                            }
+                                            if ((Convert.ToDateTime(reps.Max(i => i.ScheduledStart)).Hour == Hour) && (Convert.ToDateTime(reps.Max(i => i.ScheduledStart)).Minute == Minute))
+
+                                            //                                            if ((Convert.ToDateTime(reps[0].ScheduledStart).Hour == Hour) && (Convert.ToDateTime(reps[0].ScheduledStart).Minute == Minute))
+                                            {
+                                                int rows = MDS.Controllers.DashboardController.GetSpan(Hour, Minute, 99, reps.Select(i => i.ID).ToList(), Model.Bookings, Model.Hours, item.Day.Date, eng.EngineerID);// ;
+
+
+                                                <td align="center" width="40px" rowspan="@rows">
+
+                                                    <table frame="void" rules="all" width="100%" style="border-collapse:collapse;" border="1" cellpadding="0" cellspacing="0">
+                                                        @foreach (var rep in reps)
+                                                        {
+                                                            MDS.Controllers.DashboardController.Colours col = MDS.Controllers.DashboardController.ForeBack(rep, Model.Engineers);
+
+                                                            <tr>
+                                                                <td align="center" width="40px" style="background-color:@col.Back;color:@col.Fore;">
+                                                                    @rep.RepairOrService @((rep.Complete) ? ((rep.Invoiced) ? "Invoiced" : "Complete") : "Uncomplete")<br />@Html.ActionLink(@MDS.Helper.Utility.GetBranchCode() + ((rep.RepairOrService == "Repair") ? "R" : "S") + @rep.Code.ToString(), "Edit", rep.RepairOrService, new { id = rep.ID, BranchID = rep.BranchID }, null)<br />@rep.Desc <br />@MDS.Controllers.DashboardController.BookingCustomer(rep)<br />@MDS.Controllers.DashboardController.BookingTimes(rep)
+                                                                </td>
+
+                                                            </tr>
+
+                                                        }
+                                                    </table>
+                                                </td>
+                                            }
+                                        }
+                                        else if (reps.Count() == 1)
+                                        {
+                                            var rep = reps.FirstOrDefault();
+                                            if ((Convert.ToDateTime(rep.ScheduledStart).Hour == Hour) && (Convert.ToDateTime(rep.ScheduledStart).Minute == Minute))
+                                            {
+                                                double TotalMins = Convert.ToDateTime(rep.ScheduledEnd).Subtract(Convert.ToDateTime(rep.ScheduledStart)).TotalMinutes;
+                                                double HalfHours = TotalMins / (double)30;
+                                                int rows = MDS.Controllers.DashboardController.GetSpan(Hour, Minute, Convert.ToInt32(HalfHours), (new int[] { rep.ID }).ToList(), Model.Bookings, Model.Hours, item.Day.Date, eng.EngineerID);// ;
+
+                                                MDS.Controllers.DashboardController.Colours col = MDS.Controllers.DashboardController.ForeBack(rep,Model.Engineers);
+                        <td align="center" width="40px" rowspan="@rows" style="background-color:@col.Back;color:@col.Fore">@rep.RepairOrService @((rep.Complete) ? ((rep.Invoiced) ? "Invoiced" : "Complete") : "Uncomplete")<br />@Html.ActionLink(@MDS.Helper.Utility.GetBranchCode() + ((rep.RepairOrService == "Repair") ? "R" : "S") + @rep.Code.ToString(), "Edit", rep.RepairOrService, new { id = rep.ID, BranchID = rep.BranchID }, null)<br />@rep.Desc <br />@MDS.Controllers.DashboardController.BookingCustomer(rep)<br />@MDS.Controllers.DashboardController.BookingTimes(rep)</td>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <td width="40px"></td>
+                                        }
+                                    }
+                                }
+                            }
+                        </tr>
+                    }
+                }
+            </table>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+    function Refresh(y,m,d) {
+        window.location.href = '@Url.Action("SchedulerDayTech", "Dashboard")' + "?y=" + y + "&m=" + m + "&d=" + d;
+    }
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>

@@ -1,0 +1,102 @@
+﻿@model  IEnumerable<MDS.Models.EquipmentCustNextServiceList>
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@Html.ActionLink("Back", "Index")
+
+<h1>Equipment with unscheduled services that were due this month</h1>
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+
+    #eqGrid tbody tr:hover {
+        cursor: pointer !important;
+    }
+</style>
+@using (Html.BeginForm("CustomersUnscheduledServicesDueThisMonth", "Dashhboard", FormMethod.Post, new { id = "CustomersUnscheduledServicesDueThisMonth" }))
+{
+    <div class="contact-info">
+        <div class="content">
+            <table width="100%">
+                <tr>
+                    <td colspan="6">
+                        @(Html.Kendo().Grid(Model)
+.Name("rpCustomer")
+.Columns(columns =>
+{
+    columns.Bound(p => p.EquipDesc).Title("Serial No").ClientTemplate(@Html.ActionLink("#=EquipDesc#", "../Equipment/Edit", new { id = "#=EquipID#" }).ToHtmlString());
+    columns.Bound(p => p.NextServiceMonth).Title("Next Service Month");
+    columns.Bound(p => p.NextServiceYear).Title("Year");
+    columns.Bound(p => p.Customer).Title("Customer").ClientTemplate(@Html.ActionLink("#=Customer#", "../Customer/Edit", new { id = "#=CustomerCode#" }).ToHtmlString());
+    columns.Bound(p => p.MDSItemNo).Title(@MDS.Controllers.LoginController.CompanyName + "Item No");
+    columns.Bound(p => p.WarrantyExpirationDate).Title("WarrantyExpirationDate").ClientTemplate("#= (WarrantyExpirationDate == null) ? ' ' : kendo.toString(WarrantyExpirationDate, 'dd/MM/yyyy') #");
+    columns.Bound(p => p.Model).Title("Model");//.ClientTemplate(@Html.ActionLink("#=Model#", "../EquipModel/Edit", new { id = "#=ModelUID#" }).ToHtmlString());
+    columns.Bound(p => p.EquipementType).Title("Type");
+
+
+})
+.Pageable()
+.Sortable()
+.Filterable()
+.DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(200)
+        .ServerOperation(false)
+     )
+                        )
+                    </td>
+                </tr>
+            </table>
+
+            @*<table>
+                <tr>
+                    <th>
+                        Equipment
+                    </th>
+                    <th>
+                        Next Service (Month / Year)
+                    </th>
+                    <th>
+                        Customer
+                    </th>
+                    <th>
+                        MDS Item No
+                    </th>
+                    <th>
+                        Warrant Expiry Date
+                    </th>
+                    <th>
+                        Model
+                    </th>
+                </tr>
+                @foreach (MDS.Models.EquipmentCustNextServiceList item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.EquipDesc)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.NextServiceMonth)
+                            /
+                            @Html.DisplayFor(modelItem => item.NextServiceYear)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Customer)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.MDSItemNo)
+                                                </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.WarrantyExpirationDate)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Model)
+                        </td>
+                    </tr>
+        }
+            </table>*@
+</div>
+</div>
+}

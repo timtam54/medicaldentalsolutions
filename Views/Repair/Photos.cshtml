@@ -1,0 +1,108 @@
+﻿@model MDS.Models.RepairPhotos
+@{
+    ViewBag.Title = "";
+}
+@using (Html.BeginForm("Photos", "Repairs", FormMethod.Post, new { id = "MooringLocation" }))
+{
+    @Html.AntiForgeryToken()
+
+    <table cellspacing="1" align="left" border="0">
+        <tbody>
+
+            <tr>
+                @if (ViewBag.Readonly != true)
+                {
+                    <td width="100px">
+                        <table style="align-items:center">
+                            <tr>
+                                <td  align="center">
+                                    <a href="" onclick="uploadfileforQuestion('@Model.Id','Attach',null);return false;">
+                                        <img height="40" width="40" title="Add Attachments" src="~/Images/Attachment.png">
+                                    </a>
+                                    </td>
+                                <td  align="center">
+                                    <a href="" onclick="uploadfileforQuestion('@Model.Id','Photo',null);return false;">
+                                        <img height="40" width="40" title="Take Camera Photos" src="~/Images/Camera.png">
+                                    </a>
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" align="center">
+                                    Add New
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                }
+
+                    @if ((@Model.Photos != null))
+                    {
+                        for (int fi = 0; fi < Model.Photos.Count(); fi++)
+                        {
+                            var xxx = Model.Photos[fi];
+                            <td>
+                                |
+                            </td>
+                            <td width="100px">
+                                <table>
+                                    <tr>
+                                        @if (Model.Photos[fi].Attach_Audio == true)
+                                        {
+                                            <td>
+                                                <table>
+                                                    <tr>
+
+                                                        <td id="@string.Format("Answer{0}{1}", @Model.Id.ToString(), @fi)" style="text-align:center">
+                                                            <a style="font-size:14px" href="@Url.Action("Download", "Repair", new { Fle = @xxx.URL, contentType = xxx.Type })"
+                                                               target="_blank"><img src="~/Images/audio.png" title="@xxx.Title" /></a>
+                                                        </td>
+                                                        @if (ViewBag.Readonly != true)
+                                                        {
+
+                                                            <td align="right" width="100%" style="text-align:right">
+                                                                <img src="~/Images/delete-icon.jpg" style="cursor: pointer;" onmouseover="" onclick="deletefile('@xxx.PhotosID','@xxx.URL');" />
+                                                            </td>
+                                                        }
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2" align="center">
+                                                            <a style="font-size:14px" href="@Url.Action("Download", "Repair", new { Fle = @xxx.URL, contentType = xxx.Type })"
+                                                               target="_blank">@xxx.Title</a>
+
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+
+
+                                        }
+                                        else
+                                        {
+                                            <td id="@string.Format("Answer{0}{1}", @Model.Id.ToString(), @fi)">
+                                                <table width="100%">
+                                                    <tr style="width:100%">
+                                                        <td valign="top" align="left">
+                                                            <a style="font-size:14px" href="@Url.Action("Download", "Repair", new { Fle = @xxx.URL, contentType = xxx.Type })"
+                                                               target="_blank">@xxx.Title</a>
+                                                        </td>
+                                                        @if (ViewBag.Readonly != true)
+                                                        {
+                                                    <td valign="bottom" align="right" width="100%">
+                                                        <br />
+                                                        <img src="~/Images/delete-icon.jpg" style="cursor: pointer;" onmouseover="" onclick="deletefile('@xxx.PhotosID','@xxx.URL');" />
+                                                    </td>
+                                                    }
+                                            </tr>
+                                        </table>
+                                    </td>
+                                                }
+                                            </tr>
+                                        </table>
+                            </td>
+                        }
+                    }
+                </tr>
+    </tbody>
+    </table>
+}

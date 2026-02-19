@@ -1,0 +1,167 @@
+﻿@model MDS.Models.QuaranParts
+@{
+    ViewBag.Title = "Parts";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+<h1>Parts to be Quarantined</h1>
+
+@using (Html.BeginForm("QuaranParts", "Parts", FormMethod.Post, new { id = "QuaranParts" }))
+{
+    @Html.HiddenFor(i => i.ServiceJobID)
+    @Html.HiddenFor(i => i.ServiceID)
+
+    <table border="1" align="center">
+        <tr>
+            <th style="background-color:black;color:white"><b>Part No</b></th>
+            <th style="background-color:black;color:white"><b>Description</b></th>
+            <th style="background-color:black;color:white"><b>Cost</b></th>
+            <th></th>
+        </tr>
+        @foreach (var item in Model.Parts)
+        {
+    <tr>
+        @*<td>
+            @item.ServicePartID
+        </td>
+        <td>
+            @item.PartID
+        </td>*@
+        <td>
+            @item.PartNumber
+        </td>
+        <td>
+            @item.Desc
+        </td>
+        <td>
+            @item.Cost
+        </td>
+
+        <td>
+            <input type="button" value="Quarantine" style="margin-top: 5px;" class="inputbuttonbg inputbig" onclick="quar(@item.ServiceID,@Model.BranchID,'@item.PartNumber','@item.Desc',@item.ServicePartID,@item.PartID,@item.Cost);   return false;">
+        </td>
+    </tr>
+        }
+    </table>
+    <table>
+        @if (Model.ServiceID != null)
+        {
+            <tr>
+                <td>
+                    @Html.ActionLink("Back to Work Order", "Edit", "ServiceWorkOrder", new { id = Model.ServiceID }, null)
+                </td>
+            </tr>
+        }
+        @if (Model.ServiceJobID != null)
+        {
+            <tr>
+                <td>
+                    @Html.ActionLink("Back to Service Job", "Edit", "Service", new { id = Model.ServiceJobID }, null)
+                </td>
+            </tr>
+        }
+    </table>
+    <table id="EditPart">
+        <tr>
+            @Html.HiddenFor(i => i.PartID)
+            @Html.HiddenFor(i => i.ServicePartID)
+
+            <td><b>Description</b></td>
+            <td>@Html.EditorFor(i => i.Desc, new { htmlAttributes = new { style = "width:400px", onkeyup = "autosearch();return false;" } })</td>
+            <td style="color:red;font-size:9px">(correct the description and hit create part in parts list)</td>
+        </tr>
+        <tr id="results">
+            <td colspan="2">
+                <b>Results</b><br />
+                <div id="searchresults">
+
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td><b>Part Number</b></td>
+            <td>@Html.EditorFor(i => i.PartNumber)</td>
+        </tr>
+        <tr>
+            <td><b>Type</b></td>
+            <td>@Html.DropDownListFor(i => i.Type, new SelectList(ViewBag.TypeX, "Type", "Type"), "-Select One-", new { style = "width:350px", data_required_msg = "Type is required." })</td>
+        </tr>
+        <tr>
+            <td><b>Cost</b></td>
+            <td>@Html.EditorFor(i => i.Cost)</td>
+        </tr>
+
+        <tr>
+            <td colspan="2">
+                <input id="btn" value="Create This as new part in Parts List" type="submit" class="inputbuttonbg inputbig" />
+            </td>
+        </tr>
+    </table>
+}
+
+<script type="text/javascript">
+
+    $('#EditPart').hide();
+    $('#results').hide();
+    function autosearch() {
+        $('#results').show();
+        try {
+            $('#PartID').val(0);
+
+            $("#btn").prop("value", "Create This as new part in Parts List");
+            var BranchID =@Model.BranchID;
+            var searchString = $('#Desc').val();// $(this).val(); //Get the value from this TextBox
+            var data = { searchString: searchString, BranchID: BranchID }
+            $.post('@Url.Action("PartSearch", "Tech")', data
+                ,function (data) {
+                    if (data.results == null)
+                        alert('no results');
+                    else {
+                        var divstring = '';
+                        for (var i = 0; i < data.results.length; i++) {
+                            divstring = divstring + "<a id='" + data.results[i].ID + "' href='' onclick='selectx(" + data.results[i].ID + ");return false;'>" + data.results[i].ItemNo + "~" + data.results[i].Descrip + "~" + data.results[i].Price + "~" + data.results[i].Type + "</a><br/>";
+                        }
+                        $("#searchresults").html(divstring);
+                    }
+                }
+            );
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+    function selectx(num) {
+        try {
+            $("#btn").prop("value", "set to part");
+
+            var desc = document.getElementById(num).innerText;
+            $('#PartID').val(num);
+            var parts = desc.split("~")
+            $('#PartNumber').val(parts[0]);
+            $('#Desc').val(parts[1]);
+            $('#Cost').val(parts[2]);
+            $('#Type').val(parts[3]);
+            $('#results').hide();
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+        return false;
+    }
+
+    function quar(ServiceID, BranchID, PartNumber,Desc,ServicePartID,PartID,Cost) {
+        $('#EditPart').show();
+        $('#ID').val(ServiceID);
+        $('#PartNumber').val(PartNumber);
+        $('#Desc').val(Desc);
+        $('#ServicePartID').val(ServicePartID);
+        $('#PartID').val(PartID);
+        $('#Cost').val(Cost);
+        return false;
+    }
+</script>

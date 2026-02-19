@@ -1,0 +1,185 @@
+﻿@model MDS.Models.CopyJob
+@{
+    ViewBag.Title = "Copy Recurring Jobs";
+    Layout = null;// "~/Views/Shared/_Layout.cshtml";
+}
+@*<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+<script src="~/Scripts/jquery.validate.js"></script>*@
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+
+    #rpGrid tbody tr:hover {
+        cursor: pointer !important;
+    }
+</style>
+<h1>Copy Recurring Jobs</h1>
+@using (Html.BeginForm("CopyJob", "Service", FormMethod.Post, new { id = "CopyJob" }))
+{
+    <table border="1" cellpadding="0" cellspacing="0" width="100%">
+        <tr style="background-color:black;color:white">
+            <th>
+                <b>
+                    Programmed Date
+                </b>
+            </th>
+            <td>
+                @Html.EditorFor(i => i.ProgrammedDate, new { htmlAttributes = new { onchange = "showDates(0);return false;" } })
+            </td>
+            <th>
+                <b>
+                    Programmed End
+                </b>
+            </th>
+            <td>
+                @Html.EditorFor(i => i.ProgrammedEnd, new { htmlAttributes = new { onchange = "showDates(0);return false;" } })
+            </td>
+            <th>
+                <b>
+                    Frequency
+                </b>
+            </th>
+            <td>
+                @Html.DropDownListFor(i => i.CopyInterval, new SelectList(ViewBag.CopyIntervalX, "PeriodID", "PeriodDesc"),  new { onchange = "showDates(0);return false;"  })
+            </td>
+            <th>
+                <b>
+                    No Of times
+                </b>
+            </th>
+            <td>
+                @Html.EditorFor(m => m.NoOfCopies, new { htmlAttributes = new { onchange = "showDates(0);return false;" } })
+            </td>
+        </tr>
+   
+    </table>
+    <script type="text/javascript">
+        function showDates(create) {
+            if (create == 1) {
+                $('#btnCreate').hide();
+            }
+        var CopyInterval = $('#CopyInterval').val();
+        var NoOfCopies = $('#NoOfCopies').val();
+        var ProgrammedDate = $('#ProgrammedDate').val();
+        var ID = $('#ID').val();
+        var BranchID = $('#BranchID').val();
+//        alert(CopyInterval);
+        try {
+
+            $.ajax({
+                url: '@Url.Content("~/Service/CopyJobDates")',
+                type: 'POST',
+                data: { CopyInterval: CopyInterval, NoOfCopies: NoOfCopies, ProgrammedDate: ProgrammedDate, ID: ID, BranchID: BranchID, create: create},
+                success: ((create == 0) ? doSubmitSuccess : doSubmitSuccessCreate)
+            });
+        }
+        catch (ex) {
+            alert('Error in init():' + ex.message);
+        }
+        }
+
+        function doSubmitSuccess(result) {
+            try {
+                $('#DatesX').html(result);
+            }
+            catch (ex) {
+                alert('Error in doSubmitSuccess():' + ex.message);
+            }
+        }
+
+        function doSubmitSuccessCreate(result) {
+            //
+            try {
+                $('#DatesX').html(result);
+                alert('created');
+            }
+            catch (ex) {
+                alert('Error in doSubmitSuccess():' + ex.message);
+            }
+        }
+
+        showDates(0);
+
+    </script>
+    <div id="DatesX"></div>
+    <table width="100%">
+        <!--<tr>
+            <td colspan="2">Add New</td>
+        </tr>
+        <tr>
+            <td width="30%"><b>Notes</b></td>
+            <td width="70%">-->
+                @*@Html.TextAreaFor(i => i.Note, 3, 5, new { @style = "width:100%;font-size:16px;text-align:left" })*@
+            <!--</td>
+        </tr>-->
+        @*@if (Model.SourceAdmin_Tech)
+        {
+            <tr>
+                <td><b>Admin Only</b></td>
+                <td>
+                    @Html.CheckBoxFor(i => i.Admin_Tech)
+                </td>
+            </tr>
+        }*@
+        
+        <tr>
+            <td>
+                <button class="inputbuttonbg inputbig"  onclick="closeDiv(); return false;">Close</button>
+            </td>
+            <td id="btnCreate">
+                <button class="inputbuttonbg inputbig"  value="Save" onclick="showDates(1); return false;">Create Recurring</button>
+            </td>
+        </tr>
+        
+        @Html.HiddenFor(i => i.BranchID)
+        @Html.HiddenFor(i => i.ID)
+    </table>
+
+}
+
+<script type="text/javascript">
+
+
+    @*function Save() {
+            try {
+                var myData = $('#xNotes')
+                try {
+                    var xxx = myData.valid();
+                    if (!xxx) {
+                        alert('form is not valid');
+                        return;
+                    }
+                }
+                catch (ex) {
+                    ;
+                }
+                $.post('@Url.Action("Notes", "Repair")', myData.serialize(),
+                    function (data) {
+                        if (data.Error == '') {
+                            try {
+                                setNotes(data.Data);
+                                closeDiv();
+                                $("#dialog").remove();
+                                openNotes();
+                            }
+                            catch (ex) {
+                                alert(ex.message);
+                            }
+                        }
+                        else
+                            alert(data.Error);
+                    }
+                    , 'json');
+            }
+            catch (ex) {
+                alert(ex.message);
+            }
+
+        }*@
+
+
+</script>

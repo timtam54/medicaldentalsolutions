@@ -1,0 +1,1974 @@
+﻿@model MDS.Models.AddEquipment
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
+
+<style type="text/css">
+    td {
+        padding: 2px;
+    }
+
+    body {
+        -moz-transform: scale(0.92, 0.92); /* Moz-browsers */
+        zoom: 0.92; /* Other non-webkit browsers */
+        zoom: 92%; /* Webkit browsers */
+    }
+</style>
+
+@if (ViewBag.Popup1 != null && ViewBag.Popup1 == 1)
+{
+    <script type="text/javascript">
+        ShowWarning("Please modify the serialno");
+    </script>
+}
+@if (ViewBag.AddPopup != null && ViewBag.AddPopup == 1)
+{
+    <script type="text/javascript">
+        $("#container-header").hide();
+        $("#hdPopUp").val("1");
+    </script>
+}
+@if (MDS.Controllers.LoginController.IsAdmin(User.Identity.Name) == MDS.Controllers.ATC.Customer)
+{
+    <h1 style="color:red">Equipment Detail</h1>
+}
+else
+{
+    if (Model.EquipIDEdit == 0)
+    {
+        <h1 style="color:red">Equipment Detail - Add New</h1>
+    }
+    else
+    {
+        <h1 style="color:navy">Equipment Detail - Edit Existing</h1>
+
+    }
+}
+@if (Model.EquipIDEdit != 0)
+{
+<embed type="text/html" style="background-color:white" src="https://red-beach-0ffb91a00.5.azurestaticapps.net/equipment?id=@Model.EquipID&branchid=@MDS.Controllers.LoginController.BranchID(User.Identity.Name)" width="100%" height="800px"/>
+}
+else
+{
+using (Html.BeginForm("Add", "Equipment", FormMethod.Post, new { id = "AddForm" }))
+{
+
+    @Html.HiddenFor(m => m.EquipIDEdit)
+    @Html.HiddenFor(m => m.PopUp)
+    @Html.HiddenFor(m => m.ServiceJobID)
+    <input id="hdPopUp" type="hidden" />
+    <div id="box2">
+        <div id="dialog"></div>
+        <table cellspacing="8" cellpadding="0" width="100%" border="0">
+            <tbody>
+                <tr>
+                    <td align="center">
+                        @Html.ValidationSummary(true)
+                    </td>
+                </tr>
+                <tr>
+                    <td width="54%">
+                        <table cellspacing="3" width="100%" border="0">
+                            <tbody>
+                                <tr>
+                                    <td colspan="3"></td>
+                                    <td>
+                                        @(Html.Kendo().Window()
+                                            .Name("window")
+                                            .Title("Equipment Model")
+                                            .Width(850)
+                                            .Height(400)
+                                            .Visible(false)
+                                            .Iframe(true)
+                                             .Modal(true)
+                                            .Events(e => e.Close("onClose"))
+                                            )
+                                        <span id="spDetails"></span>
+                                        @if (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin)
+                                        {
+                                            <a onclick="OpenWindow();" class="button"><span style="font-weight: bold">Pick Equipment Model</span></a>
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="70" class="text">
+                                        Customer:
+                                    </td>
+                                    <td>
+                                        @Html.HiddenFor(i => i.Customerid)
+                                        @Html.EditorFor(i => i.CustomerSearch, new { htmlAttributes = new { style = "width:400px", onkeyup = "autosearch();return false;", autocomplete = "off" } })
+                                        <br />
+                                        <div id="searchresults"></div>
+                                    </td>
+
+                                    <script type="text/javascript">
+    var results = 0;
+    $('#searchresults').hide();
+                                        function autosearch() {
+                                            $('#searchresults').show();
+                                            try {
+                                                $('#Customerid').val(0);
+                                                //$("#btn").prop("value", "Create This as new part in Parts List");
+                                                var searchString = $('#CustomerSearch').val();// $(this).val(); //Get the value from this TextBox
+                                                var data = { searchString: searchString }
+                                                $.post('@Url.Action("CustSearch", "Customer")', data, function (data) {
+                                                    if (data.results == null) {
+                                                        alert('no results');
+                                                        results = 0;
+                                                    }
+                                                    else {
+                                                        results = data.results.length;
+                                                        if (data.results.length == 0) {
+                                                            ;//alert('0 results.  Do you ');
+
+                                                        }
+                                                        var divstring = '';
+                                                        for (var i = 0; i < data.results.length; i++) {
+                                                            divstring = divstring + "<a id='" + data.results[i].Code + "' href='' onclick='selectx(\"" + data.results[i].Code + "\");return false;'>" + data.results[i].Code + "~" + data.results[i].Desc + "</a><br/>";
+                                                        }
+                                                        $("#searchresults").html(divstring);
+                                                    }
+                                                }
+                                                );
+                                            }
+                                            catch (ex) {
+                                                alert(ex.message);
+                                            }
+                                        }
+
+                                        function selectx(num) {
+                                            try {
+
+                                                var desc = document.getElementById(num).innerText;
+                                                var parts = desc.split("~");
+                                                if (parts[1] == "-Add-") {
+                                                    alert('adding ' + parts[0]);
+                                                    var data = { searchString: parts[0] }
+                                                    $.post('@Url.Action("CustAdd", "Customer")', data, function (data) {
+                                                        if (data.error == '') {
+                                                            alert('Added with code:' + data.code);
+                                                            $('#Customerid').val(data.code);
+                                                            $('#CustomerSearch').val(parts[0]);
+
+                                                            return;
+                                                        }
+                                                        else {
+                                                            alert(data.error);
+
+                                                            return;
+                                                        }
+                                                    }
+                                                    );
+                                                }
+                                                $('#Customerid').val(parts[0]);
+                                                $('#CustomerSearch').val(parts[1]);
+                                                $('#searchresults').hide();
+                                            }
+                                            catch (ex) {
+                                                alert(ex.message);
+                                            }
+                                            return false;
+                                        }
+                                    </script>
+                                    <td width="140">
+                                        Equip Type:
+                                    </td>
+                                    <td>
+                                        @(Html.Kendo().TextBoxFor(m => m.Equiptype)
+                                             .Name("Equiptype")
+                                             .Enable(false)
+                                             .HtmlAttributes(new { style = "width: 200px", data_required_msg = "Required.", required = "required" })
+                                          )
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="100" class="text">
+                                        Customer Site :
+                                    </td>
+                                    <td>
+                                        @Html.HiddenFor(i => i.DeptID)
+                                        @Html.EditorFor(i => i.DeptSearch, new { htmlAttributes = new { style = "width:400px", onkeyup = "autosearchdept();return false;", autocomplete = "off" } })
+                                        @if (MDS.Controllers.LoginController.IsAdmin(User.Identity.Name) != MDS.Controllers.ATC.Customer)
+                                        {
+                                            <a href="" onclick="DeptEdit();return false">Edit</a>
+                                            <br />
+                                            <div id="searchresultsdept"></div>
+                                        }
+                                    </td>
+
+                                    <script type="text/javascript">
+                                        var div = $("#dialog");
+
+                                        function DeptEdit() {
+                                            var DeptID = $('#DeptID').val();
+                                            var Customerid = $('#Customerid').val();
+
+                                            try {
+                                                div.dialog({
+                                                    closeOnEscape: false,
+                                                    open: function (event, ui) {
+                                                        $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                                                        var url = '@Url.Action("GetCustomerSites", "Customer")?id=' + Customerid;
+                                                        $(this).load(url); @*'@Url.Action("UploadFile", "Applications")');*@
+
+                                                    },
+                                                    modal: true,
+                                                    resizable: false,
+
+                                                    width: 1000,
+                                                    height: 600,
+                                                    title: "Dept Edit",
+                                                    buttons:
+                                                    {
+                                                        Close: function () {
+                                                            closerefreshdept();
+                                                        }
+                                                    },
+                                                });
+                                            }
+                                            catch (ex) {
+                                                alert('catchall:' + ex.message);
+                                            }
+                                            return false;
+
+                                        }
+
+                                        function closerefreshdept() {
+                                            try {
+                                                div.remove();
+                                            }
+                                            catch (ex) {
+                                                ;
+                                            }
+                                            try { div.dialog("close"); }
+                                            catch (ex) {
+                                                ;
+                                            }
+                                            try {
+                                                var DeptID=$('#DeptID').val();
+                                                var data = { DeptID: DeptID };
+                                                $.post('@Url.Action("GetDept", "Customer")', data, function (data) {
+                                                    if (data.results == null) {
+                                                        alert('no results');
+                                                        results = 0;
+                                                    }
+                                                    else {
+                                                        results = data.results.length;
+                                                        if (data.results == null)//.length == 0) {
+                                                            ;//alert('0 results.  Do you ');
+
+                                                    }
+                                                    $('#DeptSearch').val(data.results.Desc);
+                                                }
+                                                );
+                                            }
+                                            catch (ex) {
+                                                alert(ex.message);
+                                            }
+                                        }
+                                        var results = 0;
+                                        $('#searchresultsdept').hide();
+                                        function autosearchdept() {
+                                            $('#searchresultsdept').show();
+                                            try {
+                                                $('#DeptID').val(0);
+                                                //$("#btn").prop("value", "Create This as new part in Parts List");
+                                                var searchString = $('#DeptSearch').val();// $(this).val(); //Get the value from this TextBox
+                                                var Customerid = $('#Customerid').val();
+                                                var data = { searchString: searchString, Customerid: Customerid };
+                                                $.post('@Url.Action("DeptSearch", "Customer")', data, function (data) {
+                                                    if (data.results == null) {
+                                                        alert('no results');
+                                                        results = 0;
+                                                    }
+                                                    else {
+                                                        results = data.results.length;
+                                                        if (data.results.length == 0) {
+                                                            ;//alert('0 results.  Do you ');
+
+                                                        }
+                                                        var divstring = '';
+                                                        for (var i = 0; i < data.results.length; i++) {
+                                                            divstring = divstring + "<a id='" + data.results[i].Code + "' href='' onclick='selectxdept(\"" + data.results[i].Code + "\");return false;'>" + data.results[i].Code + "~" + data.results[i].Desc + "</a><br/>";
+                                                        }
+                                                        $("#searchresultsdept").html(divstring);
+                                                    }
+                                                }
+                                                );
+                                            }
+                                            catch (ex) {
+                                                alert(ex.message);
+                                            }
+                                        }
+
+                                        function selectxdept(num) {
+                                            try {
+
+                                                var desc = document.getElementById(num).innerText;
+                                                var parts = desc.split("~");
+                                                if (parts[1] == "-Add-") {
+                                                    alert('adding ' + parts[0]);
+                                                    var Customerid = $('#Customerid').val();
+                                                    var data = { searchString: parts[0], Customerid: Customerid };
+                                                    $.post('@Url.Action("DeptAdd", "Customer")', data, function (data) {
+                                                        if (data.error == '') {
+                                                            alert('Added with code:' + data.code);
+                                                            $('#DeptID').val(data.code);
+                                                            $('#DeptSearch').val(parts[0]);
+
+                                                            return;
+                                                        }
+                                                        else {
+                                                            alert(data.error);
+
+                                                            return;
+                                                        }
+                                                    }
+                                                    );
+                                                }
+                                                $('#DeptID').val(parts[0]);
+                                                $('#DeptSearch').val(parts[1]);
+                                                $('#searchresultsdept').hide();
+                                            }
+                                            catch (ex) {
+                                                alert(ex.message);
+                                            }
+                                            return false;
+                                        }
+                                    </script>
+
+
+
+                                    <td>
+                                        Model
+                                    </td>
+                                    <td>
+                                        @(Html.Kendo().TextBoxFor(m => m.EquipModel)
+                                             .Name("EquipModel")
+                                             .Enable(false)
+                                             .HtmlAttributes(new { style = "width: 200px " })
+                                          )
+                                        @Html.HiddenFor(m => m.ModelUID)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="70" class="text">
+                                        Location (within Site):
+                                    </td>
+                                    <td>
+                                        @Html.HiddenFor(i => i.LocationID)
+                                        @Html.EditorFor(i => i.LocSearch, new { htmlAttributes = new { style = "width:400px", onkeyup = "autosearchloc();return false;" } })
+                                        @if (MDS.Controllers.LoginController.IsAdmin(User.Identity.Name) != MDS.Controllers.ATC.Customer)
+                                        {
+                                            <a href="" onclick="LocEdit();return false">Edit</a>
+                                            <br />
+                                            <div id="searchresultsloc"></div>
+                                        }
+                                        </td>
+
+                                    <script type="text/javascript">
+
+                                        function LocEdit() {
+                                            var DeptID = $('#LocationID').val();
+                                            var Customerid = $('#Customerid').val();
+
+                                            try {
+                                                div.dialog({
+                                                    closeOnEscape: false,
+                                                    open: function (event, ui) {
+                                                        $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                                                        var url = '@Url.Action("GetCustomerLocations", "Customer")?id=' + Customerid;
+                                                        $(this).load(url); @*'@Url.Action("UploadFile", "Applications")');*@
+
+                                                    },
+                                                    modal: true,
+                                                    resizable: false,
+
+                                                    width: 1000,
+                                                    height: 600,
+                                                    title: "Location Edit",
+                                                    buttons:
+                                                    {
+                                                        Close: function () {
+                                                            closerefreshloc();
+                                                        }
+                                                    },
+                                                });
+                                            }
+                                            catch (ex) {
+                                                alert('catchall:' + ex.message);
+                                            }
+                                            return false;
+
+                                        }
+
+                                        function closerefreshloc() {
+                                            try {
+                                                div.remove();
+                                            }
+                                            catch (ex) {
+                                                ;
+                                            }
+                                            try { div.dialog("close"); }
+                                            catch (ex) {
+                                                ;
+                                            }
+                                            try {
+                                                var LocationID = $('#LocationID').val();
+                                                var data = { LocationID: LocationID };
+                                                $.post('@Url.Action("GetLoc", "Customer")', data, function (data) {
+                                                    if (data.results == null) {
+                                                        alert('no results');
+                                                        results = 0;
+                                                    }
+                                                    else {
+                                                        results = data.results.length;
+                                                        if (data.results == null)//.length == 0) {
+                                                            ;//alert('0 results.  Do you ');
+
+                                                    }
+                                                    $('#LocSearch').val(data.results.Desc);
+                                                }
+                                                );
+                                            }
+                                            catch (ex) {
+                                                alert(ex.message);
+                                            }
+                                        }
+
+                                      var results = 0;
+                                        $('#searchresultsloc').hide();
+                                        function autosearchloc() {
+                                            $('#searchresultsloc').show();
+                                            try {
+                                                $('#LocationID').val(0);
+                                                //$("#btn").prop("value", "Create This as new part in Parts List");
+                                                var searchString = $('#LocSearch').val();// $(this).val(); //Get the value from this TextBox
+                                                var Customerid = $('#Customerid').val();
+                                                var data = { searchString: searchString, Customerid: Customerid };
+                                                $.post('@Url.Action("LocSearch", "Customer")', data, function (data) {
+                                                    if (data.results == null) {
+                                                        alert('no results');
+                                                        results = 0;
+                                                    }
+                                                    else {
+                                                        results = data.results.length;
+                                                        if (data.results.length == 0) {
+                                                            ;//alert('0 results.  Do you ');
+
+                                                        }
+                                                        var divstring = '';
+                                                        for (var i = 0; i < data.results.length; i++) {
+                                                            divstring = divstring + "<a id='" + data.results[i].Code + "' href='' onclick='selectxloc(\"" + data.results[i].Code + "\");return false;'>" + data.results[i].Code + "~" + data.results[i].Desc + "</a><br/>";
+                                                        }
+                                                        $("#searchresultsloc").html(divstring);
+                                                    }
+                                                }
+                                                );
+                                            }
+                                            catch (ex) {
+                                                alert(ex.message);
+                                            }
+                                        }
+
+                                        function selectxloc(num) {
+                                            try {
+
+                                                var desc = document.getElementById(num).innerText;
+                                                var parts = desc.split("~");
+                                                if (parts[1] == "-Add-") {
+                                                    alert('adding ' + parts[0]);
+                                                    var Customerid = $('#Customerid').val();
+                                                    var data = { searchString: parts[0], Customerid: Customerid };
+                                                    $.post('@Url.Action("LocAdd", "Customer")', data, function (data) {
+                                                        if (data.error == '') {
+                                                            alert('Added with code:' + data.code);
+                                                            $('#LocationID').val(data.code);
+                                                            $('#LocSearch').val(parts[0]);
+
+                                                            return;
+                                                        }
+                                                        else {
+                                                            alert(data.error);
+
+                                                            return;
+                                                        }
+                                                    }
+                                                    );
+                                                }
+                                                $('#LocationID').val(parts[0]);
+                                                $('#LocSearch').val(parts[1]);
+                                                $('#searchresultsloc').hide();
+                                            }
+                                            catch (ex) {
+                                                alert(ex.message);
+                                            }
+                                            return false;
+                                        }
+                                    </script>
+
+                                    <td>
+                                        Manufacturer
+                                    </td>
+                                    <td>
+                                        @(Html.Kendo().TextBoxFor(m => m.Manufacturer)
+                                             .Name("Manufacturer")
+                                             .Enable(false)
+                                             .HtmlAttributes(new { style = "width: 200px " })
+                                          )
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <span id="spSince"></span>
+                                    </td>
+
+                                    <td>
+                                        Serial Number :
+                                    </td>
+                                    <td>
+                                        @(Html.Kendo().TextBoxFor(m => m.SerialNo)
+                                             .Name("SerialNo")
+                                             .HtmlAttributes(new { style = "width: 200px " })
+                                          )
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        General Notes :
+                                    </td>
+                                    <td>
+                                        @(Html.TextAreaFor(m => m.GeneralNotes,htmlAttributes: new { style = "width: 400px;height:70px" }))
+                                    </td>
+                                    <td colspan="2">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td width="140">
+                                                        @MDS.Controllers.LoginController.CompanyName Item Code
+                                                    </td>
+                                                    <td>
+                                                        @(Html.Kendo().TextBoxFor(m => m.MDSQNItem)
+                                                         .Name("MDSQNItem")
+                                                         .HtmlAttributes(new { style = "width: 200px ", @maxlength = "10" })
+                                                      )
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        Customer Item Code
+                                                    </td>
+                                                    <td>
+                                                        @(Html.Kendo().TextBoxFor(m => m.CustomerCodeEuip)
+                                                         .Name("CustomerCodeEuip")
+                                                         .HtmlAttributes(new { style = "width: 200px ", @maxlength = "10" })
+                                                      )
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        Alternative Item Code
+                                                    </td>
+                                                    <td>
+                                                        @(Html.Kendo().TextBoxFor(m => m.AlternativeItem)
+                                                         .Name("AlternativeItem")
+                                                         .HtmlAttributes(new { style = "width: 200px " })
+                                                      )
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text">Branch</td>
+                                    <td>
+                                        @(Html.Kendo().DropDownListFor(m => m.Branchid)
+                          .Name("Branchid")
+                          .DataTextField("BranchName")
+                          .DataValueField("BranchID")
+                          .BindTo(Model.BranchList)
+                          .HtmlAttributes(new { style = "width:150px", data_required_msg = "Branch is required." })
+                        )
+                                    </td>
+                                    @if (MDS.Controllers.LoginController.ShowLoaner)
+                                    {
+                                    <td class="text">Loaner Equipment</td>
+                                    <td>@Html.EditorFor(i => i.Loaner)</td>
+                                    }
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="box3">
+        <table cellspacing="8" cellpadding="0" width="100%" border="0">
+            <tbody>
+                <tr>
+                    <td colspan="2" class="text">
+                        @Html.EditorFor(m => m.MDSQNSell)
+                        <span class="text red">Did @MDS.Controllers.LoginController.CompanyName sell this item?</span>
+                    </td>
+                    <td colspan="2" class="text">
+                        @Html.EditorFor(m => m.MDSQNService)
+                        <span class="text red">Does @MDS.Controllers.LoginController.CompanyName currently service this item?</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text">
+                        Vendor
+                    </td>
+                    <td>
+                        @(Html.Kendo().DropDownListFor(m => m.VendorUID)
+                                .Name("VendorUID")
+                                .DataTextField("CompanyName")
+                                 .Filter("startswith")
+                                .DataValueField("VendorUID")
+                                .BindTo(Model.VendorList)
+                                .Enable(false)
+                                .HtmlAttributes(new { style = "width:200px" })
+                            )
+                        @if (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin)
+                        {
+                            <a onclick="OpenVendorWindow();" class="button"><span style="font-weight: bold">Add / Edit</span></a>
+                        }
+                    </td>
+                    <td>
+                        # Service per year
+                    </td>
+                    <td>
+                        @(Html.Kendo().DropDownListFor(m => m.ServicePerYear)
+                                .Name("ServicePerYear")
+                                .Enable(false)
+                                .DataTextField("Month")
+                                .DataValueField("MonthInt")
+                                .BindTo(Model.YearList)
+                                .HtmlAttributes(new { style = "width: 100px" })
+                               .Events(e => e
+        .Change("ServicePerYear_change")
+    )
+                            )
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text">
+                        Manual Library Codes
+                    </td>
+                    <td>
+                        @(Html.Kendo().TextBoxFor(m => m.ManualLibrary)
+                                .Name("ManualLibrary")
+                                 .Enable(false)
+                                .HtmlAttributes(new { style = "width: 200px" })
+                            )
+                    </td>
+                    <td>
+                        # of minor services between major services
+                    </td>
+                    <td>
+                        @(Html.Kendo().TextBoxFor(m => m.MinorService)
+                                .Name("MinorService")
+
+                                .Enable(false)
+                                .HtmlAttributes(new { style = "width: 100px", onchange = "ServiceDue()" })
+                            )
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text">
+                        Cost
+                    </td>
+                    <td>
+                        @(Html.Kendo().CurrencyTextBoxFor(m => m.Cost)
+                            .Name("Cost")
+                             .Enable(false)
+                            .HtmlAttributes(new { style = "width: 150px " })
+
+                        )
+                    </td>
+                    <td>
+                        Service due in month/s:
+                    </td>
+                    <td>
+                        @(Html.Kendo().DropDownListFor(m => m.ServicePerMonth)
+                                .Name("ServicePerMonth")
+                                  .Events(e => e
+        .Change("ServiceDue")
+    )
+                                .Enable(false)
+                                   .DataTextField("Month")
+                                .DataValueField("MonthInt")
+                                .BindTo(Model.MonthList1)
+                                .HtmlAttributes(new { style = "width: 100px" })
+                            )
+                        @(Html.Kendo().DropDownListFor(m => m.ServicePerMonth1)
+                                .Name("ServicePerMonth1")
+                                   .Events(e => e
+        .Change("ServiceDue")
+    )
+                                .Enable(false)
+
+                                    .DataTextField("Month")
+                                .DataValueField("MonthInt")
+                                .BindTo(Model.MonthList2)
+                                .HtmlAttributes(new { style = "width: 100px;" })
+                            )
+                    </td>
+
+                <tr>
+                    <td class="text">
+                        Delivery Date
+                    </td>
+                    <td>
+                        @(Html.Kendo().DatePickerFor(m => m.DeliveryDate)
+                        .Name("DeliveryDate")
+                        .Enable(false)
+                           .Events(e => e
+        .Change("ServiceDue")
+
+    )
+                        .Format("dd/MM/yyyy")
+                        .ParseFormats(new string[] { "dd/MM/yyyy" })
+        .HtmlAttributes(new { style = "width:120px", type = "text" })
+        )
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="text">
+                        Warranty Expiration Date
+                    </td>
+                    <td>
+                        @(Html.Kendo().DatePickerFor(m => m.ExpirationDate)
+                            .Name("ExpirationDate")
+                            .Enable(false)
+                            .Format("dd/MM/yyyy")
+                            .ParseFormats(new string[] { "dd/MM/yyyy" })
+            .HtmlAttributes(new { style = "width:120px", type = "text" })
+                            )
+                    </td>
+                    <td>
+                        Service Area
+                    </td>
+                    <td>
+                        @(Html.Kendo().DropDownListFor(m => m.ServiceAreaUID)
+                                .Name("ServiceAreaUID")
+                                .DataTextField("AreaDescription")
+                                .DataValueField("ServiceAreaUID")
+                                .BindTo(Model.ServiceAreaList)
+                                .Enable(false)
+                                .HtmlAttributes(new { style = "width:200px" })
+                            )
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text">
+                        Initial Condition
+                    </td>
+                    <td>
+                        @(Html.TextAreaFor(m => m.InitialCondition, new { style = "width: 200px;height:50px", @disabled = "disabled" }))
+                    </td>
+                    <td colspan="2">
+                        <span id="Duemonth"></span>
+                    </td>
+
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="box6">
+        <table cellspacing="3" cellpadding="0" width="100%" border="0">
+            <tbody>
+                <tr>
+                    <td colspan="4" class="text">
+                        @Html.EditorFor(m => m.TickItem)
+                        <span class="text red">Tick if this item of equipment has been retired</span>
+                    </td>
+                </tr>
+
+                <tr id="TickItem1">
+                    <td>
+                        Retirement reason:
+                    </td>
+                    <td>
+                        @Html.EditorFor(m => m.Obselete)
+                        This equipment item is Obselete
+                    </td>
+                    <td>
+                        @Html.EditorFor(m => m.CustomerRequired)
+                        No longer required by the customer
+                    </td>
+                    <td></td>
+                </tr>
+                <tr id="TickItem2">
+                    <td></td>
+                    <td>
+                        @Html.EditorFor(m => m.BERDisposal)
+                        BER Disposal
+                    </td>
+                    <td>
+                        @Html.EditorFor(m => m.LongerParts)
+                        Parts are no longer available
+                    </td>
+                    <td></td>
+                </tr>
+                <tr id="TickItem3">
+                    <td>
+                        Date Retired
+                    </td>
+                    <td>
+                        @(Html.Kendo().DatePickerFor(m => m.DateRequired)
+                            .Name("DateRequired")
+                            .Format("dd/MM/yyyy")
+                            .Enable(false)
+                            .ParseFormats(new string[] { "dd/MM/yyyy" })
+            .HtmlAttributes(new { style = "width:120px", type = "text" })
+                            )
+
+                    </td>
+                    <td>
+                        Retirement Comment
+                    </td>
+                    <td>
+                        @(Html.TextAreaFor(m => m.RetirementComment, new { style = "width: 300px;height:50px", @disabled = "disabled" }))
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+    }
+}
+     
+    <table width="100%">
+
+        <tr style="width:100%">
+            @*<td width="2%">
+                    &nbsp;
+                </td>*@
+            <td rowspan="3">
+                @if (ViewBag.AddNew == null)
+                {
+                    <input type="button" class="inputbuttonbg inputbig" value="Cancel / Back" onclick="cancel()" id="btnCancel">
+                }
+
+            </td>
+
+            <td>
+                <input type="button" id="btnPrintService" class="inputbuttonbg inputbig" value="Equipment History - Service">
+            </td>
+
+
+            <td>
+                <input type="button" id="btnPrintRepair" class="inputbuttonbg inputbig" value="Equipment History - Repair" />
+            </td>
+            <td>
+                &nbsp;
+            </td>
+           <td>
+
+                <input type="button" id="btnPrintRetirement" class="inputbuttonbg inputbig" value="Print Equipment Retirement Form">
+            <td> 
+                @if (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin && Model.EquipIDEdit == 0)
+                {
+                    string btnTitle;
+                    if (Model.EquipIDEdit == 0)
+                    {
+                        btnTitle = "Add";
+                    }
+                    else
+                    {
+                        btnTitle = "Update";
+
+                    }
+                    <input type="submit" class="inputbuttonbg inputbig" value="@btnTitle" id="btnOK">
+                }
+            </td>
+            @if (Model.EquipIDEdit != 0 && false)
+            {
+                if (MDS.Controllers.LoginController.IsAdmin(HttpContext.Current.User.Identity.Name) != MDS.Controllers.ATC.Customer)
+                {
+                    <td>
+                        <input type="button" class="inputbuttonbg inputbig" value="Delete" onclick="DeleteRecord();">
+                    </td>
+                }
+            }
+            @*<td>
+                    <button onclick="MergeEquip(); return false;" class="inputbuttonbg inputbig" >Merge</button>"
+                </td>
+
+                <td>
+                    <table id="mergeeq">
+                        <tr>
+                            <td><b>Merge this equipment into item (not this will be removed):</b></td>
+                            <td>
+                                <input onkeyup="autosearch();" type="text" name="YourSearchElementID" id="YourSearchElementID" value="" size="30" maxlength="30" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <div id="searchresults"></div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>*@
+        </tr>
+    </table>
+
+    @(Html.Kendo().Window()
+                            .Name("EquipmentHistoryService")
+                            .Title("Equipment History - Service")
+                            .Width(1000)
+                            .Height(600)
+                            .Visible(false)
+                            .Draggable(true)
+                             .Modal(true)
+                            .Iframe(true)
+                            )
+
+    @(Html.Kendo().Window()
+                            .Name("EquipmentHistoryRepair")
+                            .Title("Equipment History - Repair")
+                            .Width(1000)
+                            .Height(600)
+                            .Visible(false)
+                            .Draggable(true)
+                             .Modal(true)
+                            .Iframe(true)
+                            )
+
+
+
+@(Html.Kendo().Window()
+                            .Name("PrintRetirement")
+                            .Title("Retirement Detail Report")
+                            .Width(1000)
+                            .Height(600)
+                            .Visible(false)
+                            .Draggable(true)
+                            .Modal(true)
+                            .Iframe(true)
+                            )
+@(Html.Kendo().Window()
+                            .Name("windowVendor")
+                            .Title("Vendors")
+                            .Width(1000)
+                            .Height(600)
+                            .Visible(false)
+                            .Draggable(true)
+                            .Modal(true)
+                            .Iframe(true)
+                            .Events(e => e.Close("CloseVendorWindow"))
+                            )
+@(Html.Kendo().Window()
+                            .Name("windowLocation")
+                            .Title("Customer Locations")
+                            .Width(1000)
+                            .Height(600)
+                            .Visible(false)
+                            .Draggable(true)
+                            .Modal(true)
+                            .Iframe(true)
+                            .Events(e => e.Close("CloseLocationWindow"))
+                            )
+@(Html.Kendo().Window()
+                            .Name("windowSite")
+                            .Title("Customer Sites")
+                            .Width(1000)
+                            .Height(600)
+                            .Visible(false)
+                            .Draggable(true)
+                            .Modal(true)
+                            .Iframe(true)
+                            .Events(e => e.Close("CloseSiteWindow"))
+                            )
+
+
+
+
+<script>
+
+    $("#AddForm").kendoValidator({
+    });
+</script>
+<script>
+
+    var somethingChanged = false;
+    $(document).ready(function () {
+        $('input').change(function () {
+            somethingChanged = true;
+        });
+        $('textarea').change(function () {
+            somethingChanged = true;
+        });
+
+        $("#btnOK").click(function (event) {
+            event.preventDefault();
+            var isvalid = ValidateEquipmentRecord2();
+           
+            if (isvalid) {
+                var msg = '@Model.message';
+                $.post('@Url.Action("SaveUpdateEquipment", "Equipment")', $("#AddForm").serialize(), function (data) {
+                    if (data.msg == "1") {
+                        if (data.Error) {
+                            ShowAlert(data.message);
+                        }
+                        else {
+                            ShowSuccess(data.message);
+                        }
+                   @*     if @Request.UrlReferrer.LocalPath.Contains("Overdue"))
+                        setTimeout("window.location.href = '@Url.Action("OverdueService", "Equipment")';", 2000);
+                        else *@
+                        if (msg == 'CR')
+                            alert('Equipment Added - close this tab and hit search on the previous tab');
+                        else
+                            setTimeout("window.location.href = '@Url.Action("Index", "Equipment")';", 2000);
+                    }
+                    else {
+                        if (data.Error) {
+                            ShowAlert(data.message);
+                        }
+                        else {
+                            ShowSuccess(data.message);
+                        }
+                    if (msg == 'CR')
+                            alert('Equipment Added - close this tab and hit search on the previous tab');
+                        else
+                            setTimeout("window.location.href = '@Url.Action("SearchEquipmentLoad", "Repair")';", 2000);
+                    }
+                });
+            }
+        });
+
+    });
+    
+     $("#btnPrintRetirement").click(function (event) {
+            event.preventDefault();
+        //    windows.open("../Reports/EquipmentRetirement.aspx?BranchID=2147395218&equipmentID=2");
+
+            var isvalid = true;// ValidateEquipmentRecord();
+           
+            if (isvalid) {
+                 var equipmentID =  '@Model.EquipID';
+                  var bid = '@Model.Branchid';
+                 
+                window.open("../../Reports/EquipmentRetirement.aspx?BranchID="+bid.toString()+"&equipmentID="+equipmentID.toString());
+               // $.post('@Url.Action("PrintRetirementDetail", "Equipment")', $("#AddForm").serialize(), function (data) {
+                    
+               //     if (data.message != '') {
+                //        alert(data.message);
+                //    }
+                    
+                  //  openCenteredWindow(data.URL);
+               // });
+            }
+        });
+    function ValidateEquipmentRecord2() {
+            var ValidateRecord = true;
+          
+            if ($("#Customerid").val() == "" && $("#Customerid").val() == "") {
+                ShowAlert("Please select the customer.");
+                ValidateRecord = false;
+                return ValidateRecord;
+            }
+
+            if ($("#ModelUID").val() == "" && $("#ModelUID").val() == "") {
+                ShowAlert("Please pick the Equipment Model.");
+                ValidateRecord = false;
+                return ValidateRecord;
+            }
+
+//            alert('custcode');
+            if ($("#MDSQNItem").val() == "" && $("#CustomerCodeEuip").val() == "") {
+  //              alert('MDSQNItemnull');
+
+                ShowAlert("You must enter EITHER a customer code from this item of equipment, OR a an '" + '@MDS.Controllers.LoginController.CompanyName' +"' Code.");
+                ValidateRecord = false;
+                return ValidateRecord;
+            }
+
+            var SoldByMDS = $("#MDSQNSell").is(":checked");
+            if (SoldByMDS) {
+                if ($("#VendorUID").val() == null || $("#VendorUID").val() == "") {
+                    ShowAlert("Because '" + '@MDS.Controllers.LoginController.CompanyName' +"' sold this item, you must specify the VENDOR from the list.");
+                    ValidateRecord = false;
+                    return ValidateRecord;
+                }
+
+                var ExpirationDate = $("#ExpirationDate").data("kendoDatePicker").value();
+                if (ExpirationDate == null || ExpirationDate == "") {
+                    ShowAlert("Because '" + '@MDS.Controllers.LoginController.CompanyName' +"' sold this item, you should specify the warranty expiration date.");
+                    ValidateRecord = false;
+                    return ValidateRecord;
+                }
+            }
+
+            var MDSQNServiceCheck = $("#MDSQNService").is(":checked");
+            if (MDSQNServiceCheck) {
+                if ($("#ServicePerYear").val() == null || $("#ServicePerYear").val() == "" || $("#ServicePerYear").val() == "0") {
+                    ShowAlert("Because '" + '@MDS.Controllers.LoginController.CompanyName' +"' services this item, you must specify the number of service vistis required per year.");
+                    ValidateRecord = false;
+                    return ValidateRecord;
+                }
+    //            alert('ServicePerMonth');
+
+                if ($("#ServicePerMonth").val() == null || $("#ServicePerMonth").val() == "" || $("#ServicePerMonth").val() == "0") {
+                    ShowAlert("Because '" + '@MDS.Controllers.LoginController.CompanyName' +"' services this item, you must specify the month in which the first service of a year will fall. (Range 1 to 12).");
+                    ValidateRecord = false;
+                    return ValidateRecord;
+                }
+
+                if ($("#ServicePerYear").val() == "2") {
+                    if ($("#ServicePerMonth1").val() == null || $("#ServicePerMonth1").val() == "" || $("#ServicePerMonth1").val() == "0") {
+                        ShowAlert("Because '" + '@MDS.Controllers.LoginController.CompanyName' +"' services this item, and there are TWO services per year, you must specify the month on which the second service will fall. (Range 1 to 12).");
+                        ValidateRecord = false;
+                        return ValidateRecord;
+                    }
+                }
+        //        alert('ServiceAreaUID');
+
+                if ($("#ServiceAreaUID").val() == null || $("#ServiceAreaUID").val() == "" || $("#ServiceAreaUID").val() == "0") {
+                    ShowAlert("Because '" + '@MDS.Controllers.LoginController.CompanyName' +"' services this item, you should select the SERVICE AREA from the list.  (This information is required to generate a service schedule.");
+                    ValidateRecord = false;
+                    return ValidateRecord;
+                }
+            }
+
+            var Retired = $("#TickItem").is(":checked");
+            if (Retired) {
+                if ($("#MDSQNService").is(":checked")) {
+                    ShowAlert("You have indicated that this equipment item has been retired. However, the option: serviced by '" + '@MDS.Controllers.LoginController.CompanyName' +"' is still checked.   This checkbox should be un-ticked.");
+                    ValidateRecord = false;
+                    return ValidateRecord;
+                }
+
+                if (!$("#Obselete").is(":checked") && !$("#CustomerRequired").is(":checked") && !$("#BERDisposal").is(":checked") && !$("#LongerParts").is(":checked")) {
+                    if ($("#RetirementComment").val() == null || $("#RetirementComment").val() == "") {
+                        ShowAlert("You have indicated that this equipment item has been retired. You must now either select the retirement reason, or enter an explanatory comment in the Retirement commment area.");
+                        ValidateRecord = false;
+                        return ValidateRecord;
+                    }
+                }
+
+                var DateRequiredRetire = $("#DateRequired").data("kendoDatePicker").value();
+                if (DateRequiredRetire == null || DateRequiredRetire == "") {
+                    ShowAlert("You must specify the date the equipment item was retired.. If the exact date is not known, enter an approximate date and indicate this with a comment.");
+                    ValidateRecord = false;
+                    return ValidateRecord;
+                }
+            }
+
+            return ValidateRecord;
+        }
+
+    function CustomerBranchData() {
+        return {
+            Customerid: $("#Customerid").val(),
+            Branchid: $("#Branchid").val(),
+        };
+    }
+
+    function CustomerSiteData() {
+        return {
+            Customerid: $("#Customerid").val(),
+            Branchid: $("#Branchid").val(),
+            userFilter: $("#DeptID").data("kendoComboBox").input.val(),
+        };
+    }
+
+    function CustomerLocationData() {
+        return {
+            Customerid: $("#Customerid").val(),
+            Branchid: $("#Branchid").val(),
+            userFilter: $("#LocationID").data("kendoComboBox").input.val(),
+        };
+    }
+
+    function cancel() {
+        if (somethingChanged) {
+            var r = confirm("Do you wish to discard any changes you have made?");
+            if (r) {
+
+                if ($("#PopUp").val() == "True") {
+                    window.location.href = '@Url.Action("SearchEquipmentLoad", "Repair")';
+                }
+                else {
+                    window.location.href = '@Url.Action("Index", "Equipment")';
+                }
+
+            }
+        }
+        else {
+
+            if ($("#PopUp").val() == "True") {
+                window.location.href = '@Url.Action("SearchEquipmentLoad", "Repair")';
+            }
+            else {
+                window.location.href = '@Url.Action("Index", "Equipment")';
+            }
+        }
+    }
+
+    function OpenVendorWindow() {
+
+        var window = $("#windowVendor").data("kendoWindow");
+        window.Visible = true;
+        var actionURL = '@Url.Action("IndexPopUp", "Vendor")';
+        window.refresh({
+            url: actionURL
+        });
+        if ($("#PopUp").val() == "True") {
+            var width95 = (screen.width) * 75 / 100;
+            var height75 = (screen.height) * 75 / 100;
+            window.setOptions({ width: width95, height: height75 });
+        }
+        else {
+            var width95 = (screen.width) * 95 / 100;
+            var height75 = (screen.height) * 75 / 100;
+            window.setOptions({ width: width95, height: height75 });
+        }
+        window.center();
+        window.open();
+    }
+
+    function CloseVendorWindow(e) {
+
+        var dataSource = new kendo.data.DataSource({
+            transport: {
+                read: {
+                    url: '@Url.Action("GetVendors", "Equipment")',
+                    async: false,
+                    data: {}
+                }
+            }
+        });
+
+        var ddl = $('#VendorUID').data("kendoDropDownList");
+        ddl.setDataSource(dataSource);
+        ddl.refresh();
+        var id = '@Model.EquipID';
+        if (id != 0) {
+            ddl.value('@Model.VendorUID');
+        }
+    }
+
+        function OpenWindow() {
+
+            var window = $("#window").data("kendoWindow");
+            //alert(window);
+            window.Visible = true;
+            var actionURL = '@Url.Action("GetEquipmentModel", "Equipment")';
+        window.refresh({
+            url: actionURL,
+            data: {}
+        });
+
+        if ($("#PopUp").val() == "True") {
+            var width95 = (screen.width) * 85 / 100;
+            var height75 = (screen.height) * 65 / 100;
+            window.setOptions({ width: width95, height: height75 });
+        }
+        else {
+            var width95 = (screen.width) * 95 / 100;
+            var height75 = (screen.height) * 75 / 100;
+            window.setOptions({ width: width95, height: height75 });
+        }
+
+        window.center();
+        window.open();
+    }
+    function onClose(e) {
+        ServiceDue();
+    }
+
+    function ServicePerYear_change() {
+        DisplayNumServices();
+        ServiceDue();
+    }
+
+    function DisplayServiced() {
+        var bEnabled = $("#MDSQNService").is(":checked");
+        var ServicePerYear = $("#ServicePerYear").data("kendoDropDownList");
+        var ServiceAreaUID = $("#ServiceAreaUID").data("kendoDropDownList");
+        var ServicePerMonth = $("#ServicePerMonth").data("kendoDropDownList");
+        var ServicePerMonth1 = $("#ServicePerMonth1").data("kendoDropDownList");
+        $("#MinorService").prop("disabled", !bEnabled);
+        ServicePerYear.enable(bEnabled);
+        ServiceAreaUID.enable(bEnabled);
+        ServicePerMonth.enable(bEnabled);
+        ServicePerMonth1.enable(bEnabled);
+        DisplayNumServices();
+    }
+
+    function DisplayNumServices() {
+        var bEnabled = $("#ServicePerYear").val() == "2";
+        var ServicePerMonth1 = $("#ServicePerMonth1").data("kendoDropDownList");
+        ServicePerMonth1.enable(bEnabled);
+        if (bEnabled) {
+            var dropdownlist = $("#ServicePerMonth1").data("kendoDropDownList");
+            var service = $("#ServicePerYear").val();
+            if (service == "1") {
+                dropdownlist.wrapper.hide();
+            }
+            else {
+                dropdownlist.wrapper.show();
+            }
+        }
+    }
+
+    function DisplaySoldByMDS() {
+        var bEnabled = $("#MDSQNSell").is(":checked");
+        var Vendordropdownlist = $("#VendorUID").data("kendoDropDownList");
+        var CostCurrencyTextBox = $("#Cost").data("kendoNumericTextBox");
+        var DeliveryDate = $("#DeliveryDate").data("kendoDatePicker");
+        var ExpirationDate = $("#ExpirationDate").data("kendoDatePicker");
+        Vendordropdownlist.enable(bEnabled);
+        $("#ManualLibrary").prop("disabled", !bEnabled);
+        $('#InitialCondition').prop('disabled', !bEnabled);
+        CostCurrencyTextBox.enable(bEnabled);
+        DeliveryDate.enable(bEnabled);
+        ExpirationDate.enable(bEnabled);
+    }
+
+    function DisplayInService() {
+
+        var bEnabled = $("#TickItem").is(":checked");
+        var DateRequired = $("#DateRequired").data("kendoDatePicker");
+
+        $('#Obselete').attr('disabled', !bEnabled);
+        $('#BERDisposal').attr('disabled', !bEnabled);
+        $('#CustomerRequired').attr('disabled', !bEnabled);
+        $('#LongerParts').attr('disabled', !bEnabled);
+        DateRequired.enable(bEnabled);
+        $('#RetirementComment').attr('disabled', !bEnabled);
+        if (bEnabled) {
+            $("#btnPrintRetirement").show();
+        }
+        else {
+            $("#btnPrintRetirement").hide();
+        }
+    }
+
+    function DisplayRepairCostSoFar() {
+        $.ajax({
+            url: '@Url.Action("GetTotalRepaiCost", "Equipment")',
+            type: 'POST',
+            datatype: "json",
+            data: { equipmentID: '@Model.EquipID' },
+                success: function (response) {
+                    $("#spSince").text("Repairs: $" + response.Cost + " & " + response.RHours + " Hours");
+                },
+                error: function (req, status, error) {
+                }
+        });
+
+        }
+
+        function RefreshRecord() {
+            DisplayInService();
+            DisplayServiced();
+            DisplaySoldByMDS();
+            DisplayRepairCostSoFar();
+            ServiceDue();
+        }
+        function OpenLocationindow() {
+            var CustomerCode = "";
+            CustomerCode = $("#Customerid").val();
+            if (CustomerCode == "") {
+                ShowAlert("Please select the customer first");
+                return false;
+            }
+            var window = $("#windowLocation").data("kendoWindow");
+            window.Visible = true;
+            var actionURL = '@Url.Action("GetCustomerLocations", "Customer")' + '/' + CustomerCode;
+        window.refresh({
+            url: actionURL
+        });
+        //alert('begin');
+        if ($("#hdPopUp").val() == "1") {
+
+            var width95 = (screen.width) * 75 / 100;
+            var height75 = (screen.height) * 75 / 100;
+            window.setOptions({ width: width95, height: height75 });
+            //alert('test1');
+        }
+        else {
+            //alert('test2');
+            var width95 = (screen.width) * 90 / 100;
+            var height75 = (screen.height) * 70 / 100;
+            window.setOptions({ width: width95, height: height75 });
+        }
+        window.center();
+        window.open();
+    }
+
+    function CloseLocationWindow(e) {
+        try {
+            //$("#LocationID").data("kendoDropDownList").dataSource.read();
+            var Customerid = $("#Customerid").val();
+            var Branchid = $("#Branchid").val();
+            var dataSource = new kendo.data.DataSource({
+                transport: {
+                    read: {
+                        url: '@Url.Action("GetCustomerLocationBlank", "Service")',
+                        async: false,
+                        data: { Customerid: Customerid, Branchid: Branchid }
+                    }
+                }
+            });
+
+            var ddl = $('#LocationID').data("kendoComboBox");//kendoDropDownList
+            ddl.setDataSource(dataSource);
+            ddl.refresh();
+            //if (RepairUID != 0) {
+            //ddl.value('@Model.DeptID');
+            //}
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+    //function MergeEquip() {
+    //    $('#mergeeq').show();
+    //}
+
+    //$('#mergeeq').hide();
+
+
+    @*function selectx(num) {
+        try {
+            var res = num.split("~");
+            var id=res[1];
+            var nme=res[2];
+            var ths='@Model.SerialNo';
+            var tg = '@Model.EquipID';
+            if (confirm('Are you sure you wish to merge this item of equipment '+ths+' into '+nme+' (note this item will be removed)?')) {
+                var data = { SourceID: id, TargetID: tg }
+            $.post('@Url.Action("MergeEquip", "Equipment")', data,
+                function (data) {
+                    if (data.Error == '') {
+                        alert('Merge successful');
+                    }
+                    else
+                        alert('Could not Merge: '+data.Error);
+                }
+                , 'json');
+            }
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+        return false;
+    }*@
+
+    @*function autosearch()
+    {
+        try{
+            var searchString =  $('#YourSearchElementID').val();// $(this).val(); //Get the value from this TextBox
+            if (searchString == '') return;
+            var CustomerCode = '@Model.Customerid';
+            var data = { Prefix: searchString, CustomerCode: CustomerCode }
+            $.post('@Url.Action("SearchCust", "Equipment")', data,
+                function (data) {
+
+                if (data.results == null)
+                    alert('no results');
+                else {
+                    var divstring = '';
+                    divstring = ''
+                    for (var i = 0; i < data.results.length; i++) {
+                        divstring = divstring + "<a id='" + data.results[i].Key + "' href='' onclick='selectx(" + data.results[i].Key.toString() + "~" + data.results[i].Name + ");return false;'>" + data.results[i].Name + "</a><br/>"
+                    }
+                    $("#searchresults").html(divstring);
+                }
+            });
+        }
+        catch(ex)
+        {
+            alert(ex.message);
+        }
+    }*@
+
+
+    function OpenSiteWindow() {
+        var CustomerCode = "";
+        CustomerCode = $("#Customerid").val();
+        if (CustomerCode == "") {
+            ShowAlert("Please select the customer first");
+            return false;
+        }
+        var window = $("#windowSite").data("kendoWindow");
+        window.Visible = true;
+        var actionURL = '@Url.Action("GetCustomerSites", "Customer")' + '/' + CustomerCode;
+        window.refresh({
+            url: actionURL
+        });
+        //alert('begin1');
+        if ($("#hdPopUp").val() == "1") {
+            var width95 = (screen.width) * 75 / 100;
+            var height75 = (screen.height) * 75 / 100;
+            window.setOptions({ width: width95, height: height75 });
+           //alert('chk1');
+        }
+        else {
+            //alert('chk2')
+            var width95 = (screen.width) * 90 / 100;
+            var height75 = (screen.height) * 70 / 100;
+            window.setOptions({ width: width95, height: height75 });
+        }
+        window.center();
+        window.open();
+    }
+
+    function CloseSiteWindow(e) {
+
+        try {
+            //    $("#DeptID").data("kendoDropDownList").dataSource.read();
+
+            var Customerid = $("#Customerid").val();
+            var Branchid = $("#Branchid").val();
+            var dataSource = new kendo.data.DataSource({
+                transport: {
+                    read: {
+                        url: '@Url.Action("GetCustomerSiteX", "Service")',
+                        async: false,
+                        data: { Customerid: Customerid, Branchid: Branchid }
+                    }
+                }
+            });
+
+            var ddl = $('#DeptID').data("kendoComboBox");//kendoDropDownList
+            ddl.setDataSource(dataSource);
+            ddl.refresh();
+            //if (RepairUID != 0) {
+            //ddl.value('@Model.DeptID');
+            //}
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+        //   alert('qw');
+    }
+
+
+
+        
+
+        function ServiceDue() {
+
+            $("#Duemonth").text("Next service due: insufficient information");
+
+            var bEnabled = $("#TickItem").is(":checked");
+            if (bEnabled) { return false; }
+
+            var bEnabledMDSQNService = $("#MDSQNService").is(":checked");
+            if (!bEnabledMDSQNService) { return false; }
+
+            var EquipID = '@Model.EquipID';
+        if (EquipID == 0) { return false; }
+
+        var ServicePerYear = $("#ServicePerYear").data("kendoDropDownList").value();
+        var ServicePerMonth = $("#ServicePerMonth").data("kendoDropDownList").value();
+        if (ServicePerMonth == "0") { return false; }
+
+        var ServicePerMonth1 = $("#ServicePerMonth1").data("kendoDropDownList").value();
+        if (ServicePerYear == "2") {
+            if (ServicePerMonth1 == "0") { return false; }
+        }
+
+        var DeliveryDate = $("#DeliveryDate").data("kendoDatePicker").value();
+        var MinorService = $("#MinorService").val();
+
+        //if (EquipID == "" || DeliveryDate == null) {
+        //    $("#Duemonth").text("insufficient information");
+        //    return false;
+        //}
+        if (DeliveryDate != null && DeliveryDate != "") {
+            DeliveryDate = DeliveryDate.toLocaleString("en-AU");
+        }
+
+        $.ajax({
+            url: '@Url.Action("GetDueDate", "Equipment")',
+            type: 'POST',
+            datatype: "json",
+            data: { EquipID: EquipID, ServicePerYear: ServicePerYear, ServicePerMonth: ServicePerMonth, ServicePerMonth1: ServicePerMonth1, DeliveryDate: DeliveryDate, MinorService: MinorService },
+            success: function (response) {
+                if (response.Overdue) {
+                    $('#Duemonth').text("Next service due on month OVERDUE");
+                }
+                else {
+                    $('#Duemonth').text("Next service due on month " + response.DueDateData1);
+                }
+            },
+            error: function (req, status, error) {
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        
+        var equipmentID = 0;
+        equipmentID = '@Model.EquipID';
+        $("#btnPrintService").click(function () {
+
+            if (equipmentID == 0) {
+                alert("Please save the equipment details first");
+                return false;
+            }
+            var bid = '@Model.Branchid';
+            window.open('../../Reports/EquipmentHistoryService.aspx?BranchID=' + bid.toString() + '&EquipmentID=' + equipmentID.toString(), 'Equipment', 'scrollbars=yes,fullscreen=yes,left=25,top=25,width=' + (screen.width - 50).toString() + ',height=' + (screen.height - 130).toString())
+
+
+        });
+        $("#btnPrintRepair").click(function () {
+            if (equipmentID == 0) {
+                alert("Please save the equipment details first");
+                return false;
+            }
+
+            var bid = '@Model.Branchid';
+            window.open('../../Reports/EquipmentHistoryRepair.aspx?BranchID=' + bid.toString() + '&EquipmentID=' + equipmentID.toString(), 'Equipment', 'scrollbars=yes,fullscreen=yes,left=25,top=25,width=' + (screen.width - 50).toString() + ',height=' + (screen.height - 130).toString())
+
+            //$.ajax({
+            //    type: "POST",
+            //    url: '@Url.Action("EquipmentHistoryRepair", "Equipment")',
+             //   data: {
+              //      equipmentID: equipmentID
+               // },
+               // success: function (data) {
+                //    openCenteredWindow(data.URL);
+               // }
+            //});
+
+        });
+        $("#btnPrintRetirement").click(function (event) {
+            event.preventDefault();
+            var isvalid = true;// ValidateEquipmentRecord();
+            if (isvalid) {
+
+                $.post('@Url.Action("PrintRetirementDetail", "Equipment")', $("#AddForm").serialize(), function (data) {
+                    //var window = $("#PrintRetirement").data("kendoWindow");
+                    //window.Visible = true;
+                    //var actionURL = data.URL;
+                    //window.refresh({
+                    //    url: actionURL,
+                    //    data: {}
+                    //});
+
+                    //if ($("#hdPopUp").val() == "1") {
+                    //    var width95 = (screen.width) * 75 / 100;
+                    //    var height75 = (screen.height) * 75 / 100;
+                    //    window.setOptions({ width: width95, height: height75 });
+                    //}
+                    //else {
+                    //    var width95 = (screen.width) * 95 / 100;
+                    //    var height75 = (screen.height) * 75 / 100;
+                    //    window.setOptions({ width: width95, height: height75 });
+                    //}
+                    //window.center();
+                    //window.open();
+                    if (data.message != '') {
+                        alert(data.message);
+                    }
+                    openCenteredWindow(data.URL);
+                });
+            }
+        });
+        function ValidateEquipmentRecord() {
+            var ValidateRecord = true;
+            alert('test');
+            if ($("#Customerid").val() == "" && $("#Customerid").val() == "") {
+                ShowAlert("Please select the customer.");
+                ValidateRecord = false;
+                return ValidateRecord;
+            }
+
+            if ($("#ModelUID").val() == "" && $("#ModelUID").val() == "") {
+                ShowAlert("Please pick the Equipment Model.");
+                ValidateRecord = false;
+                return ValidateRecord;
+            }
+
+//            alert('custcode');
+            if ($("#MDSQNItem").val() == "" && $("#CustomerCodeEuip").val() == "") {
+  //              alert('MDSQNItemnull');
+
+                ShowAlert("You must enter EITHER a customer code from this item of equipment, OR a an '" + '@MDS.Controllers.LoginController.CompanyName' +"' Code.");
+                ValidateRecord = false;
+                return ValidateRecord;
+            }
+
+            var SoldByMDS = $("#MDSQNSell").is(":checked");
+            if (SoldByMDS) {
+                if ($("#VendorUID").val() == null || $("#VendorUID").val() == "") {
+                    ShowAlert("Because '" + '@MDS.Controllers.LoginController.CompanyName' +"' sold this item, you must specify the VENDOR from the list.");
+                    ValidateRecord = false;
+                    return ValidateRecord;
+                }
+
+                var ExpirationDate = $("#ExpirationDate").data("kendoDatePicker").value();
+                if (ExpirationDate == null || ExpirationDate == "") {
+                    ShowAlert("Because '" + '@MDS.Controllers.LoginController.CompanyName' +"' sold this item, you should specify the warranty expiration date.");
+                    ValidateRecord = false;
+                    return ValidateRecord;
+                }
+            }
+
+            var MDSQNServiceCheck = $("#MDSQNService").is(":checked");
+            if (MDSQNServiceCheck) {
+                if ($("#ServicePerYear").val() == null || $("#ServicePerYear").val() == "" || $("#ServicePerYear").val() == "0") {
+                    ShowAlert("Because '" + '@MDS.Controllers.LoginController.CompanyName' +"' services this item, you must specify the number of service vistis required per year.");
+                    ValidateRecord = false;
+                    return ValidateRecord;
+                }
+    //            alert('ServicePerMonth');
+
+                if ($("#ServicePerMonth").val() == null || $("#ServicePerMonth").val() == "" || $("#ServicePerMonth").val() == "0") {
+                    ShowAlert("Because '" + '@MDS.Controllers.LoginController.CompanyName' +"' services this item, you must specify the month in which the first service of a year will fall. (Range 1 to 12).");
+                    ValidateRecord = false;
+                    return ValidateRecord;
+                }
+
+                if ($("#ServicePerYear").val() == "2") {
+                    if ($("#ServicePerMonth1").val() == null || $("#ServicePerMonth1").val() == "" || $("#ServicePerMonth1").val() == "0") {
+                        ShowAlert("Because '" + '@MDS.Controllers.LoginController.CompanyName' +"' services this item, and there are TWO services per year, you must specify the month on which the second service will fall. (Range 1 to 12).");
+                        ValidateRecord = false;
+                        return ValidateRecord;
+                    }
+                }
+        //        alert('ServiceAreaUID');
+
+                if ($("#ServiceAreaUID").val() == null || $("#ServiceAreaUID").val() == "" || $("#ServiceAreaUID").val() == "0") {
+                    ShowAlert("Because '" + '@MDS.Controllers.LoginController.CompanyName' +"' services this item, you should select the SERVICE AREA from the list.  (This information is required to generate a service schedule.");
+                    ValidateRecord = false;
+                    return ValidateRecord;
+                }
+            }
+
+            var Retired = $("#TickItem").is(":checked");
+            if (Retired) {
+                if ($("#MDSQNService").is(":checked")) {
+                    ShowAlert("You have indicated that this equipment item has been retired. However, the option: serviced by '" + '@MDS.Controllers.LoginController.CompanyName' +"' is still checked.   This checkbox should be un-ticked.");
+                    ValidateRecord = false;
+                    return ValidateRecord;
+                }
+
+                if (!$("#Obselete").is(":checked") && !$("#CustomerRequired").is(":checked") && !$("#BERDisposal").is(":checked") && !$("#LongerParts").is(":checked")) {
+                    if ($("#RetirementComment").val() == null || $("#RetirementComment").val() == "") {
+                        ShowAlert("You have indicated that this equipment item has been retired. You must now either select the retirement reason, or enter an explanatory comment in the Retirement commment area.");
+                        ValidateRecord = false;
+                        return ValidateRecord;
+                    }
+                }
+
+                var DateRequiredRetire = $("#DateRequired").data("kendoDatePicker").value();
+                if (DateRequiredRetire == null || DateRequiredRetire == "") {
+                    ShowAlert("You must specify the date the equipment item was retired.. If the exact date is not known, enter an approximate date and indicate this with a comment.");
+                    ValidateRecord = false;
+                    return ValidateRecord;
+                }
+            }
+
+            return ValidateRecord;
+        }
+        
+        //$('#Obselete').attr('disabled', 'disabled');
+        //$('#BERDisposal').attr('disabled', 'disabled');
+        //$('#CustomerRequired').attr('disabled', 'disabled');
+        //$('#LongerParts').attr('disabled', 'disabled');
+        var dropdownlist = $("#ServicePerMonth1").data("kendoDropDownList");
+        dropdownlist.wrapper.hide();
+        RefreshRecord();
+        @*var MDSQNSell = '@Model.MDSQNSell';
+        var MDSQNService = '@Model.MDSQNService';
+        var TickItem = '@Model.TickItem';
+
+        if (TickItem == "True") {
+            var DateRequired = $("#DateRequired").data("kendoDatePicker");
+            $('#Obselete').attr('disabled', false);
+            $('#BERDisposal').attr('disabled', false);
+            $('#CustomerRequired').attr('disabled', false);
+            $('#LongerParts').attr('disabled', false);
+            DateRequired.enable();
+            $('#RetirementComment').attr('disabled', false);
+        }
+        if (MDSQNSell == "True") {
+            var Vendordropdownlist = $("#VendorUID").data("kendoDropDownList");
+            var CostCurrencyTextBox = $("#Cost").data("kendoNumericTextBox");
+            var DeliveryDate = $("#DeliveryDate").data("kendoDatePicker");
+            var ExpirationDate = $("#ExpirationDate").data("kendoDatePicker");
+
+            Vendordropdownlist.enable();
+            $("#ManualLibrary").prop("disabled", false);
+            $('#InitialCondition').prop('disabled', false);
+            CostCurrencyTextBox.enable();
+            DeliveryDate.enable();
+            ExpirationDate.enable();
+        }
+        if (MDSQNService == "True") {
+            var ServicePerYear = $("#ServicePerYear").data("kendoDropDownList");
+            var ServiceAreaUID = $("#ServiceAreaUID").data("kendoDropDownList");
+            var ServicePerMonth = $("#ServicePerMonth").data("kendoDropDownList");
+            var ServicePerMonth1 = $("#ServicePerMonth1").data("kendoDropDownList");
+            ServicePerYear.enable();
+            $("#MinorService").prop("disabled", false);
+            ServiceAreaUID.enable();
+            ServicePerMonth.enable();
+            ServicePerMonth1.enable();
+        }*@
+
+        
+
+        
+
+        $('#TickItem').click(function () {
+            //var DateRequired = $("#DateRequired").data("kendoDatePicker");
+            //if ($(this).is(":checked")) {
+            //    $('#Obselete').attr('disabled', false);
+            //    $('#BERDisposal').attr('disabled', false);
+            //    $('#CustomerRequired').attr('disabled', false);
+            //    $('#LongerParts').attr('disabled', false);
+            //    DateRequired.enable();
+            //    $('#RetirementComment').attr('disabled', false);
+            //}
+            //else {
+            //    $('#Obselete').attr('disabled', 'disabled');
+            //    $('#BERDisposal').attr('disabled', 'disabled');
+            //    $('#CustomerRequired').attr('disabled', 'disabled');
+            //    $('#LongerParts').attr('disabled', 'disabled');
+            //    $('#DateRequired').attr('disabled', 'disabled');
+            //    $('#RetirementComment').attr('disabled', 'disabled');
+            //    DateRequired.enable(false);
+            //}
+
+            DisplayInService();
+        });
+
+        $("#MDSQNSell").click(function () {
+            //var Vendordropdownlist = $("#VendorUID").data("kendoDropDownList");
+            //var CostCurrencyTextBox = $("#Cost").data("kendoNumericTextBox");
+            //var DeliveryDate = $("#DeliveryDate").data("kendoDatePicker");
+            //var ExpirationDate = $("#ExpirationDate").data("kendoDatePicker");
+            //if ($(this).is(":checked")) {
+            //    Vendordropdownlist.enable();
+            //    $("#ManualLibrary").prop("disab   led", false);
+            //    $('#InitialCondition').prop('disabled', false);
+            //    CostCurrencyTextBox.enable();
+            //    DeliveryDate.enable();
+            //    ExpirationDate.enable();
+            //}
+            //else {
+            //    Vendordropdownlist.enable(false);
+            //    $("#ManualLibrary").prop("disabled", true);
+            //    $('#InitialCondition').prop('disabled', true);
+            //    CostCurrencyTextBox.enable(false);
+            //    DeliveryDate.enable(false);
+            //    ExpirationDate.enable(false);
+            //}
+
+            DisplaySoldByMDS();
+
+        });
+
+        $("#MDSQNService").click(function () {
+            //var ServicePerYear = $("#ServicePerYear").data("kendoDropDownList");
+            //var ServiceAreaUID = $("#ServiceAreaUID").data("kendoDropDownList");
+            //var ServicePerMonth = $("#ServicePerMonth").data("kendoDropDownList");
+            //var ServicePerMonth1 = $("#ServicePerMonth1").data("kendoDropDownList");
+            //if ($(this).is(":checked")) {
+            //    ServicePerYear.enable();
+            //    $("#MinorService").prop("disabled", false);
+            //    ServiceAreaUID.enable();
+            //    ServicePerMonth.enable();
+            //    ServicePerMonth1.enable();
+            //}
+            //else {
+            //    ServicePerYear.enable(false);
+            //    $("#MinorService").prop("disabled", true);
+            //    ServicePerMonth.enable();
+            //    ServicePerMonth1.enable();
+            //    ServiceAreaUID.enable(false);
+            //}
+            DisplayServiced();
+        });
+
+
+
+        @*$('#ServicePerMonth').change(function () {
+            $.ajax({
+                url: '@Url.Action("GetDueDate", "Equipment")',
+                type: 'POST',
+                datatype: "json",
+                data: { EquipID: $("#EquipID").val(), ServicePerYear: $("#ServicePerYear").val(), ServicePerMonth: $("#ServicePerMonth").val(), ServicePerMonth: $("#ServicePerMonth1").val(), DeliveryDate: $("#DeliveryDate").val(), MinorService: $("#MinorService").val() },
+                success: function (response) {
+
+                    // alert(response.DueDateData1);
+                    $('#Duemonth').text(response.DueDateData1);
+
+                },
+                error: function (req, status, error) {
+                    //  alert("R: " + req + " S: " + status + " E: " + error);
+                }
+            });
+        });*@
+    });
+        
+        
+        
+
+
+        function DeleteRecord() {
+        try {
+            var r = confirm("Do you wish to delete this record?");
+            if (r) {
+
+
+                var data = { id: '@Model.EquipID' };
+                $.post('@Url.Action("DeleteRecord", "Equipment")', data,
+                    function (data) {
+                        if (data.Error == '') {
+                            alert('Record Deleted')
+                            cancel();
+                        }
+                        else
+                            alert(data.Error);
+                    }
+                    , 'json');
+
+
+            }
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>
+
+
+

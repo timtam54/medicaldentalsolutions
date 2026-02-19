@@ -1,0 +1,114 @@
+﻿@{    
+    Layout = "~/Views/Shared/_IFrameLayout.cshtml";
+}
+   
+<h1>Enter Equipment Service Month</h1>
+@using (Html.BeginForm(new { id = "rpForm" }))
+{
+    <div class="contact-info">
+        <div class="content">
+            <table>
+
+                                                <tr>
+                    <td>No of Service per year:
+                    </td>
+                    <td>
+                        <select id="ServiesPerYear"  onchange="NoChange(this);">
+    <option value="1">1</option>
+    <option value="2">2</option>
+</select>
+                    </td>
+                </tr>
+
+
+
+                <tr>
+                    <td>Please enter the Equipment Service Month:
+                    </td>
+                    <td>
+                        <select id="sm1">
+    <option value="1">Jan (1)</option>
+    <option value="2">Feb (2)</option>
+    <option value="3">Mar (3)</option>
+    <option value="4">Apr (4)</option>
+    <option value="5">May (5)</option>
+    <option value="6">Jun (6)</option>
+  <option value="7">Jul (7)</option>
+    <option value="8">Aug (8)</option>
+    <option value="9">Sep (9)</option>
+    <option value="10">Oct (10)</option>
+    <option value="11">Nov (11)</option>
+    <option value="12">Dec (12)</option>
+
+                        </select>
+                    </td>
+
+                                        <td>
+                        <select id="sm2" hidden="hidden">
+    <option value="1">Jan (1)</option>
+    <option value="2">Feb (2)</option>
+    <option value="3">Mar (3)</option>
+    <option value="4">Apr (4)</option>
+    <option value="5">May (5)</option>
+    <option value="6">Jun (6)</option>
+    <option value="7">Jul (7)</option>
+    <option value="8">Aug (8)</option>
+    <option value="9">Sep (9)</option>
+    <option value="10">Oct (10)</option>
+    <option value="11">Nov (11)</option>
+    <option value="12">Dec (12)</option>
+</select>
+                    </td>
+
+                </tr>
+
+
+
+                <tr>
+                    <td> </td>
+                    <td>
+                        <a onclick="pick();" class="button"><span>OK</span></a> </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+}
+
+<script>
+
+    $("#rpForm").kendoValidator({
+    });
+    function pick() {
+       // alert('d');
+        var sm1 = $("#sm1").val();
+        var ServiesPerYear = $("#ServiesPerYear").val();
+        var sm2 = $("#sm2").val();
+
+        /*if (sm1 == "") {
+            alert("Please Select a Month");
+            return false;
+        }
+        */
+        parent.$("#hdsm1").val(sm1);
+        parent.$("#hdServiesPerYear").val(ServiesPerYear);
+        if (ServiesPerYear==1)
+            parent.$("#hdsm2").val(sm2);
+        else
+            parent.$("#hdsm2").val(sm1);
+        parent.$("#ESMwindow").data("kendoWindow").close();
+    }
+
+
+    function NoChange() {
+        var ServiesPerYear = $("#ServiesPerYear").val();
+        if (ServiesPerYear == 1)
+
+            $("#sm2").hide();
+        else
+            $("#sm2").show();
+
+ }
+
+</script>
+
+

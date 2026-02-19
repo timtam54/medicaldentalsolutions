@@ -1,0 +1,332 @@
+﻿@model MDS.Models.ServiceSearch
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+</style>
+<h2 style="text-align: center;">Service Search</h2>
+@using (Html.BeginForm("SearchServiceJob", "ServiceWorkOrder", FormMethod.Post, new { id = "svForm" }))
+{   
+    <div class="contact-info" style="margin: 25px;">
+        <div class="content">
+            <table width="100%">
+                <tr>
+                    <td>Service Work:
+                    </td>
+                    <td colspan="2">
+                        @if (Model.ServiceWork == "C")
+                        {                            
+                            @Html.RadioButtonFor(m => m.ServiceWork, "C", new { Name = "ServiceWork", Checked = "checked" }) <span>Complete</span>
+                            @Html.RadioButtonFor(m => m.ServiceWork, "I", new { Name = "ServiceWork" })  <span>Incomplete</span>
+                            @Html.RadioButtonFor(m => m.ServiceWork, "E", new { Name = "ServiceWork" })<span>Either</span>
+                        
+                        }
+
+                        else if (Model.ServiceWork == "I")
+                        {
+                            @Html.RadioButtonFor(m => m.ServiceWork, "C", new { Name = "ServiceWork" }) <span>Complete</span>
+                            @Html.RadioButtonFor(m => m.ServiceWork, "I", new { Name = "ServiceWork", Checked = "checked" })  <span>Incomplete</span>
+                            @Html.RadioButtonFor(m => m.ServiceWork, "E", new { Name = "ServiceWork" })<span>Either</span>
+                        }
+
+                        else
+                        {                       
+                            @Html.RadioButtonFor(m => m.ServiceWork, "C", new { Name = "ServiceWork" }) <span>Complete</span>
+                            @Html.RadioButtonFor(m => m.ServiceWork, "I", new { Name = "ServiceWork" })  <span>Incomplete</span>
+                            @Html.RadioButtonFor(m => m.ServiceWork, "E", new { Name = "ServiceWork", Checked = "checked" })<span>Either</span> 
+                        }
+
+                    </td>
+                    <td align="center">Invoice:
+                    </td>
+                    <td colspan="2">
+
+                        @if (Model.ServiceWork == "R")
+                        {                            
+                            @Html.RadioButtonFor(m => m.Invoice, "R", new { Name = "Invoice", Checked = "checked" })  <span>Raised</span>
+                            @Html.RadioButtonFor(m => m.Invoice, "N", new { Name = "Invoice" })  <span>Not Raised</span>
+                            @Html.RadioButtonFor(m => m.Invoice, "E", new { Name = "Invoice" }) <span>Either</span>
+                        
+                        }
+
+                        else if (Model.ServiceWork == "N")
+                        {
+                            @Html.RadioButtonFor(m => m.Invoice, "R", new { Name = "Invoice" })  <span>Raised</span>
+                            @Html.RadioButtonFor(m => m.Invoice, "N", new { Name = "Invoice", Checked = "checked" })  <span>Not Raised</span>
+                            @Html.RadioButtonFor(m => m.Invoice, "E", new { Name = "Invoice" }) <span>Either</span>
+                        }
+
+                        else
+                        {                       
+                            @Html.RadioButtonFor(m => m.Invoice, "R", new { Name = "Invoice" })  <span>Raised</span>
+                            @Html.RadioButtonFor(m => m.Invoice, "N", new { Name = "Invoice" })  <span>Not Raised</span>
+                            @Html.RadioButtonFor(m => m.Invoice, "E", new { Name = "Invoice", Checked = "checked" }) <span>Either</span>
+                        }
+
+
+                    </td>
+                </tr>
+                <tr>
+                    <td width="100">Engineer:
+                    </td>
+                    <td>@(Html.Kendo().DropDownListFor(m => m.EngineerID)
+                            .Name("EngineerID")
+                            .DataTextField("EngineerName")
+                            .DataValueField("EngineerID")
+                            .BindTo(Model.EngineerList)
+                             .Filter("startswith")
+                            .HtmlAttributes(new { style = "width:150px" })
+                            )
+
+                    </td>
+                    <td width="100">Customer:
+                    </td>
+                    <td>@(Html.Kendo().DropDownListFor(m => m.Customerid)
+                          .Name("Customerid")
+                          .DataTextField("CompanyName")
+                          .DataValueField("CustomerCode")
+                          .BindTo(Model.CustomerList)
+                           .Filter(MDS.Controllers.LoginController.SearchType)
+                          .HtmlAttributes(new { style = "width:150px" })
+                        )
+
+                    </td>
+                    <td width="100">Customer-Site:
+                    </td>
+                    <td>@(Html.Kendo().DropDownListFor(m => m.Department)
+                          .Name("Department")
+                          .DataTextField("Department")
+                          .DataValueField("DepartmentID")
+                          .DataSource(dataSource =>
+                                  {
+                                      dataSource.Read(read =>
+                                      {
+                                          read.Action("GetCustomerSiteX", "Service")
+                                             .Data("CustomerSiteData");
+                                      })
+                                      .ServerFiltering(true);
+                                  })
+                                  .AutoBind(false)
+                                 .CascadeFrom("Customerid")
+                  
+                          .HtmlAttributes(new { style = "width:150px" })
+                        )
+                    </td>
+                </tr>
+                <tr>
+                    <td>Location:
+                    </td>
+                    <td>@(Html.Kendo().DropDownListFor(m => m.Locationid)
+                                .Name("Locationid")
+                                .DataTextField("Location")
+                                .DataValueField("Locationid")
+                                .DataSource(dataSource =>
+                                  {
+                                      dataSource.Read(read =>
+                                      {
+                                          read.Action("GetCustomerLocation", "Service")
+                                             .Data("CustomerSiteData");
+                                      })
+                                      .ServerFiltering(true);
+                                  })
+                                  .AutoBind(false)
+                                 .CascadeFrom("Customerid")
+                                .HtmlAttributes(new { style = "width:150px" })
+                            )
+                    </td>
+                    <td>Service Job #:
+                    </td>
+                    <td>@(Html.Kendo().TextBoxFor(m => m.ServiceJob)
+                                .Name("ServiceJob")
+                                //.Filter("startswith")
+                                .HtmlAttributes(new { style = "width: 150px " })
+                            )
+
+                    </td>
+                    <td>Customer Order No:
+                    </td>
+                    <td>@(Html.Kendo().TextBoxFor(m => m.CustomerOrderNo)
+                                .Name("CustomerOrderNo")
+                                .HtmlAttributes(new { style = "width: 150px " })
+                            )
+                    </td>
+                </tr>
+            <tr>
+                    <td>Date In Filter:
+                    </td>
+                    <td>
+                        @if (Model.DateInFilter)
+                        {
+                            @Html.CheckBox("ChkDateInFilter", true)
+                        }
+                        else
+                        {
+                            @Html.CheckBox("ChkDateInFilter", false)
+                        }
+
+                    </td>
+                    <td class="datein">Date In From/To:
+                    </td>
+                    <td class="datein">
+                        @(Html.Kendo().DatePickerFor(m => m.FromDate)
+                            .Name("FromDate")
+                            .Value(DateTime.Now.AddMonths(-1))
+                            .Format("dd/MM/yyyy")
+                            .ParseFormats(new string[] { "dd/MM/yyyy" })
+                            .HtmlAttributes(new { required = "required", type = "text" , data_required_msg = "Date In is required." })
+                            )
+
+                    </td>
+                    <td class="datein">
+                        @(Html.Kendo().DatePickerFor(m => m.ToDate)
+                            .Name("ToDate")
+                            .Value(DateTime.Now)
+                            .Format("dd/MM/yyyy")
+            .HtmlAttributes(new { required = "required", type = "text", data_required_msg = "Date Out is required." })
+                            )</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Date Out Filter:
+                    </td>
+                    <td>
+
+                        @if (Model.DateOutFilter)
+                        {
+                            @Html.CheckBox("ChkDateOutFilter", true)
+                        }
+                        else
+                        {
+                            @Html.CheckBox("ChkDateOutFilter", false)
+                        }
+
+
+                    </td>
+                    <td class="dateout">Date Out From/To:
+                    </td>
+                    <td class="dateout">@(Html.Kendo().DatePickerFor(m => m.OutFromDate)
+                            .Name("OutFromDate")
+                            .Value(DateTime.Now.AddMonths(-1))
+                            .Format("dd/MM/yyyy")
+                            .ParseFormats(new string[] { "dd/MM/yyyy" })
+.HtmlAttributes(new { style = "width:120px", type = "text" })
+                            )
+
+                    </td>
+                    <td class="dateout">@(Html.Kendo().DatePickerFor(m => m.OutToDate)
+                            .Name("OutToDate")
+                        .Value(DateTime.Now)
+                            .Format("dd/MM/yyyy")
+.HtmlAttributes(new { style = "width:120px", type = "text" })
+                            )
+                    </td>
+                    <td>
+                     
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Branch:
+                    </td>
+                    <td>@(Html.Kendo().DropDownListFor(m => m.Branchid)
+                     .Enable(MDS.Controllers.LoginController.AllCustomers(User.Identity.Name))
+
+                          .Name("Branchid")
+                          .DataTextField("BranchName")
+                          .DataValueField("BranchID")
+                          .BindTo(Model.BranchList)
+                          .HtmlAttributes(new { style = "width:150px" })
+                        )
+                    </td>
+                    <td>
+                        <a class="button" onclick="$('#svForm').submit();"><span>Search</span></a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="6">&nbsp;@Html.HiddenFor(m => m.DateInFilter)
+                        @Html.HiddenFor(m => m.DateOutFilter)
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="8" align="left">
+                        <a onclick="pick();" class="button"><span>Pick</span></a>
+                            <a onclick="cancel();" class="button"><span>Cancel</span></a>
+                    </td>
+                </tr>
+            </table>
+            <table width="100%">
+                <tr>
+                    <td colspan="6">
+                        @(Html.Kendo().Grid(Model.Service)
+.Name("svGrid")
+.Columns(columns =>
+{
+    columns.Bound(p => p.JobCode).Title("Job No");
+    columns.Bound(p => p.ServiceJobUID).Title("Job No").Visible(false);
+    columns.Bound(p => p.Customer).Title("Customer");
+    columns.Bound(p => p.CustomerSite).Title("Customer Site");
+    columns.Bound(p => p.DateProgrammed).Title("Date Programmed").ClientTemplate("#= (DateProgrammed == null) ? ' ' : kendo.toString(DateProgrammed, 'dd/MM/yyyy') #");
+    columns.Bound(p => p.DateStart).Title("Date Start").ClientTemplate("#= (DateStart == null) ? ' ' : kendo.toString(DateStart, 'dd/MM/yyyy') #");
+    columns.Bound(p => p.EngineerName).Title("Engineer Name");
+})
+.Pageable()
+.Sortable()
+.Filterable()
+.Selectable(s => s.Mode(GridSelectionMode.Single))
+ .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(200)
+        .ServerOperation(false)
+     )
+)
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="8" align="left">
+                        <a onclick="pick();" class="button"><span>Pick</span></a>
+                    </td>
+                </tr>
+                <tr style="height: 20px">
+                    <td colspan="8" align="left"></td>
+                </tr>
+                <tr style="height: 20px">
+                    <td colspan="8" align="left"></td>
+                </tr>
+
+            </table>
+        </div>
+    </div>
+    
+}
+
+<script>
+    $("#rpForm").kendoValidator({
+    });
+
+</script>
+<script>
+    function CustomerSiteData() {
+        return {
+            Customerid: $("#Customerid").val(),
+            Branchid: $("#Branchid").val()
+        };
+    }
+
+    function pick() {
+        var entityGrid = $("#svGrid").data("kendoGrid");
+        var selectedItem = entityGrid.dataItem(entityGrid.select());
+        if (selectedItem == undefined) {
+            alert("Please select the row first");
+        }
+        else {
+            parent.$("#ServiceJobID").val(selectedItem.ServiceJobUID);
+            parent.$("#hdServiceId").val(selectedItem.Customer);
+            parent.$("#window").data("kendoWindow").close();
+        }
+    }
+
+    function cancel() {
+        parent.$("#window").data("kendoWindow").close();
+    }
+</script>

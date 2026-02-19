@@ -1,0 +1,56 @@
+﻿@*@model MDS.Models.AddRepaire
+
+<div id="window">
+    <div class="armchair">
+        <table>
+
+            <tr>
+                <td>Part NameX
+                </td>
+                <td>
+                    @(Html.Kendo().AutoCompleteFor(m => m.PartName)
+                                               .Name("PartName")
+                                               .Placeholder("Search Parts")
+                                               .DataTextField("PartName")
+                                               .DataSource(source =>
+                                                 {
+                                                     source.Read(read =>
+                                                     {
+                                                         read.Action("GetPartItem", "Repair"); //Set the Action and Controller name
+
+                                                     })
+                                                     .ServerFiltering(true);
+
+                                                 })
+
+                                         )
+                </td>
+
+            </tr>
+            <tr>
+                <td>Number Of PartsX
+                </td>
+                <td>
+                    @(Html.Kendo().NumericTextBoxFor(m => m.NoOfParts)
+                                              .Name("NoOfParts")
+                                            .HtmlAttributes(new { style = "width: 200px " })
+                                         )
+
+                </td>
+            </tr>
+            <tr>
+                <td>Cost
+                </td>
+                <td>
+                    @(Html.Kendo().CurrencyTextBoxFor(m => m.Cost)
+                                            .Name("Cost")
+                                            .HtmlAttributes(new { style = "width: 200px " })
+                                         )
+                </td>
+            </tr>
+
+        </table>
+
+
+    </div>
+</div>*@

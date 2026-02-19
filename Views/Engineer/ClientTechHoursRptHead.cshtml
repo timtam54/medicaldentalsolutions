@@ -1,0 +1,111 @@
+﻿@model MDS.Models.StartEndDate
+@{
+    ViewBag.Title = "Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+<link href="~/CSS/style.css" rel="stylesheet" />
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
+
+<script type="text/javascript">
+    function TechClientCosts(Cust, Eng, Chrg,Wrnty) {
+        var From = $('#From').val();
+        var To = $('#To').val();
+        Cust = Cust.replace('&', '--');
+        Cust = Cust.replace(' ', '~~');
+      //  alert('TechClientCosts:' + Cust + ' ' + Eng + ' ' + Chrg);
+          try {
+            div.dialog({
+                closeOnEscape: false,
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    var url = '@Url.Action("TechClientCostsDet", "Engineer")?To=' + To + '&From=' + From + '&Cust=' + Cust + '&Eng=' + Eng + '&Chrg=' + Chrg + '&Warranty=' + Wrnty;
+                    $(this).load(url); @*'@Url.Action("UploadFile", "Applications")');*@
+
+                },
+                modal: true,
+                resizable: false,
+
+                width: 700,
+                height: 600,
+                title: "Hours",
+                buttons:
+                {
+                    Close: function () {
+                        div.remove(); div.dialog("close");
+                    }
+                },
+            });
+        }
+        catch (ex) {
+            alert('catchall:' + ex.message);
+        }
+    }
+</script>
+<div class="contact-info">
+    <div class="content">
+        <div id="dialog"></div>
+        <table width="100%">
+            <tr>
+                <th>
+                    <b>
+                        From
+                    </b>
+                </th>
+                <td>
+                    @Html.EditorFor(i => i.From)
+                </td>
+                <th>
+                    <b>
+                        To
+                    </b>
+                </th>
+                <td>
+                    @Html.EditorFor(i => i.To)
+                </td>
+                <td>
+                    <input class="inputbuttonbg inputbig" type="button" onclick="RefreshPhoto()" value="Refresh" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="5">
+                    <div id="PhotosX" />
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+            var div = $("#dialog");
+
+            function RefreshPhoto() {
+            try {
+                var From = $('#From').val();
+                var To = $('#To').val();
+
+                $.ajax({
+                    url: '@Url.Content("~/Engineer/ClientTechHoursRpt")',
+                    type: 'POST',
+                    data: { From: From,To:To },
+                    success: doSubmitSuccess
+                });
+            }
+            catch (ex) {
+                alert('Error in init():' + ex.message);
+            }
+        }
+
+        function doSubmitSuccess(result) {
+            try {
+                $('#PhotosX').html(result);
+            }
+            catch (ex) {
+                alert('Error in doSubmitSuccess():' + ex.message);
+            }
+        }
+    RefreshPhoto();
+</script>

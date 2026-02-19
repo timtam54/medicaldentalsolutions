@@ -1,0 +1,403 @@
+﻿@model MDS.Models.MobEquip
+@{
+    ViewBag.Title = "Services";
+    Layout = null;
+}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+<style>
+    a.my-class {
+        color: #333333
+    }
+
+        a.my-class:active {
+            color: #666666
+        }
+
+        a.my-class:link {
+            color: #999999
+        }
+
+        a.my-class:visited {
+            color: #CCCCCC
+        }
+
+    body {
+        font-family: Arial;
+    }
+</style>
+
+<script type="text/javascript">
+
+    function selectx(num,ord) {
+        try {
+            //alert(num);
+            $('#EquipUID').val(num);
+            document.forms[0].submit();
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+        return false;
+    }
+
+    function autosearch() {
+        try {
+            var searchString = $('#YourSearchElementID').val();// $(this).val(); //Get the value from this TextBox
+            var data = { searchString: searchString }
+            $.post('@Url.Action("EquipSearch","Mobile")', data,
+                function (data) {
+                    if (data.results == null)
+                        alert('no results');
+                    else {
+                        var divstring = '';
+                        divstring = ''
+                        for (var i = 0; i < data.results.length; i++) {
+                            divstring = divstring + "<a id='" + data.results[i].ID + "' href='' onclick='selectx(" + data.results[i].ID + ","+data.results[i].Ord+");return false;'>" + data.results[i].Desc + "</a><br/>"
+                        }
+                        $("#searchresults").html(divstring);
+                    }
+                });
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+
+</script>
+
+<body>
+    @using (Html.BeginForm("Equipment", "Mobile", FormMethod.Post, new { id = "Equipment" }))
+    {
+        <table cellpadding="0" cellspacing="0" style="width:100%" align="center">
+            <tr>
+                <td width="50%">
+                    <table style="width:100%">
+                        <tr style="width:100%">
+                            <td style="width:100%">
+                                <table style="width:100%">
+                                    <tr style="width:100%">
+                                        <td style="background-color:white"><img alt="@MDS.Controllers.LoginController.CompanyName" title="@MDS.Controllers.LoginController.CompanyName" class="logo-image" src="@Url.Action("../images/logo.png")"></td>
+                                        <td  style="vertical-align:top" align="center">@Html.ActionLink("Repairs", "DashboardRepairs"@* , null, new { @class = "my-class" }*@)</td>
+                                        <td  style="vertical-align:top" align="center">@Html.ActionLink("Log Off", "LogOff", "Login", null, new { @class = "my-class" })</td>
+                                    </tr>
+                                </table>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:100%">
+                                <table style="width:100%">
+                                    <tr>
+
+                                        <td>
+                                            <h4><span style="width:250px;color:#000080">Equipment</span></h4>
+                                        </td>
+                                        <td>
+                                            <h4><span style="width:250px;color:#000080">@MDS.Controllers.MobileController.EngineerName(User.Identity.Name)</span></h4>
+                                        </td>
+
+                                    </tr>
+                                </table>
+                            </td>
+
+                        </tr>
+                    </table>
+                </td>
+                <td valign="top" style="width:50%">
+                    <table style="width:100%;vertical-align:top">
+                        <tr style="width:100%;vertical-align:top">
+
+                            <td style="vertical-align:top">
+                                <input style="width:50%" onblur="autosearch();" type="text" autocomplete="off"  name="YourSearchElementID" onkeyup="autosearch();" id="YourSearchElementID" value="" size="30" maxlength="30" />
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="width:50%" id="searchresults">
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    </table>
+                </td>
+
+            </tr>
+        </table>
+        <table cellspacing="0" style="width:100%" align="center">
+            <tr>
+                <td><b>EquipID</b></td>
+                <td>
+                    @Model.Equip.EquipUID
+                </td>
+            </tr>
+            <tr style="background-color:silver">
+                <td><b>Serial Number</b></td>
+                <td>
+                    @Model.Equip.SerialNumber
+                </td>
+            </tr>
+            <tr>
+                <td><b>Cost</b></td>
+                <td>
+                    @Convert.ToDecimal(Model.Equip.Cost).ToString("c")
+                </td>
+            </tr>
+            <tr style="background-color:silver">
+                <td><b>Item Code</b></td>
+                <td>
+                    @Model.Equip.BNQItemCode
+                </td>
+            </tr>
+            <tr>
+                <td><b>Currently Serviced By US</b></td>
+                <td>
+                    @Html.CheckBoxFor(model => model.Equip.CurrentlyServicedByBNQ, new { Name = "DataEntryIncompeteOnly", style = "width:20px;height:20px" })
+                </td>
+            </tr>
+            <tr style="background-color:silver">
+                <td><b>Delivery Date</b></td>
+                @if (@Model.Equip.DeliveryDate == null)
+                {
+                    <td></td>
+                }
+                else
+                {
+                    <td>
+                        @Convert.ToDateTime(Model.Equip.DeliveryDate).ToString("dd-MMM-yyyy")
+                    </td>
+                }
+            </tr>
+
+
+            <tr>
+                <td><b>Customer Code</b></td>
+                <td>
+                    @Model.Equip.CustomerCode
+                </td>
+            </tr>
+            <tr style="background-color:silver">
+                <td><b>Cust Equip Code</b></td>
+                <td>
+                    @Model.Equip.CustomerEquipCode
+                </td>
+            </tr>
+
+            <tr>
+                <td><b>Delivery Date</b></td>
+                <td>
+                    @Convert.ToDateTime(Model.Equip.DeliveryDate).ToString("dd-MMM-yyyy")
+                </td>
+            </tr>
+            <tr style="background-color:silver">
+                <td><b>Department</b></td>
+                <td>
+                    @Model.Equip.Department
+
+                </td>
+            </tr>
+
+            <tr>
+                <td><b>Initial Condition</b></td>
+                <td>
+                    @Model.Equip.InitialCondition
+                </td>
+            </tr>
+
+            <tr style="background-color:silver">
+                <td><b>In Service</b></td>
+                <td>
+                    @Html.CheckBoxFor(model => model.Equip.InService, new { Name = "DataEntryIncompeteOnly", style = "width:20px;height:20px" })
+                </td>
+            </tr>
+
+            <tr>
+                <td><b>Location</b></td>
+                <td>
+                    @Model.Equip.Location
+                </td>
+            </tr>
+
+            <tr style="background-color:silver">
+                <td><b>Manuals</b></td>
+                <td>
+                    @Model.Equip.Manuals
+                </td>
+            </tr>
+
+            <tr>
+                <td><b>Minors Between Majors</b></td>
+                <td>
+                    @Model.Equip.MinorsBetweenMajors
+                </td>
+            </tr>
+
+            <tr style="background-color:silver">
+                <td><b>Model</b></td>
+                <td>
+                    @MDS.Controllers.MobileController.GetEquipModel(Model.Equip.ModelUID)
+                </td>
+            </tr>
+
+            <tr>
+                <td><b>Equipment Type</b></td>
+                <td>
+                    @MDS.Controllers.MobileController.GetEquipType(Model.Equip.ModelUID)
+                </td>
+            </tr>
+
+            <tr style="background-color:silver">
+                <td><b>No Longer Required</b></td>
+                <td>
+                    @Html.CheckBoxFor(model => model.Equip.NoLongerRequired, new { Name = "DataEntryIncompeteOnly", style = "width:20px;height:20px" })
+                </td>
+            </tr>
+
+            @{
+                int iix = 0;
+                foreach (var item in Model.Repairs)
+                {
+                    <tr>
+                        @if (iix == 0)
+                        {
+                            iix++;
+
+                            <td><b>Repairs</b></td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                        <td>
+                            @Html.ActionLink(@Model.BranchPrefix + "R" + @item.JobCode + "(" + Convert.ToDateTime(@item.DateIn).ToString("dd-MMM-yy") + ")", "Repair", new { RepairID = item.RepairUID })
+
+                        </td>
+                    </tr>
+
+                }
+            }
+            @{
+                int iiy = 0;
+                foreach (var item in Model.Services)
+                {
+                    <tr style="background-color:silver">
+
+                        @if (iiy == 0)
+                        {
+                            iiy++;
+
+                            <td><b>Services</b></td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                        <td>
+                            @Model.BranchPrefix S @item.JobCode.ToString()
+                            @*@Html.ActionLink(@Model.BranchPrefix + "S" + @item.JobCode.ToString() + "(" + Convert.ToDateTime(@item.ActualDateStart).ToString("dd-MMM-yy") + ")", "Service", new { ServiceJobUID = item.ServiceJobUID })*@
+
+                        </td>
+                    </tr>
+
+                }
+            }
+
+            <tr>
+                <td><b>Notes</b></td>
+                <td>
+                    @Model.Equip.Notes
+                </td>
+            </tr>
+
+            <tr style="background-color:silver">
+                <td><b>Num Services Per Year</b></td>
+                <td>
+                    @Model.Equip.NumServicesPerYear
+                </td>
+            </tr>
+
+            <tr>
+                <td><b>Obsolete</b></td>
+                <td>
+                    @Html.CheckBoxFor(model => model.Equip.Obselete, new { Name = "DataEntryIncompeteOnly", style = "width:20px;height:20px" })
+
+                </td>
+            </tr>
+
+            <tr style="background-color:silver">
+                <td><b>Retirement Comment</b></td>
+                <td>
+                    @Model.Equip.RetirementComment
+                </td>
+            </tr>
+
+            <tr>
+                <td><b>SerialNumber</b></td>
+                <td>
+                    @Model.Equip.SerialNumber
+                </td>
+            </tr>
+
+            <tr style="background-color:silver">
+                <td><b>Service Area</b></td>
+                <td>
+                    @MDS.Controllers.MobileController.GetServiceArea(Model.Equip.ServiceAreaUID)
+                </td>
+            </tr>
+
+            <tr>
+                <td><b>Service Month 1</b></td>
+                <td>
+                    @Model.Equip.ServiceMonth1
+                </td>
+            </tr>
+
+            <tr style="background-color:silver">
+                <td><b>Service Month 2</b></td>
+                <td>
+                    @Model.Equip.ServiceMonth2
+                </td>
+            </tr>
+
+            <tr>
+                <td><b>Sold By MDS</b></td>
+                <td>
+                    @Html.CheckBoxFor(model => model.Equip.SoldByBNQ, new { Name = "DataEntryIncompeteOnly", style = "width:20px;height:20px" })
+                </td>
+            </tr>
+
+            <tr style="background-color:silver">
+                <td><b>Vendor</b></td>
+                <td>
+                    @MDS.Controllers.MobileController.GetVendor(Model.Equip.VendorUID)
+                </td>
+            </tr>
+            <tr>
+                <td><b>Warranty Exp Date</b></td>
+                <td>
+                    @if (Model.Equip.WarrantyExpirationDate != null)
+                    {
+                        @Convert.ToDateTime(Model.Equip.WarrantyExpirationDate).ToString("dd-MMM-yyyy")
+                    }
+                </td>
+            </tr>
+
+
+            <tr>
+                <td>
+                    @Html.EditorFor(m => m.Equip.EquipUID, new { htmlAttributes = new { style = "border:none;color:white", width = "0px", id = "EquipUID" } })
+                </td>
+            </tr>
+        </table>
+
+    }
+</body>

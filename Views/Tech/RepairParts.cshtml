@@ -1,0 +1,104 @@
+﻿@model List<MDS.DB.RepairPart>
+@{
+    ViewBag.Title = "";
+}
+
+@using (Html.BeginForm("RepairParts", "Tech", FormMethod.Post, new { id = "RepairParts" }))
+{
+
+    @Html.AntiForgeryToken()
+
+    <table cellspacing="0" cellpadding="2" width="100%" border="1">
+        <tbody>
+
+            <tr style="width:100%">
+                <th>
+                    <b>Part number</b>
+                </th>
+                <th>
+                    <b>Part Name</b>
+                </th>
+                <th>
+                    <b>Units</b>
+                </th>
+                <th>
+                    <b>Cost per unit</b>
+                </th>
+                <th>
+                    <b>Total</b>
+                </th>
+                @if (MDS.Controllers.LoginController.IsAdmin(User.Identity.Name) != MDS.Controllers.ATC.Customer && ViewBag.Readonly != true)
+                    {
+                        <th colspan="1">
+                            <a href="" onclick="CreateParts();return false;" title="Add Parts"><img title="Add Parts" height="40" width="40" src="~/Images/Add.png" /></a>
+                        </th>
+                    }
+                    else
+                    {
+                        <th></th>
+                    }
+                </tr>
+        </tbody>
+        @if ((@Model == null))
+        {
+            <tr><td  align="center"  colspan="6">No records</td></tr>
+        }
+        else if ((@Model.Count() == 0))
+    {
+    <tr><td align="center" colspan="6">No records</td></tr>
+    }
+else
+
+{
+    for (int fi = 0; fi < Model.Count(); fi++)
+    {
+        MDS.DB.RepairPart xxx = Model[fi];
+        <tr>
+            <td>
+                @if (MDS.Controllers.LoginController.IsAdmin(User.Identity.Name) != MDS.Controllers.ATC.Customer && ViewBag.Readonly != true)
+                    {
+                        <a href="" onclick="editPart('@xxx.RepairPartId', '@xxx.BranchID'); return false;" title="Edit Parts">
+                            @xxx.PartNumber
+                        </a>
+                    }
+                    else
+                    {
+                        @xxx.PartNumber
+                    }
+                </td>
+            <td>
+                @xxx.PartDesc
+            </td>
+            <td>
+                @xxx.NumberUsed
+            </td>
+            <td>
+                @MDS.Controllers.TechController.FormatCurrency(xxx.CostPerUnit)
+            </td>
+            <td>
+                @MDS.Controllers.TechController.FormatCurrency(xxx.NumberUsed * xxx.CostPerUnit)
+            </td>
+            <td>
+                @if (MDS.Controllers.LoginController.IsAdmin(User.Identity.Name) != MDS.Controllers.ATC.Customer)
+                {
+                    if (ViewBag.Readonly != true)
+                    {
+                        <a href="" onclick="deletePart('@xxx.RepairPartId', '@xxx.BranchID'); return false;" Title="Delete"><img height="40" width="40" src="~/Images/Delete.png" /></a>
+                    }
+                }
+                </td>
+        </tr>
+    }
+
+}
+
+        <tr>
+        </tr>
+    </table>
+
+    @*<script type="text/javascript">
+        function deletePart(PartID,BranchID) {
+            ;
+        }
+    </script>*@
+}

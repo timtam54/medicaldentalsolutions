@@ -1,0 +1,138 @@
+﻿@model MDS.Models.EquipTypeSearch
+@{
+    ViewBag.Title = "Equipment Type & Test Scripts - Search";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<div class="breadcrumb">
+     @Html.ActionLink("Home", "Index", "Dashboard")
+    » @Html.ActionLink("Equipment Type and Test Script", "Index", "EquipType")
+</div>*@
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+
+    #rpGrid tbody tr:hover {
+        cursor: pointer !important;
+    }
+</style>
+@if (@Model.PopUp)
+{ 
+    <script type="text/javascript">
+        $("#container-header").hide();
+    </script>
+}
+<h1>Equipment Type and Test Script Search</h1>
+
+@using (Html.BeginForm("Index", "EquipType", FormMethod.Post, new { id = "brForm" }))
+{
+     @Html.HiddenFor(m => m.PopUp)
+    <div class="contact-info">
+        <div class="content">
+            <table width="100%">
+                
+                <tr>
+                    <td>Code:
+                    </td>
+                    <td>
+                        @(Html.Kendo().TextBoxFor(m => m.Code)
+                                .Name("Code")
+                                .HtmlAttributes(new { style = "width: 150px " })
+                            )
+                    </td>
+                    <td>Name:
+                    </td>
+                    <td>
+                        @(Html.Kendo().TextBoxFor(m => m.Name)
+                                .Name("Name")
+                                .HtmlAttributes(new { style = "width: 150px " })
+                            )
+                    </td>
+                    <td>
+                        <a class="button" onclick="$('#brForm').submit();"><span>Search</span></a>
+                    </td>
+                </tr>
+
+            </table>
+
+            <table width="100%">
+                <tr>
+                    <td colspan="6">
+                         @if (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin)
+                    {
+                        <input type="button" class="inputbuttonbg inputbig" value="Add New Equipment Type" onclick="add()">
+                         }
+                                 </td>
+
+                </tr>
+                <tr>
+                    <td colspan="6">
+                        @(Html.Kendo().Grid(Model.EquipTypes)
+.Name("brGrid")
+.Columns(columns =>
+{   
+    if (ViewBag.PopUp != null) { columns.Bound(p => p.Code).Title("Code").ClientTemplate(@Html.ActionLink("#=Code#", "EditPopUp", "EquipType", new { id = "#=CodeRed#" }, null).ToHtmlString()); }
+    else { columns.Bound(p => p.Code).Title("Code").ClientTemplate(@Html.ActionLink("#=Code#", "Edit", "EquipType", new { id = "#=CodeRed#" }, null).ToHtmlString()); }    
+   
+    columns.Bound(p => p.Name).Title("Name");
+    columns.Bound(p => p.Description).Title("Description");
+    columns.Bound(p => p.TechServiceWorkDone).Title("Tech Service Work Done");
+})
+.Pageable()
+.Sortable()
+.Filterable()
+.Selectable(s => s.Mode(GridSelectionMode.Single))
+.DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(200)
+        .ServerOperation(false)
+     )
+)
+                    </td>
+                </tr>
+                
+            </table>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+
+    $('input').keypress(function (e) {
+        {
+            if (event.which == 13) {
+                //alert('search');
+                //$(this).closest('form').submit();
+                $('#brForm').submit();
+                return false;
+            }
+        }
+    });
+
+    function add() {
+        var popup = '@Model.PopUp';
+
+        if (popup == "True") {
+            var url = '@Url.Action("AddPopUp", "EquipType")';
+            window.location.href = url;
+        }
+        else {
+            window.location.href = '@Url.Action("Add", "EquipType")';
+        }
+    }
+
+</script>
+
+@*<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>*@

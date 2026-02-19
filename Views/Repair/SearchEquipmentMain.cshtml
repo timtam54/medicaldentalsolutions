@@ -1,0 +1,141 @@
+﻿@model MDS.Models.EquipmentSearchNew
+@{
+    ViewBag.Title = "";
+}
+@{
+    Layout = "~/Views/Shared/_IFrameLayout.cshtml";
+}
+@using (Html.BeginForm("SearchEquipmentMain", "Repair", FormMethod.Post, new { id = "SearchEquipmentMain" }))
+{
+    @Html.AntiForgeryToken()
+    <table>
+        <tr>
+            <td>
+                <b>Customer</b>
+            </td>
+            @if (ViewBag.CusLock)
+            {
+                <td>
+                    @Html.DropDownListFor(m => m.Customerid, new SelectList(ViewBag.CustomerX, "CustomerCode", "CompanyName"), new { @class = "form-control", @id = "CustCode",disabled= "disabled" })
+                </td>
+            }
+            else
+            {
+                <td>
+                    @Html.DropDownListFor(m => m.Customerid, new SelectList(ViewBag.CustomerX, "CustomerCode", "CompanyName"), new { @class = "form-control", @id = "CustCode" })
+                </td>
+            }
+                <td>
+                    @Html.CheckBoxFor(m => m.DisplayEquip)<span> Only display Equipment in service (not retired)</span>
+                </td>
+                <td>
+                    @Html.CheckBoxFor(m => m.ServiceMDS)<span> Only display Equipment currently service by @MDS.Controllers.LoginController.CompanyName</span>
+                </td>
+
+            </tr>
+        <tr>
+            <td><b>Search</b></td>
+            <td>
+                @Html.EditorFor(m => m.SearchMDS)
+            </td>
+            <td>
+                <b>Equipment Type</b>
+            </td>
+            <td>
+                @Html.DropDownListFor(m => m.EquipType, new SelectList(ViewBag.EquipTypeX, "EquipTypeCode", "Name"), new { @class = "form-control", @id = "EquipType" })
+            </td>
+
+            <td>
+                <a class="button" onclick="Search(); return false;"><span>Search</span></a>
+            </td>
+            <td>
+                @*<a href="@Url.Action("Add","Equipment", new { Customerid = Model.Customerid })" target="_blank">Add New Equipment</a>*@
+                <a href="" onclick="AddNewEquip(); return false;" target="_blank">Add New Equipment</a>
+            </td>
+        </tr>
+    </table>
+    <div id="results"></div>
+}
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        $("#SearchMDS").keypress(function (event) {
+            if (event.which == 13) {
+                Search(); return false;
+            }
+        });
+    });
+
+
+    //$('input').keypress(function (e) {
+    //    return e.keyCode !== 13;
+    //});
+
+    function AddNewEquip() {
+        //alert($('#CustCode').val());
+        var url = '@Url.Action("Add", "Equipment")?Customerid=' + $('#CustCode').val() + "&message=CR";
+        //$(this).load(url);
+        window.open(url);
+//        window.location.href = url;// "/Login/PDFReport" + '?Period=' + Period;
+
+    }
+
+    function EditEquip(id) {
+        //alert($('#CustCode').val());
+        var url = '@Url.Action("Edit", "Equipment")?id=' +id;
+        //$(this).load(url);
+        window.location.href = url;// "/Login/PDFReport" + '?Period=' + Period;
+
+    }
+
+
+    function Pick(EquipID) {
+        $("#SelectedEquipment").val(EquipID);
+          try {
+              CloseEquipmentWindow();
+              closeDiv();
+              return;
+                    }
+                    catch (ex) {
+                        ;
+                    }
+                    try {
+                        parent.CloseEquipmentWindow();
+                        closeDiv();
+                        return;
+                    }
+                    catch (ex) {
+                        ;
+                    }
+    }
+
+    function Search() {
+        try {
+
+            var CustCode = $('#CustCode').val();
+            var EquipType = $('#EquipType').val();
+            var InService = $('#DisplayEquip').prop("checked");
+            var ServiceMDS = $('#ServiceMDS').prop("checked");
+            var SearchMDS = $('#SearchMDS').val();
+            $.ajax({
+                url: '@Url.Content("~/Repair/SearchEquipmentload")',
+                type: 'POST',
+                data: { CustCode: CustCode, InService: InService, ServiceMDS: ServiceMDS, Search: SearchMDS, EquipType: EquipType, BranchID:'@Model.Branchid' },
+                success: function (result) {
+                    try {
+                        $('#results').html(result);
+                    }
+                    catch (ex) {
+                        alert('Error in doSubmitSuccessParts():' + ex.message);
+                    }
+                }
+            });
+        }
+        catch (ex) {
+            alert('Error in init():' + ex.message);
+        }
+    }
+
+    Search();
+</script>

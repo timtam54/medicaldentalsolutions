@@ -1,0 +1,10 @@
+﻿@model MDS.Models.Signature
+
+
+@using (Html.BeginForm("ShowSignature", "Tech", FormMethod.Post, new { id = "sigPad" }))
+{
+    <input type="button" onclick="redosignature(); return false;" value="Close and redo" />
+    <img src="@Url.Content("~/UploadedFiles/Signature_"+Model.ID.ToString()+"-"+Model.RepairOrService+"-"+Model.BranchID.ToString()+".png")" height="500" width="500" />
+
+
+}

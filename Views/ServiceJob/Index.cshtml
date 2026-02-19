@@ -1,0 +1,811 @@
+﻿@model MDS.Models.ServiceJobSearch
+@{
+    ViewBag.Title = "Service Job Search";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+
+    #sjGrid tbody tr:hover {
+        cursor: pointer !important;
+    }
+</style>
+<h1>Create Service Job</h1>
+@using (Html.BeginForm("Index", "ServiceJob", FormMethod.Post, new { id = "sjForm" }))
+{
+    <div class="contact-info">
+        <div class="content">
+            <p><b>To generate a SERVICE JOB with a schedule of SERVICE WORK ORDERS, use the settings below to specify the list of equipment that requires servicing. Ensure only ONE CUSTOMER is represented, and then press the button.</b></p>
+            <p><b>Show the next as-yet unscheduled programmed services...</b></p>
+            <table width="100%">
+                <tr>
+                    <td width="25%">
+                        @Html.RadioButtonFor(m => m.OverDue, "OVD", new { Name = "OverDue", id = "OVD" }) <span>Over Due</span>
+                    </td>
+                    <td>
+                        @Html.RadioButtonFor(m => m.OverDue, "NMD", new { Name = "OverDue", id = "NMD" })<span>Due By End of Next Month</span>
+                    </td>
+                    <td colspan="1">
+                        @Html.RadioButtonFor(m => m.OverDue, "NMO", new { Name = "OverDue", id = "NMO" }) <span>for next month ONLY</span>
+                    </td>
+                    <td>
+                        @Html.RadioButtonFor(m => m.OverDue, "CMB", new { Name = "OverDue", id = "CMB" }) <span>Due this month or earlier</span>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td colspan="1">
+                        @Html.RadioButtonFor(m => m.OverDue, "DBD", new { Name = "OverDue", id = "DBD" })  <span>Due by the end of</span>
+                    </td>
+                    <td>
+                        @(Html.Kendo().DropDownListFor(m => m.MonthVal)
+                                         .Filter("startswith")
+                                              .Name("MonthVal")
+                                              .DataTextField("Description")
+                                              .DataValueField("Val")
+                                              .BindTo(Model.monthdataList)
+                                                .Events(e => e
+                        .Change("dropdownlist_change")
+)
+                                              .HtmlAttributes(new { style = "width:150px", data_required_msg = "Month is required." })
+                        )
+                    </td>
+                    <td colspan="1">
+                        @Html.RadioButtonFor(m => m.OverDue, "ALS", new { Name = "OverDue", id = "ALS" })<span>ALL services</span>
+                    </td>
+                    <td colspan="2">
+                        <table>
+                            <tr style="color:navy">
+                                <td>
+                                    Limit number of Records to no more than:
+                                </td>
+                                <td>
+                                    @(Html.Kendo().DropDownListFor(m => m.SelCnt)
+                                          .Name("SelCnt")
+                                          .BindTo(Model.Cnt)
+                                           .Events(e => e
+.Change("dropdownlist_change")
+)
+                                          .HtmlAttributes(new { style = "width:200px", data_required_msg = "Records is required." })
+
+                                    )
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+
+
+                </tr>
+                <tr>
+                    <td width="150">
+                        Customer:
+                    </td>
+                    <td>
+                        @(Html.Kendo().DropDownListFor(m => m.Customerid)
+                                     .Filter(MDS.Controllers.LoginController.SearchType)
+                                          .Name("Customerid")
+                                          .DataTextField("CompanyName")
+                                          .DataValueField("CustomerCode")
+                                          .Enable(MDS.Controllers.LoginController.AllCustomers(User.Identity.Name))
+
+                                          .BindTo(Model.CustomerList)
+                                            .Events(e => e
+                        .Change("dropdownlist_change")
+)
+                                          .HtmlAttributes(new { style = "width:200px", data_required_msg = "Customer is required." })
+                        )
+
+                    </td>
+                    <td width="150">
+                        Customer Site:
+                    </td>
+                    <td>
+                        @(Html.Kendo().DropDownListFor(m => m.Department)
+
+                                          .Name("Department")
+                                          .DataTextField("Department")
+                                            .DataValueField("DepartmentID")
+                                              .Events(e => e
+                        .Change("dropdownlist_change")
+                )
+                                          .DataSource(dataSource =>
+                                          {
+                                              dataSource.Read(read =>
+                                              {
+                                                  read.Action("GetCustomerSiteX", "Service")
+                                                     .Data("CustomerSiteData");
+                                              })
+                                              .ServerFiltering(true);
+                                          })
+                                                  .AutoBind(false)
+                                                  .CascadeFrom("Customerid")
+                                        .HtmlAttributes(new { style = "width:200px", data_required_msg = "Customer Site is required." })
+                        )
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Location:
+                    </td>
+                    <td>
+                        @(Html.Kendo().DropDownListFor(m => m.Locationid)
+
+                                                .Name("Locationid")
+                                                .DataTextField("Location")
+                                                .DataValueField("Locationid")
+                                                  .Events(e => e
+                        .Change("dropdownlist_change")
+                    )
+                                                .DataSource(dataSource =>
+                                                {
+                                                    dataSource.Read(read =>
+                                                    {
+                                                        read.Action("GetCustomerLocationBlank", "Service")
+                                                           .Data("CustomerSiteData");
+                                                    })
+                                                    .ServerFiltering(true);
+                                                })
+                                                  .AutoBind(false)
+                                                 .CascadeFrom("Customerid")
+                                                .HtmlAttributes(new { style = "width:200px" })
+                        )
+                    </td>
+                    <td>
+                        Branch :
+                    </td>
+                    <td>
+                        @(Html.Kendo().DropDownListFor(m => m.Branchid)
+
+                                          .Name("Branchid")
+                                          .DataTextField("BranchName")
+                                          .DataValueField("BranchID")
+                                            .Events(e => e
+                        .Change("dropdownlist_change")
+                        )
+                                          .BindTo(Model.BranchList)
+                                          .HtmlAttributes(new { style = "width:200px", data_required_msg = "Branch is required." })
+                        )
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Equipment Items:</td>
+                    <td>
+                        @Html.HiddenFor(m => m.SelectedEquipment)
+                        @Html.HiddenFor(m => m.EquipmentData)
+                        @(Html.Kendo().Window()
+                                            .Name("window1")
+                                            .Title("Equipment Search")
+                                            .Width(1000)
+                                            .Height(500)
+                                            .Visible(false)
+                                            .Draggable(true)
+                                            .Iframe(true)
+                                             .Modal(true)
+                                            .Events(e => e.Close("onClose1"))
+                        )
+                        <a onclick="OpenWindow1();" class="button"><span style="font-weight: bold">Pick Equipment</span></a>
+                    </td>
+                    <td colspan="2"><span id="spDetails1"></span></td>
+                    <td><a onclick="ClearEquipment();" id="btnEquipmentClear" class="button"><span style="font-weight: bold">Clear Equipment</span></a>  </td>
+                </tr>
+                @* <tr>
+                        <td align="left">
+                            <a class="button" onclick="$('#sjForm').submit();"><span>Search</span></a>
+                        </td>
+                    </tr>*@
+
+            </table>
+
+            <table width="100%">
+                <tr>
+                    <td>
+                        <a onclick="Recalculate();" class="button" style="width: 270px"><span style="font-weight: bold">Recalculate the dates of the next service for all equipment specified here</span></a>
+                    </td>
+                    <td>
+                        <a onclick="ViewHistory();" class="button"><span style="font-weight: bold">View the Service History for this Item </span></a>
+                    </td>
+                    <td>
+                        <a onclick="CreateWorkOrder();" class="button"><span style="font-weight: bold">Add Work Order for this item</span></a>
+                    </td>
+                    <td>
+                        <a onclick="CreateServiceJob();" class="button"><span style="font-weight: bold">Create a Service Job with Service Work Orders</span></a>
+                    </td>
+                    <td>
+                        <a onclick="ChangeEquipDueDate();" class="button"><span style="font-weight: bold">Change Equipment Service Month(s)</span></a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="button" class="inputbuttonbg inputbig" value="Print List of Service Works" id="btnPrint">
+
+                        <input type="image" value="Excel" src="~/Images/excel.png" id="btnPrintExcel">
+                    </td>
+                    <td colspan="3">&nbsp; </td>
+                </tr>
+            </table>
+            <table></table>
+
+            <table>
+                <tr>
+                    <td colspan="4">
+                        @(Html.Kendo().Grid(Model.Service)
+                    .Name("sjGrid")
+                    .Columns(columns =>
+                    {
+                        columns.Bound(p => p.EquipId).Title("EquipId").Visible(false);
+                        columns.Bound(p => p.NextServiceMonth).Title("NextServiceMonth").Visible(false);
+                        columns.Bound(p => p.NextServiceYear).Title("NextServiceYear").Visible(false);
+                        columns.Bound(p => p.DateServiced).Title("DateServiced").Visible(false);
+                        columns.Bound(p => p.LastServiceUID).Title("LastServiceUID").Visible(false);
+                        columns.Bound(p => p.Customer).Title("Customer");
+                        columns.Bound(p => p.DueOn).Title("Due On");
+                        columns.Bound(p => p.MDSItemCode).Title("MDSItemCode");
+                        columns.Bound(p => p.SerialNo).Title("SerialNo");
+                        columns.Bound(p => p.EquipmentType).Title("Equipment Type");
+                        columns.Bound(p => p.CustomerSite).Title("Customer Site");
+                        columns.Bound(p => p.Location).Title("Location");
+                        columns.Bound(p => p.Manufacturer).Title("Manufacturer");
+                        columns.Bound(p => p.FutureService).Title("Notes for next Service");
+
+                    })
+                    .Pageable()
+                    .Sortable()
+                    .Filterable()
+                    .Selectable(s => s.Mode(GridSelectionMode.Single))
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(200)
+                        .ServerOperation(false)
+                     )
+                        )
+                    </td>
+                </tr>
+
+            </table>
+        </div>
+    </div>
+    @(Html.Kendo().Window()
+                                                                    .Name("WOwindow")
+                                                                    .Title("Associated Work Orders")
+                                                                    .Width(1000)
+                                                                    .Draggable(true)
+                                                                    .Height(480)
+                                                                    .Visible(false)
+                                                                    .Iframe(true)
+                                                                     .Modal(true)
+    )
+    @(Html.Kendo().Window()
+                                                                    .Name("POwindow")
+                                                                    .Title("ProgrammeDate")
+                                                                    .Width(600)
+                                                                    .Draggable(true)
+                                                                    .Height(300)
+                                                                    .Visible(false)
+                                                                    .Iframe(true)
+                                                                     .Modal(true)
+                                                                   .Events(e => e.Close("onCloseP"))
+    )
+    @(Html.Kendo().Window()
+                                                                    .Name("ESMwindow")
+                                                                    .Title("ServiceMonth")
+                                                                    .Width(600)
+                                                                    .Draggable(true)
+                                                                    .Height(300)
+                                                                    .Visible(false)
+                                                                    .Iframe(true)
+                                                                     .Modal(true)
+                                                                   .Events(e => e.Close("onCloseESM"))
+    )
+    @(Html.Kendo().Window()
+                                                        .Name("servicewindow")
+                                                        .Title("Service Detail")
+                                                        .Width(1000)
+                                                        .Height(600)
+                                                        .Visible(false)
+                                                        .Iframe(true)
+                                                        .Modal(true)
+                                                        .Events(e => e.Close("onCloseS"))
+    )
+
+    @(Html.Kendo().Window()
+                                                        .Name("serviceworkorderwindow")
+                                                        .Title("Service Workorder Detail")
+                                                        .Width(1000)
+                                                        .Height(600)
+                                                        .Visible(false)
+                                                        .Iframe(true)
+                                                         .Modal(true)
+    )
+
+    @Html.HiddenFor(m => m.EquipmentClear)
+    @Html.HiddenFor(m => m.progDate)
+    @Html.HiddenFor(m => m.progEngineer)
+    @*@(Html.Kendo().Window()
+        .Name("PrintSWList")
+        .Title("Service Work List")
+        .Width(1000)
+        .Height(600)
+        .Visible(false)
+        .Draggable(true)
+        .Iframe(true)
+         .Modal(true)
+        )*@
+    <input type="hidden" id="hdProgrammeDate" />
+    <input type="hidden" id="hdEngineer" />
+    <input type="hidden" id="hdsm1" />
+    <input type="hidden" id="hdsm2" />
+    <input type="hidden" id="hdServiesPerYear" />
+    <div id="swindow">
+        <div class="contact-info" style="margin: 25px;">
+            <div class="content">
+                <table width="98%" id="tbJob" style="border-collapse: collapse;"></table>
+            </div>
+        </div>
+    </div>
+}
+<script>
+
+    $("#rpForm").kendoValidator({
+    });
+</script>
+<script>
+
+
+    $(document).ready(function () {
+        var MonthYear = $("#MonthVal").data("kendoDropDownList");
+        MonthYear.enable(false);
+        $("#DBD").click(function (e) {
+            if ($(this).is(":checked")) {
+                MonthYear.enable(true);
+            }
+            else {
+                MonthYear.enable(false);
+            }
+        });
+
+        var win = $("#swindow").kendoWindow({
+            height: "400px",
+            title: "Service Job",
+            visible: false,
+            draggable: true,
+            modal: true,
+            width: "800px"
+        }).data("kendoWindow");
+
+        if ($("#DBD").is(":checked")) { MonthYear.enable(true); }
+
+        var EquipClear = '@Model.EquipmentClear';
+        if (EquipClear == "C")
+        { $("#btnEquipmentClear").show(); }
+        else { $("#btnEquipmentClear").hide(); }
+        $("#spDetails1").text('@Model.EquipmentData');
+
+        $("#OVD").click(function () {
+            $("#sjForm").submit();
+        });
+        $("#NMD").click(function () {
+            $("#sjForm").submit();
+        });
+        $("#NMO").click(function () {
+            $("#sjForm").submit();
+        });
+        $("#CMB").click(function () {
+            $("#sjForm").submit();
+        });
+        $("#ALS").click(function () {
+            $("#sjForm").submit();
+        });
+
+
+        $("#btnPrintExcel").click(function (event) {
+            event.preventDefault();
+            $.post('@Url.Action("PrintListExcel", "ServiceJob")', $("#sjForm").serialize(), function (data) {
+                openCenteredWindow(data.URL);
+            });
+        });
+
+        $("#btnPrint").click(function (event) {
+            event.preventDefault();
+            $.post('@Url.Action("PrintList", "ServiceJob")', $("#sjForm").serialize(), function (data) {
+                openCenteredWindow(data.URL);
+            });
+        });
+
+
+    });
+
+    function Recalculate() {
+        var r = confirm("Are you sure you wish to recalculate the next as-yet unscheduled programmed service for ALL the equipment-items-of-interest specified here? (such a recalculation should not normally be required unless you have been manually adding or deleting Work Orders, or editing the PROGRAMMED SERVICE dates of Work Orders, or if the system has issued any warning about being out-of-sync, or if a process failed (for example, if adding a Service Job failed halfway))");
+        if (r) {
+            $("#divProgress").show();
+            $.post('@Url.Action("CreateServiceJobWorkOrder", "ServiceJob")', $("#sjForm").serialize(), function (data) {
+                $("#divProgress").hide();
+                alert("The next unscheduled programmed service has been recalculated for all the 'equipment-items-of-interest specified here, that are currently serviced by US.");
+                $("#sjForm").submit();
+            });
+        }
+    }
+
+    function CustomerSiteData() {
+        return {
+            Customerid: $("#Customerid").val(),
+            Branchid: $("#Branchid").val()
+        };
+    }
+    function dropdownlist_change() {
+        $("#sjForm").submit();
+    }
+    function OpenWindow() {
+
+        var window = $("#window5").data("kendoWindow");
+
+        window.Visible = true;
+        var actionURL = '@Url.Action("SearchServiceWorkorder", "ServiceJob")';
+        window.refresh({
+            url: actionURL,
+            data: {}
+        });
+        var width95 = (screen.width) * 95 / 100;
+        var height75 = (screen.height) * 75 / 100;
+        window.setOptions({ width: width95, height: height75 });
+
+        window.center();
+        window.open();
+    }
+
+
+    function OpenWindow1() {
+
+        var window1 = $("#window1").data("kendoWindow");
+
+        window1.Visible = true;
+        var actionURL = '@Url.Action("SearchEquipmentLoad", "Repair")';
+        window1.refresh({
+            url: actionURL,
+            data: {}
+        });
+        var width95 = (screen.width) * 95 / 100;
+        var height75 = (screen.height) * 75 / 100;
+        window1.setOptions({ width: width95, height: height75 });
+        window1.center();
+        window1.open();
+    }
+    function ClearEquipment() {
+        $('#EquipmentClear').val("");
+        $("#SelectedEquipment").val("-1");
+        $("#btnEquipmentClear").hide();
+        $("#EquipmentData").val("");
+        $('#spDetails1').text("");
+    }
+
+    function onClose1(e) {
+        if ($("#SelectedEquipment").val() != "") {
+            $.ajax({
+                url: '@Url.Action("GetEquipInfomationData", "ServiceJob")',
+                type: 'POST',
+                datatype: "json",
+                data: { EquipUID: $("#SelectedEquipment").val() },
+                success: function (response) {
+                    $('#spDetails1').text(response.CustomerInfo);
+                    $('#EquipmentData').val(response.CustomerInfo);
+                    $("#btnEquipmentClear").show();
+                    $('#EquipmentClear').val("C");
+                    $("#sjForm").submit();
+                },
+                error: function (req, status, error) {
+                    //  alert("R: " + req + " S: " + status + " E: " + error);
+                }
+            });
+        }
+    }
+
+    function onCloseS(e) {
+        $("#sjForm").submit();
+    }
+
+    function onCloseESM(e) {
+     //   alert('x');
+    //}
+    //function onCloseESMX(e) {
+
+        var sm1 = $("#hdsm1").val();
+//        alert(sm1);
+        var sm2 = $("#hdsm2").val();
+  //      alert(sm2);
+        var ServiesPerYear = $("#hdServiesPerYear").val();
+    //    alert(ServiesPerYear);
+
+        if (ServiesPerYear != "") {
+            var grid = $("#sjGrid").data("kendoGrid");
+            grid.dataSource.read();
+            var count = grid.dataSource.total();
+
+            var r = confirm("Are you sure you wish to change the Equipment Service Month for all " + count + " items of equipment");
+            if (r) {
+//                var m = new Date(Pdate);
+                var year = "20" + ServiesPerYear + "";
+                var month = sm1 + "";
+                var day = sm2 + "";
+                var dateFormat = year + "-" + month + "-" + day;
+                $("#progDate").val(dateFormat);
+                $.post('@Url.Action("UpdateEquipServiceMonth", "ServiceJob")', $("#sjForm").serialize(), function (data) {
+                    alert(data.msg);
+                    //$("#tbJob").html(data.msg);
+                    //var win = $("#swindow").data("kendoWindow");
+                    //win.center();
+                    //win.open();
+                    alert("The service month has been updated for all the 'equipment-items-of-interest specified here, that are currently serviced by US.");
+                    $("#sjForm").submit();
+
+                });
+               @*$.ajax({
+                url: '@Url.Action("UpdateEquipServiceMonth", "ServiceJob")',
+                type: 'POST',
+                datatype: "json",
+                data: { model: $("#sjForm").serialize() },
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+                    alert(response.msg);
+                    $("#sjForm").submit();
+                },
+                error: function (req, status, error) {
+                    //  alert("R: " + req + " S: " + status + " E: " + error);
+                }
+            });*@
+            }
+        }
+    }
+
+    //UpdateEquipServiceMonth
+    function onCloseP(e) {
+        try {
+            var pEngineer = $("#hdEngineer").val();;
+            var Pdate = $("#hdProgrammeDate").val();
+            if (Pdate != "") {
+                var grid = $("#sjGrid").data("kendoGrid");
+                grid.dataSource.read();
+                var count = grid.dataSource.total();
+
+                var r = confirm("Are you sure you wish to add a Service Work Order for all " + count + " items of equipment");
+                if (r) {
+                    var m = new Date(Pdate);
+                    var year = m.getFullYear() + "";
+                    var month = (m.getMonth() + 1) + "";
+                    var day = m.getDate() + "";
+                    var dateFormat = year + "-" + month + "-" + day;
+                    $("#progDate").val(dateFormat);
+                    $("#progEngineer").val(pEngineer);
+
+                    $.post('@Url.Action("CreateServiceJob", "ServiceJob")', $("#sjForm").serialize(), function (data) {
+
+                        $("#tbJob").html(data.msg);
+                        var win = $("#swindow").data("kendoWindow");
+                        win.center();
+                        win.open();
+                    });
+                }
+            }
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+
+    function yes() {
+        $("#swindow").data("kendoWindow").close();
+        $.ajax({
+            url: '@Url.Action("GetJobId", "ServiceJob")',
+            type: 'POST',
+            datatype: "json",
+            data: {},
+            success: function (response) {
+                var window = $("#servicewindow").data("kendoWindow");
+                window.Visible = true;
+                var actionURL = '@Url.Action("EditPopUp", "Service")' + '/' + response.id;
+                window.refresh({
+                    url: actionURL
+                });
+                var width95 = (screen.width) * 95 / 100;
+                var height75 = (screen.height) * 75 / 100;
+                window.setOptions({ width: width95, height: height75 });
+                window.center();
+                window.open();
+            }
+        });
+    }
+    function no() {
+        $("#swindow").data("kendoWindow").close();
+        $("#sjForm").submit();
+    }
+
+    function ViewHistory() {
+        var entityGrid = $("#sjGrid").data("kendoGrid");
+        var selectedItem = entityGrid.dataItem(entityGrid.select());
+        if (selectedItem == undefined) {
+            alert("You must select row from the list.");
+            return false;
+        }
+        else {
+            var ServiceUID = selectedItem.LastServiceUID;
+
+            var EquipUID = selectedItem.EquipId;
+            if (ServiceUID == "0") {
+                $.ajax({
+                    url: '@Url.Action("ServiceCount", "ServiceJob")',
+                    type: 'POST',
+                    datatype: "json",
+                    data: { EquipUID: EquipUID },
+                    success: function (response) {
+                        if (response.Count == "0") {
+                            alert("There have been no services recorded for this equipment item.");
+                        }
+                        else {
+                            alert("Records indicate that the number of services recorded for this equipment item is: " + response.Count + " However, the NEXT SERVICE list does not have a 'previous service' listed. This means that either:  the NEXT SERVICE list needs refreshing: press the Refresh button. OR there are service records with an incorrect (future) date on them.");
+                        }
+                        return false;
+                    },
+                    error: function (req, status, error) {
+                        //  alert("R: " + req + " S: " + status + " E: " + error);
+                    }
+                });
+            }
+
+
+            var window = $("#WOwindow").data("kendoWindow");
+            window.Visible = true;
+            var actionURL = '@Url.Action("GetWOForEquipment", "ServiceJob")' + "?EquipID=" + EquipUID;
+                window.refresh({
+                    url: actionURL,
+                    data: { EquipID: EquipUID }
+                    // data: { defectId: defId }
+                });
+                var width95 = (screen.width) * 95 / 100;
+                var height75 = (screen.height) * 75 / 100;
+                window.setOptions({ width: width95, height: height75 });
+                window.center();
+                window.open();
+
+            }
+        }
+
+        function CreateWorkOrder() {
+            var entityGrid = $("#sjGrid").data("kendoGrid");
+            var selectedItem = entityGrid.dataItem(entityGrid.select());
+            if (selectedItem == undefined) {
+                alert("You must select an item of service job from the list.");
+                return false;
+            }
+            else {
+
+                var r = confirm("This is not the recommended way to create a Work Order. Normally you would create a new SERVICE JOB, complete with a set of associated Work Orders, all in one hit using the  Create a Service Job with Service Work Orders button.  If you add a Work Order directly, you will be forced to specify an EXISTING Service Job to associated it with. Do you wish to proceed?");
+                if (r) {
+                    $("#divProgress").show();
+                    var NextServiceMonth = selectedItem.NextServiceMonth;
+                    var NextServiceYear = selectedItem.NextServiceYear;
+                    var EquipUID = selectedItem.EquipId;
+                    $.ajax({
+                        url: '@Url.Action("CheckService", "ServiceJob")',
+                    type: 'POST',
+                    datatype: "json",
+                    data: { EquipUID: EquipUID, ServiceMonth: NextServiceMonth, ServiceYear: NextServiceYear },
+                    success: function (response) {
+                        $("#divProgress").hide();
+                        if (response.msg != "") {
+                            alert(response.msg);
+                            var window = $("#serviceworkorderwindow").data("kendoWindow");
+                            window.Visible = true;
+                            var actionURL = '@Url.Action("EditPopupWorkOrder", "ServiceWorkOrder")' + '/' + response.id;
+                            window.refresh({
+                                url: actionURL
+                            });
+                            var width95 = (screen.width) * 95 / 100;
+                            var height75 = (screen.height) * 75 / 100;
+                            window.setOptions({ width: width95, height: height75 });
+                            window.center();
+                            window.open();
+                            // window.location.href = '@Url.Action("Edit", "ServiceWorkOrder")' + '/' + response.id;
+                        }
+                        else {
+                            var window = $("#serviceworkorderwindow").data("kendoWindow");
+                            window.Visible = true;
+                            var actionURL = '@Url.Action("AddWO", "ServiceWorkOrder")' + '/' + EquipUID;
+                            window.refresh({
+                                url: actionURL
+                            });
+                            var width95 = (screen.width) * 95 / 100;
+                            var height75 = (screen.height) * 75 / 100;
+                            window.setOptions({ width: width95, height: height75 });
+                            window.center();
+                            window.open();
+                            // window.location.href = '@Url.Action("AddWO", "ServiceWorkOrder")' + '/' + EquipUID;
+                        }
+                    },
+                    error: function (req, status, error) {
+                        //  alert("R: " + req + " S: " + status + " E: " + error);
+                    }
+                });
+            }
+        }
+    }
+
+    function ChangeEquipDueDate() {
+        var grid = $("#sjGrid").data("kendoGrid");
+        grid.dataSource.read();
+        var count = grid.dataSource.total();
+        if (count == "0") {
+            alert("There are no items of service job currently in the list.");
+            return false;
+        }
+
+        var r = confirm("Do you wish to change the Service Month for all the equipment results below?");
+        if (r) {
+            $("#hdProgrammeDate").val("");
+            var window = $("#ESMwindow").data("kendoWindow");
+            window.Visible = true;
+            var actionURL = '@Url.Action("EquipServiceMonth", "ServiceJob")';
+            window.refresh({
+                url: actionURL,
+                data: {}
+            });
+            window.center();
+            window.open();
+        }
+        else {
+
+        }
+    }
+
+    function CreateServiceJob() {
+        var grid = $("#sjGrid").data("kendoGrid");
+        grid.dataSource.read();
+        var count = grid.dataSource.total();
+        if (count == "0") {
+            alert("There are no items of service job currently in the list.");
+            return false;
+        }
+        if ($("#Customerid").val() == "") {
+            alert("you must select a customer first in the customer filter to ensure all results belong to one customer");
+            return false;
+        }
+        var r = confirm("Do you wish to generate a Service Job with Service Work Orders for the equipment results only?");
+        if (r) {
+            $("#hdProgrammeDate").val("");
+            var window = $("#POwindow").data("kendoWindow");
+            window.Visible = true;
+            var actionURL = '@Url.Action("GetProgarmmeDate", "ServiceJob")';
+            window.refresh({
+                url: actionURL,
+                data: {}
+            });
+            window.center();
+            window.open();
+        }
+        else {
+
+        }
+    }
+
+
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>
+
+
+

@@ -1,0 +1,1111 @@
+﻿@model MDS.Models.RepairSearch
+@{
+    ViewBag.Title = "Repair Search";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+    #rpGrid tbody tr:hover {
+        cursor: pointer !important;
+    }
+</style>
+<h1>@MDS.Controllers.LoginController.RepairLabel Search</h1>
+@using (Html.BeginForm("Index", "Repair", FormMethod.Post, new { id = "rpForm" }))
+    {
+        <div class="contact-info">
+            <div class="content">
+                @if (MDS.Controllers.LoginController.RepairLabel == "General")
+                {
+                    <table>
+                        <tr>
+                            <td>
+                                <b>Date</b>
+                            </td>
+                            <td>
+                                @Html.EditorFor(m => m.FromDate)
+                                @Html.EditorFor(m => m.ToDate)
+                                @Html.HiddenFor(m => m.OutFromDate)
+                                @Html.HiddenFor(m => m.OutToDate)
+                            </td>
+                            <td>
+                                Staff
+                            </td>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.EngineerID)
+                                                    .Name("EngineerID")
+                                                    .DataTextField("EngineerName")
+                                                    .DataValueField("EngineerID")
+                                                    .BindTo(Model.EngineerList)
+                                                    .HtmlAttributes(new { style = "width:100%", data_required_msg = "Principle Engineer is required." })
+                                                    .Filter("startswith")
+                            )
+                            </td>
+                            <td>
+                                <a id="btnsearch" class="button"><span>Search</span></a>
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.HiddenFor(m => m.Resolved)
+                                @Html.HiddenFor(m => m.Complete)
+                                @Html.HiddenFor(m => m.ServiceJobID)
+                                @Html.HiddenFor(m => m.ServiceData)
+                                @Html.HiddenFor(m => m.SelectedEquipment)
+                                @Html.HiddenFor(m => m.EquipmentData)
+                                @Html.HiddenFor(m => m.Customerid)
+                                @Html.HiddenFor(m => m.Department)
+
+                                @Html.HiddenFor(m => m.Locationid)
+                                @Html.HiddenFor(m => m.Equiptype)
+                                @Html.HiddenFor(m => m.Branchid)
+                                @Html.HiddenFor(m => m.RepairJob)
+                                @Html.HiddenFor(m => m.CustomerOrderNo)
+                                @Html.HiddenFor(m => m.SelCnt)
+                                @Html.HiddenFor(m => m.DateInFilter)
+                                @Html.HiddenFor(m => m.DateOutFilter)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" valign="middle">
+                                @if (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin)
+                                {
+                                    <input type="button" class="inputbuttonbg inputbig" value="Add New @MDS.Controllers.LoginController.RepairLabel" onclick="window.location.href = '@Url.Action("Add", "Repair")'">
+                                    <input type="button" class="inputbuttonbg inputbig" value="Add a New Job from Currently" onclick="createjob()">
+                                    <input type="button" class="inputbuttonbg inputbig" value="Delete @MDS.Controllers.LoginController.RepairLabel" id="btnDelete">
+                                }
+                                <input type="button" class="inputbuttonbg inputbig" value="Print List of @MDS.Controllers.LoginController.RepairLabel Items" id="btnPrint">
+                                &nbsp;&nbsp;
+                                <input type="image" value="Excel" src="~/Images/excel.png" id="btnPrintExcel">
+                                &nbsp;&nbsp;
+                                <a href="@Url.Action("PDFReportX", "Repair", new { APPLICATION_ID = 1 })" type="submit" title="Print" target="_blank"><img src="~/Content/themes/base/images/Avosoft-Warm-Toolbar-Print.ico" height="50" width="50" /></a>
+                            </td>
+                        </tr>
+                    </table>
+
+            }
+            else
+            {
+                <table width="100%">
+                    <tr>
+                        <td width="16.6%">
+                            Tech Resolved:
+                        </td>
+                        <td colspan="2">
+
+                            @if (!MDS.Controllers.LoginController.AllCustomers(@User.Identity.Name))
+                            {
+                                <span><u>Resolved or Incomplete</u></span>
+                                @Html.HiddenFor(m => m.Resolved)
+                            }
+                            else
+                            {
+
+                                if (Model.Resolved == "R")
+                                {
+                                    @Html.RadioButtonFor(m => m.Resolved, "R", new { Name = "Resolved", Checked = "checked" }) <span> Resolved </span>
+                                    @Html.RadioButtonFor(m => m.Resolved, "N", new { Name = "Resolved" }) <span> Not Resolved </span>
+                                    @Html.RadioButtonFor(m => m.Resolved, "E", new { Name = "Resolved" }) <span> Either </span>
+                                }
+                                else if (Model.Resolved == "N")
+                                {
+                                    @Html.RadioButtonFor(m => m.Resolved, "R", new { Name = "Resolved" }) <span> Resolved </span>
+                                    @Html.RadioButtonFor(m => m.Resolved, "N", new { Name = "Resolved", Checked = "checked" }) <span> Not Resolved </span>
+                                    @Html.RadioButtonFor(m => m.Resolved, "E", new { Name = "Resolved" }) <span> Either </span>
+                                }
+                                else
+                                {
+                                    @Html.RadioButtonFor(m => m.Resolved, "R", new { Name = "Resolved" }) <span> Resolved </span>
+                                    @Html.RadioButtonFor(m => m.Resolved, "N", new { Name = "Resolved" }) <span> Not Resolved </span>
+                                    @Html.RadioButtonFor(m => m.Resolved, "E", new { Name = "Resolved", Checked = "checked" }) <span> Either </span>
+                                }
+                            }
+                        </td>
+
+                        <td width="16.6%">
+                            Handover to customer:
+                        </td>
+                        <td colspan="2">
+                            @if (Model.Complete == "C")
+                            {
+                                @Html.RadioButtonFor(m => m.Complete, "C", new { Name = "Complete", Checked = "checked" }) <span>Complete</span>
+                                @Html.RadioButtonFor(m => m.Complete, "I", new { Name = "Complete" }) <span>Incomplete</span>
+                                @Html.RadioButtonFor(m => m.Complete, "E", new { Name = "Complete" })<span>Either</span>
+                            }
+                            else if (Model.Complete == "I")
+                            {
+                                @Html.RadioButtonFor(m => m.Complete, "C", new { Name = "Complete" }) <span>Complete</span>
+                                @Html.RadioButtonFor(m => m.Complete, "I", new { Name = "Complete", Checked = "checked" }) <span>Incomplete</span>
+                                @Html.RadioButtonFor(m => m.Complete, "E", new { Name = "Complete" })<span>Either</span>
+                            }
+                            else
+                            {
+                                @Html.RadioButtonFor(m => m.Complete, "C", new { Name = "Complete" }) <span>Complete</span>
+                                @Html.RadioButtonFor(m => m.Complete, "I", new { Name = "Complete" }) <span>Incomplete</span>
+                                @Html.RadioButtonFor(m => m.Complete, "E", new { Name = "Complete", Checked = "checked" })<span>Either</span>
+                            }
+
+                        </td>
+                    </tr>
+                    @if ((MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin) || (MDS.Controllers.LoginController.AdminTechCustomer(@User.Identity.Name) == "Tech"))
+                    {
+                        <tr>
+                            <td>Only display repairs for Service jobs:</td>
+                            <td width="16.6%">
+                                @Html.HiddenFor(m => m.ServiceJobID)
+                                @Html.HiddenFor(m => m.ServiceData)
+                                @(Html.Kendo().Window()
+                                .Name("window")
+                                .Title("Service Job Search")
+                                .Width(1000)
+                                .Height(500)
+                                .Visible(false)
+                                .Draggable(true)
+                                .Iframe(true)
+                                 .Modal(true)
+                                 .Resizable()
+                                .Events(e => e.Close("onClose"))
+                            )
+                                <a onclick="OpenWindow();" class="button"><span style="font-weight: bold">Pick Service Job</span></a>
+                            </td>
+                            <td colspan="3"><span id="spDetails"></span></td>
+                            <td><a onclick="ClearService();" id="btnServiceClear" class="button"><span style="font-weight: bold">Clear Service Job</span></a> </td>
+                        </tr>
+                    }
+                    <tr>
+                        <td>Only display repairs for Equipment:</td>
+                        <td>
+                            @Html.HiddenFor(m => m.SelectedEquipment)
+                            @Html.HiddenFor(m => m.EquipmentData)
+                            @(Html.Kendo().Window()
+                            .Name("window1")
+                            .Title("Equipment Search")
+                            .Width(1000)
+                            .Height(500)
+                            .Visible(false)
+                            .Draggable(true)
+                            .Iframe(true)
+                             .Modal(true)
+                               .Resizable()
+                            .Events(e => e.Close("onClose1"))
+                        )
+                            <a onclick="OpenWindow1();" class="button"><span style="font-weight: bold">Pick Equipment</span></a>
+                        </td>
+                        <td colspan="3"><span id="spDetails1"></span></td>
+                        <td><a onclick="ClearEquipment();" id="btnEquipmentClear" class="button"><span style="font-weight: bold">Clear Equipment</span></a>  </td>
+                    </tr>
+
+
+                    @*<script type="text/javascript">
+            function autosearch()
+                {
+                      try {
+                          $("#searchresults").hide();
+                          var searchString = $('#CustomerSearch').val();
+                        //var searchString =  $('#YourSearchElementID').val();// $(this).val(); //Get the value from this TextBox
+                          var data = { searchString: searchString, InvolvedWhoWhatID: InvolvedWhoWhatID }
+                        $.post('@Url.Action("TaxonSearch","Home")', data,
+                        function (data) {
+                            if (data.results == null)
+                                alert('no results');
+                            else {
+                                $("#searchresults").show();
+                                var divstring = '';
+                                divstring = ''
+                                for (var i = 0; i < data.results.length; i++) {
+                                    divstring = divstring + "<a href='' onclick='selectx(\"" + data.results[i].ID + "~" + data.results[i].NAME + "~" + data.results[i].POSITION + "~" + data.results[i].CommenceDate +"\");return false;'>"+ data.results[i].NAME + " - " + data.results[i].POSITION + "</a><br/>"
+                                }
+                                $("#searchresults").html(divstring);
+                            }
+                        });
+                    }
+                    catch(ex)
+                    {
+                        alert(ex.message);
+                    }
+                }
+
+                                </script>*@
+                
+                        <tr>
+                            <td width="100">
+                                Customer:
+                            </td>
+                            @*<td>
+                        <input style="" AutoComplete="off" onkeyup="autosearch();" type="text" name="CustomerSearch" id="CustomerSearch" maxlength="30" />
+                    </td>*@
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.Customerid)
+                                  .Name("Customerid")
+                                  .Filter("startswith")
+                                  .DataTextField("CompanyName")
+                                  .DataValueField("CustomerCode")
+                                  .Enable(MDS.Controllers.LoginController.AllCustomers(User.Identity.Name))
+                                  .BindTo(Model.CustomerList)
+                                  .HtmlAttributes(new { style = "width:100%", data_required_msg = "Customer is required." })
+              .Filter(MDS.Controllers.LoginController.SearchType)
+                            )
+
+                            </td>
+                            <td width="16.6%">
+                                Customer Site:
+                            </td>
+                            <td width="16.6%">
+                                @(Html.Kendo().DropDownListFor(m => m.Department)
+                                      .Name("Department")
+                                      .DataTextField("Department")
+                                        .DataValueField("DepartmentID")
+                                      .DataSource(dataSource =>
+                                      {
+                                          dataSource.Read(read =>
+                                          {
+                                              read.Action("GetCustomerSite", "Repair")
+                                                 .Data("CustomerSiteData");
+                                          })
+                                          .ServerFiltering(true);
+                                      })
+
+                                              .AutoBind(false)
+                                             .CascadeFrom("Customerid")
+                                       .HtmlAttributes(new { style = "width:100%", data_required_msg = "Customer Site is required." })
+
+                            )
+
+                            </td>
+                            <td>
+                                Location:
+                            </td>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.Locationid)
+                                                .Name("Locationid")
+                                                .DataTextField("Location")
+                                                .DataValueField("Locationid")
+                                                .DataSource(dataSource =>
+                                                {
+                                                    dataSource.Read(read =>
+                                                    {
+                                                        read.Action("GetCustomerLocationBlank", "Service")
+                                                           .Data("CustomerSiteData");
+                                                    })
+                                                    .ServerFiltering(true);
+                                                })
+                                                  .AutoBind(false)
+                                                 .CascadeFrom("Customerid")
+                                                .HtmlAttributes(new { style = "width:100%" })
+
+                            )
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="100">
+                                Equip Type:
+                            </td>
+                            <td>
+                                @if (MDS.Controllers.LoginController.AllCustomers(User.Identity.Name))
+                                {
+                                    @(Html.Kendo().DropDownListFor(m => m.Equiptype)
+                            .Name("Equiptype")
+                            .DataTextField("Name")
+                            .DataValueField("EquipTypeCode")
+                            .BindTo(Model.EquipTypeList)
+                            .Filter("StartsWith")
+                          .HtmlAttributes(new { style = "width:100%", data_required_msg = "Equip Type is required." })
+                                )
+
+                                }
+                                else
+                                {
+
+                                    @(Html.Kendo().DropDownListFor(m => m.Equiptype)
+
+                                  .Name("Equiptype")
+                                  .DataTextField("Name")
+                                  .DataValueField("EquipTypeCode")
+                                  .Filter("StartsWith")
+
+                                 .DataSource(dataSource =>
+                                 {
+                                     dataSource.Read(read =>
+                                     {
+                                         read.Action("GetEquipmentTypeSite", "Service")
+                                            .Data("CustomerSiteData");
+                                     })
+                                     .ServerFiltering(true);
+                                 })
+
+                                          .AutoBind(false)
+                                         .CascadeFrom("Customerid")
+                                  .HtmlAttributes(new { style = "width:150px", data_required_msg = "Equip Type is required." })
+                                )
+                                }
+
+
+                            </td>
+
+                            <td>
+                                Engineer:
+                            </td>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.EngineerID)
+                                                    .Name("EngineerID")
+                                                    .DataTextField("EngineerName")
+                                                    .DataValueField("EngineerID")
+                                                    .BindTo(Model.EngineerList)
+                                                    .HtmlAttributes(new { style = "width:100%", data_required_msg = "Principle Engineer is required." })
+                                                    .Filter("startswith")
+                            )
+                            </td>
+                            <td>
+                                Branch :
+                            </td>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.Branchid)
+                                              .Name("Branchid")
+                                              .DataTextField("BranchName")
+                                               .Enable(false)/*MDS.Controllers.LoginController.AllCustomers(User.Identity.Name)*/
+                                                      .DataValueField("BranchID")
+                                                      .BindTo(Model.BranchList)
+                                                      .HtmlAttributes(new { style = "width:100%", data_required_msg = "Branch is required." })
+
+                                              .DataValueField("BranchID")
+                                              .BindTo(Model.BranchList)
+                                              .HtmlAttributes(new { style = "width:100%", data_required_msg = "Branch is required." })
+
+                            )
+                            </td>
+
+
+                        </tr>
+                        <tr>
+                            <td>
+                                Repair Job:
+                            </td>
+                            <td>
+                                @(Html.Kendo().TextBoxFor(m => m.RepairJob)
+                                                .Name("RepairJob")
+                                                .HtmlAttributes(new { style = "width:100%" })
+                            )
+                            </td>
+                            <td>
+                                Customer Order No:
+                            </td>
+                            <td>
+                                @(Html.Kendo().TextBoxFor(m => m.CustomerOrderNo)
+                                                    .Name("CustomerOrderNo")
+                                                    .HtmlAttributes(new { style = "width:100%" })
+                            )
+
+                            </td>
+                            <td colspan="2">
+                                <table>
+                                    <tr style="color:navy">
+                                        <td>
+                                            Limit number of Records to no more than:
+                                        </td>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.SelCnt)
+                                              .Name("SelCnt")
+                                              .BindTo(Model.Cnt)
+                                              .HtmlAttributes(new { style = "width:100%", data_required_msg = "Records is required." })
+
+                                        )
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Date In Filter:
+                            </td>
+
+                            <td style="text-align:left">
+                                @if (Model.DateInFilter)
+                                {
+                                    @Html.CheckBox("ChkDateInFilter", true, new { onclick = "ChkDateInFilterCheck();", style = "width:20px;height:20px;text-align:left" })
+                                }
+                                else
+                                {
+                                    @Html.CheckBox("ChkDateInFilter", false, new { onclick = "ChkDateInFilterCheck();", style = "width:20px;height:20px;text-align:left" })
+                                }
+
+                            </td>
+                            <td class="datein">
+                                Date In From/To:
+                            </td>
+                            <td class="datein">
+                                @Html.EditorFor(m => m.FromDate)
+                                @Html.ValidationMessageFor(m => m.FromDate)
+
+
+                            </td>
+                            <td class="datein">
+                                @Html.EditorFor(m => m.ToDate)
+                                @Html.ValidationMessageFor(m => m.ToDate)
+
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Date Out Filter:
+                            </td>
+                            <td>
+
+                                @if (Model.DateOutFilter)
+                                {
+                                    @Html.CheckBox("ChkDateOutFilter", true, new { @onclick = "ChkDateOutFilterCheck();", style = "width:20px;height:20px;align:left" })
+                                }
+                                else
+                                {
+                                    @Html.CheckBox("ChkDateOutFilter", false, new { @onclick = "ChkDateOutFilterCheck();", style = "width:20px;height:20px;align:left" })
+                                }
+
+
+                            </td>
+                            <td class="dateout">
+                                Date Out From/To:
+                            </td>
+                            <td class="dateout">
+                                @Html.EditorFor(m => m.OutFromDate)
+                                @Html.ValidationMessageFor(m => m.OutFromDate)
+
+                            </td>
+                            <td class="dateout">
+                                @Html.EditorFor(m => m.OutToDate)
+                                @Html.ValidationMessageFor(m => m.OutToDate)
+                            </td>
+                            <td>
+                                <a id="btnsearch" class="button"><span>Search</span></a>
+                                @Html.HiddenFor(m => m.DateInFilter)
+                                @Html.HiddenFor(m => m.DateOutFilter)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" valign="middle">
+                                @if (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin)
+                                {
+                                    <input type="button" class="inputbuttonbg inputbig" value="Add New @MDS.Controllers.LoginController.RepairLabel" onclick="window.location.href = '@Url.Action("Add", "Repair")'">
+                                    <input type="button" class="inputbuttonbg inputbig" value="Add a New Job from Currently" onclick="createjob()">
+                                    <input type="button" class="inputbuttonbg inputbig" value="Delete @MDS.Controllers.LoginController.RepairLabel" id="btnDelete">
+                                }
+                                <input type="button" class="inputbuttonbg inputbig" value="Print List of @MDS.Controllers.LoginController.RepairLabel Items" id="btnPrint">
+                                &nbsp;&nbsp;
+                                <input type="image" value="Excel" src="~/Images/excel.png" id="btnPrintExcel">
+                                &nbsp;&nbsp;
+                                <a href="@Url.Action("PDFReportX", "Repair", new { APPLICATION_ID = 1 })" type="submit" title="Print" target="_blank"><img src="~/Content/themes/base/images/Avosoft-Warm-Toolbar-Print.ico" height="50" width="50" /></a>
+                            </td>
+                        </tr>
+                    </table>
+                }
+
+                <script type="text/javascript">
+                      function reportpopup(id) {
+                          window.open('Reports/RepairDetailRpt.aspx?repairID=' + id + '&branchID=' + @MDS.Controllers.LoginController.BranchID(@User.Identity.Name).ToString(),'report','left=30,top=30,width='+(screen.width-60).toString()+', height='+(screen.width-60).toString());
+                      }
+                </script>
+                <table width="100%">
+                    <tr>
+                        <td colspan="6">
+                            @(Html.Kendo().Grid(Model.Repairs)
+                .Name("rpGrid")
+                .Columns(columns =>
+                {
+                    if (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin)
+                        columns.Bound(p => p.JobCode).Title("Job No").ClientTemplate(@Html.ActionLink("#=JobCode#", "Edit", new { id = "#=RepairUID#" }).ToHtmlString());
+                    else
+                        columns.Bound(p => p.Equipment).Title("Job No").ClientTemplate(@Html.ActionLink("#=JobCode#", "Edit", "Index", new { onclick = "reportpopup(#=RepairUID#);return false" }).ToHtmlString());
+
+                    columns.Bound(p => p.RepairUID).Title("RepairUID").Visible(false);
+                    columns.Bound(p => p.Equipment).Title("Equip Item");
+                    columns.Bound(p => p.Customer).Title("Customer");
+                    columns.Bound(p => p.OrderNumber).Title("Order No");
+                    columns.Bound(p => p.DateIn).Title("Date In").ClientTemplate("#= (DateIn == null) ? ' ' : kendo.toString(DateIn, 'dd/MM/yyyy') #");
+                    columns.Bound(p => p.DateOut).Title("Date Out").ClientTemplate("#= (DateOut == null) ? ' ' : kendo.toString(DateOut, 'dd/MM/yyyy') #");
+                    columns.Bound(p => p.Engineer).Title("Engineer");
+                    columns.Bound(p => p.Status).Title("Tech Status");
+                    if (!MDS.Controllers.LoginController.AllCustomers(@User.Identity.Name))
+                    {
+                        columns.Bound(p => p.RepairCompleted).Title("Completed");
+                        columns.Bound(p => p.TotalCharge).Title("Total Charge");
+                        columns.Bound(p => p.FaultDetails).Title("Fault Details");
+                        columns.Bound(p => p.WorkDone).Title("Work Done").Width("300px");
+                        columns.Bound(p => p.RepairTravelExpenseCost).Title("Repair Travel Expense");
+                        columns.Bound(p => p.PartsCost).Title("Parts Cost");
+                        columns.Bound(p => p.WarrantyExpirationDate).Title("Warranty Expire");
+                    }
+                })
+                .Pageable()
+                .Sortable()
+                .Filterable()
+                .Selectable(s => s.Mode(GridSelectionMode.Single))
+                .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(200)
+                        .ServerOperation(false)
+                     )
+                            )
+                        </td>
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+
+        @Html.HiddenFor(m => m.ServiceClear)
+        @Html.HiddenFor(m => m.EquipmentClear)
+        @(Html.Kendo().Window()
+                                .Name("PrintRepairList")
+                                .Title("Repair List")
+                                .Width(1000)
+                                .Height(600)
+                                .Visible(false)
+                                .Draggable(true)
+                                .Iframe(true)
+                                  .Resizable()
+                                 .Modal(true)
+        )
+    }
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var Customeridwrapper = $("#Customerid").data("kendoDropDownList").wrapper;
+        Customeridwrapper.keydown(function (e) {
+        if (e.keyCode == 13) {
+            $('#rpForm').submit();
+        }
+        });
+
+        var Departmentwrapper = $("#Department").data("kendoDropDownList").wrapper;
+        Departmentwrapper.keydown(function (e) {
+            if (e.keyCode == 13) {
+                $('#rpForm').submit();
+            }
+        });
+
+        var Locationidwrapper = $("#Locationid").data("kendoDropDownList").wrapper;
+        Locationidwrapper.keydown(function (e) {
+            if (e.keyCode == 13) {
+                $('#rpForm').submit();
+            }
+        });
+
+        var Equiptypewrapper = $("#Equiptype").data("kendoDropDownList").wrapper;
+        Equiptypewrapper.keydown(function (e) {
+            if (e.keyCode == 13) {
+                $('#rpForm').submit();
+            }
+        });
+
+        var EngineerIDwrapper = $("#EngineerID").data("kendoDropDownList").wrapper;
+        EngineerIDwrapper.keydown(function (e) {
+            if (e.keyCode == 13) {
+                $('#rpForm').submit();
+            }
+        });
+
+        var Branchidwrapper = $("#Branchid").data("kendoDropDownList").wrapper;
+        Branchidwrapper.keydown(function (e) {
+            if (e.keyCode == 13) {
+                $('#rpForm').submit();
+            }
+        });
+
+        var SelCntwrapper = $("#SelCnt").data("kendoDropDownList").wrapper;
+        SelCntwrapper.keydown(function (e) {
+            if (e.keyCode == 13) {
+                $('#rpForm').submit();
+            }
+        });
+
+    });
+    $('select').keypress(function (e) {
+        {
+            if (event.which == 13) {
+                alert('enter');
+                //alert('search');
+                //$(this).closest('form').submit();
+                $('#rpForm').submit();
+                return false;
+            }
+        }
+    });
+
+
+    $('input').keypress(function (e) {
+        {
+            if (event.which == 13) {
+                //alert('search');
+                //$(this).closest('form').submit();
+                $('#rpForm').submit();
+                return false;
+            }
+        }
+    });
+
+        function ChkDateInFilterCheck() {
+            //alert('x');
+
+            if ($('#ChkDateInFilter').is(":checked")) {
+                $(".datein").show();
+                $("#DateInFilter").val(true);
+            }
+            else {
+                $(".datein").hide();
+                $("#DateInFilter").val(false);
+            }
+        }
+
+        function ChkDateOutFilterCheck() {
+            if ($("#ChkDateOutFilter").is(":checked")) {
+                $(".dateout").show();
+                $("#DateOutFilter").val(true);
+            }
+            else {
+                $(".dateout").hide();
+                $("#DateOutFilter").val(false);
+            }
+        }
+
+
+   
+        $("#rpForm").kendoValidator({
+        });
+
+
+
+
+    </script>
+
+
+
+<script>
+
+    $('#btnsearch').click(function () {
+        $('#rpForm').submit();
+
+            });
+    $(document).ready(function () {
+
+
+
+        $("#spDetails").text('@Model.ServiceData');
+        $("#spDetails1").text('@Model.EquipmentData');
+                var EquipClear = '@Model.EquipmentClear';
+                var ServiceClear = '@Model.ServiceClear';
+
+                if (EquipClear == "C")
+                { $("#btnEquipmentClear").show(); }
+                else { $("#btnEquipmentClear").hide(); }
+
+                if (ServiceClear == "C")
+                { $("#btnServiceClear").show(); }
+                else { $("#btnServiceClear").hide(); }
+
+                var DateInFilter = '@Model.DateInFilter';
+                var DateOutFilter = '@Model.DateOutFilter';
+
+                if (DateInFilter == "True") {
+            $(".datein").show();
+                }
+                else {
+            $(".datein").hide();
+                }
+                if (DateOutFilter == "True") {
+            $(".dateout").show();
+                }
+                else {
+            $(".dateout").hide();
+                }
+
+        $("#btnPrintExcel").click(function (event) {
+            event.preventDefault();
+            var bid = '@Model.Branchid';
+        var FromDate;
+        var ToDate;
+        var dateOutFrom;
+        var dateOutTo;
+
+
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth()+1; //January is 0!
+
+        var yyyy = today.getFullYear();
+            if(dd<10){
+                dd='0'+dd
+    }
+            if(mm<10){
+                mm='0'+mm
+}
+var today = yyyy +'-'+ mm+'-'+dd;
+
+            if ('@Model.FromDate.Year'== 1)
+                FromDate = today;
+            else
+                FromDate ='@Model.FromDate.ToString("yyyy-MM-dd")';
+            if ('@Model.ToDate.Year'== 1)
+                ToDate = today;
+            else
+                ToDate ='@Model.ToDate.ToString("yyyy-MM-dd")';
+            if ('@Model.OutFromDate.Year'== 1)
+                dateOutFrom=today;
+            else
+                dateOutFrom ='@Model.OutFromDate.ToString("yyyy-MM-dd")';
+            if ('@Model.OutToDate.Year'== 1)
+                dateOutTo = today;
+            else
+                dateOutTo ='@Model.OutToDate.ToString("yyyy-MM-dd")';
+            var EngineerID='-1';
+            if ('@Model.EngineerID' != '' && '@Model.EngineerID'!=null)
+                EngineerID = '@Model.EngineerID';
+
+            var ServiceJobID='-1';
+            if ('@Model.ServiceJobID' != '' && '@Model.ServiceJobID'!=null)
+                ServiceJobID = '@Model.ServiceJobID';
+
+            var EquipmentID='-1';
+            if ('@Model.SelectedEquipment' != '' && '@Model.SelectedEquipment'!=null)
+                EquipmentID = '@Model.SelectedEquipment';
+            var Cnt='-1';
+            if ('@Model.SelCnt' != '' && '@Model.SelCnt'!=null)
+                Cnt = '@Model.SelCnt';
+
+
+            var url = 'Reports/RepairListRpt.aspx?dateInFrom=' + FromDate + '&dateInTo=' + ToDate + '&customerID=' + '@Model.Customerid' + '&equipmentType=' + '@Model.Equiptype' + '&BranchID=' + bid + '&resolved_NotResolved_Either=' + '@Model.Resolved' + '&handoverCompleted_Incomplete_Either=' + '@Model.Complete' + '&serviceJobID=' + ServiceJobID + '&equipmentID=' + EquipmentID + '&department=' + '@Model.Department' + '&location=' + '@Model.Locationid' + '&engineerID=' + EngineerID + '&custOrderNo=' + '@Model.CustomerOrderNo' + '&repairJobNo=' + '@Model.RepairJob' + '&dateOutFrom=' + dateOutFrom + '&dateOutTo=' + dateOutTo + '&DateInFilter=' + '@Model.DateInFilter' + '&DateOutFilter=' + '@Model.DateOutFilter' + '&Cnt=' + Cnt + '&Excel=True';
+window.open(url , 'Repair', 'scrollbars=yes,fullscreen=yes,left=25,top=25,width=' + (screen.width - 50).toString() + ',height=' + (screen.height - 130).toString())
+        });
+
+        $("#btnPrint").click(function (event) {
+            event.preventDefault();
+
+    var bid = '@Model.Branchid';
+    var FromDate;
+    var ToDate;
+    var dateOutFrom;
+    var dateOutTo;
+
+
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+
+    var yyyy = today.getFullYear();
+    if(dd<10){
+        dd='0'+dd
+            }
+    if(mm<10){
+        mm='0'+mm
+            }
+    var today = yyyy +'-'+ mm+'-'+dd;
+
+
+    if ('@Model.FromDate.Year'== 1)
+        FromDate = today;
+    else
+    {
+        FromDate ='@Model.FromDate.ToString("yyyy-MM-dd")';
+    }
+    if ('@Model.ToDate.Year'== 1)
+        ToDate = today;
+    else
+        ToDate ='@Model.ToDate.ToString("yyyy-MM-dd")';
+    if ('@Model.OutFromDate.Year'== 1)
+        dateOutFrom=today;
+    else
+        dateOutFrom ='@Model.OutFromDate.ToString("yyyy-MM-dd")';
+    if ('@Model.OutToDate.Year'== 1)
+        dateOutTo = today;
+    else
+        dateOutTo ='@Model.OutToDate.ToString("yyyy-MM-dd")';
+    var EngineerID='-1';
+    if ('@Model.EngineerID' != '' && '@Model.EngineerID'!=null)
+        EngineerID = '@Model.EngineerID';
+
+    var ServiceJobID='-1';
+    if ('@Model.ServiceJobID' != '' && '@Model.ServiceJobID'!=null)
+        ServiceJobID = '@Model.ServiceJobID';
+
+    var EquipmentID='-1';
+    if ('@Model.SelectedEquipment' != '' && '@Model.SelectedEquipment'!=null)
+        EquipmentID = '@Model.SelectedEquipment';
+    var Cnt='-1';
+    if ('@Model.SelCnt' != '' && '@Model.SelCnt'!=null)
+        Cnt = '@Model.SelCnt';
+
+    var url = 'Reports/RepairListRpt.aspx?dateInFrom=' + FromDate + '&dateInTo=' + ToDate + '&customerID=' + '@Model.Customerid' + '&equipmentType=' + '@Model.Equiptype' + '&BranchID=' + bid + '&resolved_NotResolved_Either=' + '@Model.Resolved' + '&handoverCompleted_Incomplete_Either=' + '@Model.Complete' + '&serviceJobID=' + ServiceJobID + '&equipmentID=' + EquipmentID + '&department=' + '@Model.Department' + '&location=' + '@Model.Locationid' + '&engineerID=' + EngineerID + '&custOrderNo=' + '@Model.CustomerOrderNo' + '&repairJobNo=' + '@Model.RepairJob' + '&dateOutFrom=' + dateOutFrom + '&dateOutTo=' + dateOutTo + '&DateInFilter=' + '@Model.DateInFilter' + '&DateOutFilter=' + '@Model.DateOutFilter' + '&Cnt=' + Cnt;
+    window.open(url, 'Repair', 'scrollbars=yes,fullscreen=yes,left=25,top=25,width=' + (screen.width - 50).toString() + ',height=' + (screen.height - 130).toString())
+            return;
+    var url=  $.ajax({
+        url: '@Url.Action("PDFReport", "Repair")',
+    dataType: "json",
+    type: "POST",
+    data: {
+            dateInFrom: FromDate,
+        dateInTo: ToDate,
+        customerID:$("#Customerid").val(),
+        equipmentType:'@Model.Equiptype',
+        BranchID: bid,
+        resolved_NotResolved_Either:'@Model.Resolved',
+        handoverCompleted_Incomplete_Either:'@Model.Complete',
+        serviceJobID: ServiceJobID,
+        equipmentID: EquipmentID,
+        department:'@Model.Department',
+        location:'@Model.Locationid',
+        engineerID:EngineerID,
+        custOrderNo:'@Model.CustomerOrderNo',
+        repairJobNo:'@Model.RepairJob',
+        dateOutFrom: dateOutFrom,
+        dateOutTo: dateOutTo,
+        DateInFilter:'@Model.DateInFilter',
+        DateOutFilter:'@Model.DateOutFilter',
+        Cnt: Cnt
+    }
+    });
+    window.location.href = url;
+
+});
+
+
+//        $('#rpForm').live("keypress", function (e) {
+//    var code = (e.keyCode ? e.keyCode : e.which);
+//    if (code == 13) {
+//        e.preventDefault();
+//        e.stopPropagation();
+//                $(this).closest('form').submit();
+//    }
+//});
+
+
+        $("#btnDelete").click(function () {
+    var entityGrid = $("#rpGrid").data("kendoGrid");
+    var selectedItem = entityGrid.dataItem(entityGrid.select());
+    if (selectedItem == undefined) {
+        ShowAlert("Please select the repair job first");
+    }
+    else {
+
+        swal({
+            title: "Delete!",
+                    text: "Are you sure you wish to Delete the selected record.  Type YES to confirm:",
+                    type: "input",
+                    showCancelButton: true,
+                    closeOnConfirm: true,
+
+                    animation: "slide-from-top",
+                    inputPlaceholder: ""
+
+                },
+                function(inputValue){
+            if (inputValue === false) return false;
+            if (inputValue === "")
+            {
+                swal.showInputError("type YES to proceed or click cancel!");
+                return false   ;
+            }
+            if (inputValue === "YES")
+            {
+                var RepairID = selectedItem.RepairUID;
+                            $.ajax({
+                    url: '@Url.Action("DeleteRepair", "Repair")',
+                                type: 'POST',
+                                datatype: "json",
+                                data: { RepairID: RepairID },
+                                success: function (response) {
+                        alert(response.msg);
+                        if (response.msg.indexOf("Successfully") >= 0) {
+                                        $("#rpForm").submit();
+                        }
+                    },
+                                error: function (req, status, error) {
+                    }
+                });
+
+                return true;
+            }
+            swal.showInputError("You didn't type 'YES'.  Either type 'YES' or click cancel");
+            return false;
+        }
+
+        );
+
+    }
+});
+
+    });
+
+
+    function ClearEquipment() {
+        $('#EquipmentClear').val("");
+        $("#SelectedEquipment").val("-1");
+        $("#btnEquipmentClear").hide();
+        $("#EquipmentData").val("");
+        $('#spDetails1').text("");
+}
+
+function ClearService() {
+        $('#ServiceClear').val("");
+        $("#ServiceJobID").val("-1");
+        $("#btnServiceClear").hide();
+        $('#ServiceData').val("");
+        $('#spDetails').text("");
+}
+
+function CustomerSiteData() {
+    return {
+        Customerid: $("#Customerid").val(),
+            Branchid: $("#Branchid").val()
+        };
+}
+function OpenWindow() {
+
+    var window = $("#window").data("kendoWindow");
+
+    window.Visible = true;
+    var actionURL = '@Url.Action("SearchServiceJobLoad", "ServiceWorkOrder")';
+    window.refresh({
+        url: actionURL,
+            data: {}
+    });
+
+    var width95 = (screen.availWidth) * 95 / 100;
+    var height75 = (screen.availHeight) * 75 / 100;
+    window.setOptions({ width: width95, height: height75 });
+
+    window.center();
+    window.open();
+
+
+
+
+}
+
+function onClose(e) {
+    if ($("#ServiceJobID").val() != "" && $("#ServiceJobID").val() != null) {
+            $.ajax({
+            url: '@Url.Action("GetServiceJobDetails", "ServiceWorkOrder")',
+                type: 'POST',
+                datatype: "json",
+                data: { ServiceJobId: $("#ServiceJobID").val() },
+                success: function (response) {
+                    $('#spDetails').text(response.ServiceInfo);
+                    $('#ServiceData').val(response.ServiceInfo);
+                    $("#btnServiceClear").show();
+                    $('#ServiceClear').val("C");
+
+            },
+                error: function (req, status, error) {
+            }
+        });
+    }
+}
+
+function OpenWindow1() {
+
+    var window1 = $("#window1").data("kendoWindow");
+
+    window1.Visible = true;
+    var actionURL = '@Url.Action("SearchEquipmentLoad", "Repair")';
+    window1.refresh({
+        url: actionURL,
+            data: {}
+    });
+
+    var width95 = (screen.width) * 95 / 100;
+    var height75 = (screen.height) * 75 / 100;
+    window1.setOptions({ width: width95, height: height75 });
+
+    window1.center();
+    window1.open();
+}
+
+
+function onClose1(e) {
+    if ($("#SelectedEquipment").val() != "" && $("#SelectedEquipment").val() != null) {
+            $.ajax({
+            url: '@Url.Action("GetEquipInfomationData", "Repair")',
+                type: 'POST',
+                datatype: "json",
+                data: { EquipUID: $("#SelectedEquipment").val() },
+                success: function (response) {
+                    $('#spDetails1').text(response.CustomerInfo);
+                    $('#EquipmentData').val(response.CustomerInfo);
+                    $("#btnEquipmentClear").show();
+                    $('#EquipmentClear').val("C");
+            },
+                error: function (req, status, error) {
+                //  alert("R: " + req + " S: " + status + " E: " + error);
+            }
+        });
+    }
+}
+
+function createjob() {
+    var entityGrid = $("#rpGrid").data("kendoGrid");
+    var selectedItem = entityGrid.dataItem(entityGrid.select());
+    if (selectedItem == undefined) {
+        ShowAlert("Please select the existing repair");
+        return false;
+    }
+    else {
+        var RepairID = selectedItem.RepairUID;
+
+        swal({
+            title: "Are you sure?",
+                text: "Do you want to create new job based upon the currently selected job?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "green",
+                confirmButtonText: "Yes (The new repair will now be added to the database)",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+    function (isConfirm) {
+            if (isConfirm) {
+            $.ajax({
+                    url: '@Url.Action("CreateJob", "Repair")',
+                type: 'POST',
+                datatype: "json",
+                data: { ID: RepairID },
+                success: function (response) {
+                        window.location.href = '@Url.Action("EditNew", "Repair")' + '/' + response.NewRepairID;
+                    },
+                error: function (req, status, error) {
+                        //  alert("R: " + req + " S: " + status + " E: " + error);
+                    }
+                });
+            }
+            else {
+
+            }
+        });
+
+
+
+
+        }
+    }
+
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>
+
+
+

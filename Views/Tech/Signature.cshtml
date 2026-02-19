@@ -1,0 +1,84 @@
+﻿@model MDS.Models.Signature
+
+
+@using (Html.BeginForm("Signature", "Tech", FormMethod.Post, new { id = "sigPad" }))
+{
+    <div class="signature-pad">
+        <canvas width="500" height="400" id="signature"
+                style="border:1px solid black"></canvas><br>
+        <input type="button" onclick="test(); return false;" value="Accept Signature & Save" />
+        <input type="button" onclick="Clear(); return false;" value="Clear" />
+        @*<button type="submit" id="save"
+                    class="btn btn-primary">
+                Save
+            </button>*@<br>
+        @*<img width="500" height="400" id="savetarget"
+            style="border:1px solid black"><br>*@
+        @Html.HiddenFor(i => i.SignatureDataUrl)
+        @Html.HiddenFor(i => i.BranchID)
+        @Html.HiddenFor(i => i.ID)
+        @Html.HiddenFor(i => i.RepairOrService)
+
+        @* <input type="text"asp-for="@Model.SignatureDataUrl">*@
+    </div>
+}
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+
+<script src="~/Scripts/signature_pad.min.js"></script>
+<script type="text/javascript">
+
+        function SaveSig() {
+            try {
+                var data = $('#sigPad').serialize();
+            $.ajax({
+                url: '@Url.Content("~/Tech/Signature")',
+                type: 'POST',
+                data: data,
+                success: function (response) {
+                    try {
+                        div.remove(); div.dialog("close");
+                    }
+                    catch (ex) {
+                        ;
+                    }
+                    CustomerSignatureSet();//alert(response.Error);
+
+                }
+            });
+        }
+        catch (ex) {
+            alert('Error in init():' + ex.message);
+        }
+    }
+    function Clear() {
+        alert('not complete');
+    }
+    function test() {
+        try {
+            var data = pad.toDataURL();
+            //$('#savetarget').attr('src', data);
+            $('#SignatureDataUrl').val(data);
+            pad.off();
+            SaveSig();        }
+        catch (ex) {
+            alert(ex.message);
+        }
+    }
+//    function init() {
+  //      try {
+           // alert('initing');
+            var canvas = document.querySelector('#signature');
+            var pad = new SignaturePad(canvas);
+            //alert('initing complete');
+
+    //    }
+      //  catch (ex) {
+        //    alert(ex.message);
+        //}
+    //}
+
+
+</script>
+
+@*https://dzone.com/articles/creating-a-signature-pad-using-canvas-and-aspnet-c*@

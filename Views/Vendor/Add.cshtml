@@ -1,0 +1,276 @@
+﻿@model MDS.Models.VendorForm
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<div class="breadcrumb">
+     @Html.ActionLink("Home", "Index", "Dashboard")
+    » @Html.ActionLink("Vendors", "Index", "Vendor")
+</div>*@
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+</style>
+@if (ViewBag.Popup != null && ViewBag.Popup == 1)
+{ 
+    <script type="text/javascript">
+        $("#container-header").hide();
+        $("#hdPopUp").val("1");
+    </script>
+}
+<h1>Vendor Detail</h1>
+@using (Html.BeginForm("Add", "Vendor", FormMethod.Post, new { id = "AddForm" }))
+{
+    @Html.HiddenFor(mbox => mbox.VendorCode)
+      @Html.HiddenFor(m => m.PopUp)
+    <input id="hdPopUp" type="hidden" />
+    <div id="box2">
+        <table cellspacing="8" cellpadding="0" width="100%" border="0">
+            <tr>
+                <td colspan="2">
+                    @Html.ValidationSummary(true)
+                </td>
+            </tr>
+            <tr>
+                <td width="50%">
+
+                    <table>
+
+                        <tr>
+                            <td class="text">Company/Person Name <span style="color: red;">*</span></td>
+                            <td>
+                                @(Html.Kendo().TextBoxFor(mbox => mbox.CompanyName)
+                                            .Name("CompanyName")
+                                            .HtmlAttributes(new { data_required_msg = "Company Name is required.", required = "required", style = "width: 240px" })
+                                            )
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="text">Physical address</td>
+                            <td>
+                                @(Html.TextAreaFor(m => m.PhysicalAddress, new { style = "width: 230px;height:100px" })
+
+                                                         )
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text">Postal address</td>
+                            <td>
+                                @(Html.TextAreaFor(m => m.PostalAddress, new { style = "width: 230px;height:100px" })
+
+                                                         )
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="text">Phone<span style="color: red;"></span></td>
+                            <td>
+                                @(Html.Kendo().TextBoxFor(mbox => mbox.Phone1)
+                                            .Name("Phone1")
+                                            .HtmlAttributes(new { style = "width: 240px" })
+                                            )
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text">Alt Phone</td>
+                            <td>
+                                @(Html.Kendo().TextBoxFor(mbox => mbox.Phone2)
+                                            .Name("Phone2")
+                                            .HtmlAttributes(new { style = "width: 240px" })
+                                            )
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text">Fax</td>
+                            <td>
+                                @(Html.Kendo().TextBoxFor(mbox => mbox.Fax)
+                                            .Name("Fax")
+                                            .HtmlAttributes(new { style = "width: 240px" })
+                                            )
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text">Contact Name<span style="color: red;">*</span></td>
+                            <td>
+                                @(Html.Kendo().TextBoxFor(mbox => mbox.ContactName)
+                                            .Name("ContactName")
+                                            .HtmlAttributes(new { data_required_msg = "Contact Name is required.", required = "required", style = "width: 240px" })
+                                            )
+                            </td>
+                        </tr>
+
+
+
+                    </table>
+                </td>
+                <td width="50%" style="vertical-align: top;">
+
+                    <table>
+
+                        <tr>
+                            <td class="text">Email</td>
+                            <td>
+                                @(Html.Kendo().TextBoxFor(mbox => mbox.Email)
+                                            .Name("Email")
+                                            .HtmlAttributes(new { style = "width: 240px" })
+                                            )
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text">URL</td>
+                            <td>
+                                @(Html.Kendo().TextBoxFor(mbox => mbox.Url)
+                                            .Name("Url")
+                                            .HtmlAttributes(new { style = "width: 240px" })
+                                            )
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text">Notes</td>
+                            <td>
+                                @(Html.TextAreaFor(m => m.Notes, new { style = "width: 240px;height:100px" })
+
+                                                         )
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text">Contract Date</td>
+                            <td>
+                                @(Html.Kendo().DatePickerFor(m => m.ContractDate)
+                                                                    .Name("ContractDate")
+                                           .HtmlAttributes(new { style = "width:120px", type = "text" })
+                                                                )
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text">Contract Details</td>
+                            <td>
+                                @(Html.TextAreaFor(m => m.ContractDetails, new { style = "width: 230px;height:100px" })
+
+                                                         )
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+
+                    <table>
+                        <tr>
+                            <td width="2%">
+                                &nbsp;
+                            </td>
+                            <td width="10%" rowspan="3">
+                                <input type="button" class="inputbuttonbg inputbig" value="Cancel" onclick="cancel()">
+                            </td>
+                            <td width="12%">
+                                &nbsp;
+                            </td>
+                            <td width="30%" rowspan="3"></td>
+                            <td width="7%">
+                                &nbsp;
+                            </td>
+                            <td width="22%" rowspan="3"></td>
+                            <td width="7%">
+                                &nbsp;
+                            </td>
+                            <td width="7%" rowspan="3">
+                                <input type="button" class="inputbuttonbg inputbig" onclick="$('#AddForm').submit();" value="Save">
+                            </td>
+                            @if (Model.VendorCode != 0)
+                            {
+                            <td width="10%" rowspan="3">
+                                <input type="button" class="inputbuttonbg inputbig" value="Delete" onclick="DeleteRecord()">
+                            </td>
+                            }
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+        </table>
+    </div>
+}
+<script>
+
+    $("#AddForm").kendoValidator({
+    });
+
+</script>
+<script type="text/javascript">
+
+    var somethingChanged = false;
+    $(document).ready(function () {
+        $('input').change(function () {
+            somethingChanged = true;
+        });
+        $('textarea').change(function () {
+            somethingChanged = true;
+        });
+    });
+
+    function DeleteRecord() {
+
+            var r = confirm("Do you wish to delete this record?");
+        if (r) {
+
+
+            var data = { id: @Model.VendorCode.ToString() }
+        $.post('@Url.Action("DeleteRecord", "Vendor")', data,
+            function (data) {
+                if (data.Error == '') {
+                    alert('Record Deleted')
+                    back();
+                }
+                else
+                    alert(data.Error);
+            }
+            , 'json');
+
+
+            }
+
+    }
+
+    function cancel() {
+        if (somethingChanged) {
+            var r = confirm("Do you wish to discard any changes you have made?");
+            if (r) {
+                back();
+            }
+        }
+        else {
+            back();
+        }
+    }
+
+    function back() {
+        var popup = '@Model.PopUp';
+        if (popup == "True") {
+            var url = '@Url.Action("IndexPopUp", "Vendor")';
+            window.location.href = url;
+        }
+        else {
+            window.location.href = '@Url.Action("Index", "Vendor")';
+        }
+    }
+
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>

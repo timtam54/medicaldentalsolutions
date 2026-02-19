@@ -1,0 +1,102 @@
+﻿@{
+    ViewBag.Title = "Customer Sites";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model MDS.Models.CustomerDepartmentList
+<style type="text/css">
+    td {
+        padding: 5px;
+    }
+</style>
+<h2 style="text-align: center;">Customer Sites</h2>
+
+@using (Html.BeginForm("GetCustomerSites1", "Customer", FormMethod.Post, new { id = "SiteForm" }))
+{
+   
+    <div class="contact-info">
+        <div class="content">
+            <table style="margin-left: 10px; margin-top: 10px; width: 95%">
+
+                <tr>
+                    <td width="150">Customer :
+                    </td>
+                    <td>
+                        @(Html.Kendo().DropDownListFor(m => m.CustomerCode)
+                                          .Name("CustomerCode")
+                                           .Filter("startswith")
+                                          .DataTextField("CompanyName")
+                                          .DataValueField("CustomerCode")
+                                          .BindTo(Model.CustomerList)
+                                          .Events(e => e
+        .Change("dropdownlist_change")
+  )
+                                          .HtmlAttributes(new { style = "width:100%" })
+                                        )
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+
+                         @(Html.Kendo().Grid(Model.DepartmentList)
+                           .Name("locGrid")
+                           .Columns(columns =>
+{
+    columns.Bound(p => p.CustomerCode).Title("Customer Code");
+    columns.Bound(p => p.Department).Title("Site");
+    columns.Bound(p => p.DeptID).Title("Site").Visible(false);
+    columns.Command(command =>
+    {
+        command.Edit();       
+    });
+
+})
+.ToolBar(t=>t.Create())
+.Pageable()
+.Sortable()
+
+.Editable(editable => editable.Mode(GridEditMode.InLine))
+.Filterable()
+.DataSource(dataSource => dataSource
+        .Ajax()      
+        .Model(model =>
+{
+model.Id(p => p.DeptID);
+model.Field(p => p.CustomerCode).Editable(false);
+})
+          .Update(update => update.Action("UpdateSite",
+                                    "Customer"))                                  
+                                    .Create(create => create.Action("CreateSite", "Customer")) 
+        .PageSize(200)
+        .ServerOperation(false)
+     )
+)
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+
+    function dropdownlist_change() {
+        $("#SiteForm").submit();
+    }
+
+</script>
+
+
+<script>
+    $(document).ready(function () {
+
+        $('#rpForm').live("keypress", function (e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if (code == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('form').submit();
+            }
+        });
+    });
+</script>

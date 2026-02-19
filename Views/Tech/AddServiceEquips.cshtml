@@ -1,0 +1,31 @@
+﻿@model List<MDS.Models.IdText>
+@{
+   // ViewBag.Title = "Dashboard";
+    Layout = null;
+}
+
+<link href="~/CSS/style.css" rel="stylesheet" />
+
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
+
+
+
+            <table align="center">
+               
+                @foreach (MDS.Models.IdText item in Model)
+                {
+                    <tr>
+                        <td style="font-size:16px">
+                            @item.Text
+                        </td>
+                        <td style="font-size:16px">
+                            @Html.ActionLink("Add to Service", "AddEquipToServiceJob", "Tech", new { EquipID = item.Id, ServiceJobID = ViewBag.ServiceJobUID, BranchID = ViewBag.BranchID }, null)
+                        </td>
+                    </tr>
+                }
+
+               
+            </table>
+       
+

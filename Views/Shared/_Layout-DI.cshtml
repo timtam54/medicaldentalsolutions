@@ -1,0 +1,307 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+
+    <title>@MDS.Controllers.LoginController.CompanyName</title>
+
+    <script src="@Url.Content("~/Scripts/kendo/jquery.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/kendo/kendo.all.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/kendo.modernizr.custom.js")"></script>
+    <script src="@Url.Content("~/Scripts/kendo/cultures/kendo.culture.en-AU.min.js")"></script>
+    <script src="http://code.jquery.com/jquery-migrate-1.0.0.js"></script>
+
+    <script src="@Url.Content("~/Scripts/kendo/kendo.aspnetmvc.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/superfish.js")"></script>
+    <link href="@Url.Content("~/CSS/Kendo/kendo.bootstrap.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/CSS/Kendo/kendo.common.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/CSS/Kendo/kendo.dataviz.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/CSS/stylesheet.css")" rel="stylesheet" type="text/css" />
+        <link href="@Url.Content("~/CSS/style.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/SweetMaster/sweet-alert.min.js")"></script>
+    <link href="@Url.Content("~/Scripts/SweetMaster/sweet-alert.css")" rel="stylesheet" type="text/css" />
+
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,300' rel='stylesheet' type='text/css'>
+    <style type="text/css">
+        .validation-summary-errors {
+            background-color: #D9FFB2;
+            border: 1px solid #5CBA30;
+            width: 95%;
+            margin: 0 auto;
+        }
+
+        span.validation-summary-errors {
+            border-bottom-color: #D9FFB2;
+            display: block;
+        }
+
+        ul.validation-summary-errors {
+            margin: 0;
+            padding: 0;
+            border-top: none;
+        }
+
+        div.k-window {
+            border-color: #083f88 !important;
+            border-width: 7px !important;
+        }
+    </style>
+    <script language="javascript" type="text/javascript">
+        //Used to display and close the system notifications
+        $(document).ready(function () {
+            //$("#NotificationBox").fadeIn(1000);
+            //if ($("#NotificationAutoHide").val() == "true") {
+            //    //$("#NotificationBox").delay(3000).fadeOut(2000);
+            //    $("#NotificationBox").delay(5000).slideUp(1000);
+            //}
+
+        });
+        var myWindow;
+        function openCenteredWindow(url) {
+            var width = 800;
+            var height = 600;
+            var left = parseInt((screen.availWidth / 2) - (screen.availHeight / 2));
+            var top = parseInt((screen.availHeight / 2) - (screen.availHeight / 2));
+            //var top = 0;
+            //alert(left);
+            var windowFeatures = "width=" + (screen.availWidth - 80) + ",height=" + (screen.availHeight - 80) + ",status,resizable,scrollbars=0,left=40,top=40";
+            myWindow = window.open(url, "subWind", windowFeatures);
+        };
+        function ShowAlert(errormsg) {
+            swal({ title: "Error!", text: errormsg, type: "error", confirmButtonText: "OK" });
+        }
+        function ShowWarning(errormsg) {
+            swal({ title: "", text: errormsg, type: "warning", confirmButtonText: "OK" });
+        }
+        function ShowSuccess(errormsg) {
+            swal({
+                title: "Successfully Saved Information",
+                text: errormsg,
+                imageUrl: "@Url.Action("../images/1426251824_tick.png")"
+            });
+        }
+    </script>
+</head>
+
+<body>
+
+    <div id="divProgress" style="display: none">
+        <div align="center" style="width: 100%; position: fixed; z-index: 100001; top: 0px; left: 0px; vertical-align: middle; text-align: center; _height: expression(document.body.offsetHeight + 'px');">
+            <div style="margin-top: 250px">
+                <img id="imgloading" src="@Url.Action("../images/loading.gif")" />
+            </div>
+        </div>
+        <div id="backgroundElement" style="position: fixed; left: 0px; top: 0px; z-index: 10000; width: 100%; height: 1800px; background-color: #666666; opacity: 0.4; filter: alpha(opacity=40);"></div>
+    </div>
+    <div id="container-all">
+        <div id="container-header">
+            <div id="header" class="clearfloat">
+                <div id="logo">
+                    <a href="/">
+                        <img alt="@MDS.Controllers.LoginController.CompanyName" title="Dental Installations" class="logo-image" src="@Url.Action("../images/DIlogo.png")"></a>
+                </div>
+                    <div id="menu-container">
+                        <div class="clearfloat" id="menu">
+                             @if (@User.Identity.IsAuthenticated)
+                             {
+                                 int id = 0;
+                                 if (Int32.TryParse(MDS.Controllers.LoginController.BranchID(@User.Identity.Name).ToString(), out id))
+                                 {
+                              <ul class="sf-js-enabled" style="display: block;">
+                               
+                                   @if (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin)
+                                   {
+                                  <li>
+                                      @Html.ActionLink("Home",MDS.Controllers.LoginController.AdminHomePageMethod, "Dashboard")
+                                      @if (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin)
+                                      {
+
+                                      <ul @*style="visibility: hidden; display: none;"*@>
+                                          <li>
+                                              @Html.ActionLink("Dashboard Overdue", "Index", "Dashboard")
+                                          </li>
+                                          <li>
+                                              @Html.ActionLink("Diary", "Scheduler", "Dashboard")
+                                          </li>
+                                          <li>
+                                              @Html.ActionLink("Warranty Expiry", "EquipmentExpiry", "Tech")
+                                          </li>
+                                      </ul>
+                              }
+
+                                  </li>
+                                   }
+                                <li class="">@Html.ActionLink("Repair", "Index", "Repair")
+                                    @if (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin)
+                                              {
+
+                                      <ul @*style="visibility: hidden; display: none;"*@>
+                                        <li>@Html.ActionLink("Search", "Index", "Repair")
+                                        </li>
+                                        <li>@Html.ActionLink("Add New Repair", "Add", "Repair")
+                                        </li>
+                                    </ul>
+                                                                                }
+                                </li>
+                                @if (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin)
+                                {
+
+                <li class="">@Html.ActionLink("Create Service", "Index", new { controller = "ServiceJob"}, new { @style =  "width:140px;" })
+                                
+
+                                </li>
+                                }
+                                       
+                                <li class="">@Html.ActionLink("Service", "Index", "Service")
+                                                                    @if (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin)
+                                                                    {
+
+                                    <ul @*style="visibility: hidden; display: none;"*@>
+                                        <li>@Html.ActionLink("Search", "Index", "Service")
+                                        </li>
+                                        <li>@Html.ActionLink("Add New Service", "Add", "Service")
+                                        </li>
+                                    </ul>
+                                      }
+                                </li>
+                                <li class="">@Html.ActionLink("Work Order", "Index", "ServiceWorkOrder")
+                                    @if (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin)
+                            {
+                                      <ul @*style="visibility: hidden; display: none;"*@>
+                                        <li>@Html.ActionLink("Search", "Index", "ServiceWorkOrder")
+                                        </li>
+                                        <li>@Html.ActionLink("Add New Service Work Order", "Add", "ServiceWorkOrder")
+                                        </li>
+                                    </ul>
+                                  }
+                                </li>
+                                @if (MDS.Controllers.LoginController.IsAdmin(@User.Identity.Name) == MDS.Controllers.ATC.Admin)
+                                {
+                                <li class=""><a>Lists</a>
+                                             <ul>
+                                                 <li>
+                                                     @Html.ActionLink("Equipment", "Index", "Equipment")
+                                                 </li>
+                                                 <li>
+                                                     @Html.ActionLink("Customers", "Index", "Customer")
+                                                 </li>
+                                                 <li>
+                                                     @Html.ActionLink("Customer Sites", "GetCustomerSites1", "Customer")
+                                                 </li>
+                                                 <li>
+                                                     @Html.ActionLink("Vendors", "Index", "Vendor")
+                                                 </li>
+                                                 <li>
+                                                     @Html.ActionLink("Branches", "Index", "Branch")
+                                                 </li>
+                                                 <li>
+                                                     @Html.ActionLink("Engineers", "Index", "Engineer")
+                                                 </li>
+                                                 <li>
+                                                     @Html.ActionLink("Manufacturer", "Index", "EquipManufacturer")
+                                                 </li>
+                                                 @*<li>
+                                                     @Html.ActionLink("Parts", "Index", "Parts")
+                                                 </li>*@
+                                                 <li>
+                                                     @Html.ActionLink("Equipment Type / Test Script", "Index", "EquipType")
+                                                 </li>
+
+                                                 <li>
+                                                     @Html.ActionLink("Equipment Model", "Index", "EquipModel")
+                                                 </li>
+
+                                                 @*<li>
+                                                     @Html.ActionLink("Client Reporting Login", "Index", "ClientReporting")
+                                                 </li>*@
+                                                 <li>
+                                                     @Html.ActionLink("Labour Charges", "LabourChargeIndex", "Repair")
+                                                 </li>
+                                                 <li>
+                                                     @Html.ActionLink("Travel Charges", "TravelChargeIndex", "Repair")
+                                                 </li>
+                                                 <li>
+                                                     @Html.ActionLink("Overdue Services", "OverdueService", new { controller = "Equipment" }, new { @style = "color:red" })
+                                                 </li>
+                                             </ul>
+                                </li>
+                                }
+                                else
+                                {
+                                        <li>@Html.ActionLink("Equipment", "Index", "Equipment")
+                                        </li>
+
+                                }
+                            </ul>
+                                 
+                                 }
+                             }
+
+                        </div>
+                    </div>
+                <div class="links">
+                    @if (@User.Identity.IsAuthenticated)
+                    {
+                        int id = 0;
+                        if (Int32.TryParse(MDS.Controllers.LoginController.BranchID(@User.Identity.Name).ToString(), out id))
+                        {
+                            Html.RenderAction("Details", "Login");
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="position-header">
+        </div>
+        <div id="container" class="clearfloat">
+            <div id="notification"></div>
+            <div id="content">
+               @if (TempData["Notification"] != null)
+               {
+                    @* @Html.Hidden("NotificationAutoHide", TempData["NotificationAutoHide"])
+                    <div id="NotificationBox" class="@TempData["NotificationCSS"]" style="display: none">
+                        @TempData["Notification"]
+                    </div>*@
+                   
+                   <script type="text/javascript"> ShowSuccess('@TempData["Notification"]'); </script> 
+               }
+                @RenderBody()
+            </div>
+            <div class="position-footer">
+            </div>
+        </div>
+        <div id="footer-container">
+            <div class="clearfloat" id="footer-links">
+                <div id="powered">
+                    <a href="~/Mobile/TechLogin">@MDS.Controllers.LoginController.CompanyName &copy; 2020</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<script type="text/javascript">
+    $(document).ready(function () {
+        kendo.culture("en-AU");
+    });
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#menu > ul').superfish({
+            hoverClass: 'sfHover',
+            pathClass: 'overideThisToUse',
+            delay: 0,
+            animation: { height: 'show' },
+            speed: 'normal',
+            autoArrows: false,
+            dropShadows: false,
+            disableHI: false, /* set to true to disable hoverIntent detection */
+            onInit: function () { },
+            onBeforeShow: function () { },
+            onShow: function () { },
+            onHide: function () { }
+        });
+
+        $('#menu > ul').css('display', 'block');
+    });
+</script>

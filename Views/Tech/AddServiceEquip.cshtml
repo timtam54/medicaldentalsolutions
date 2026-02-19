@@ -1,0 +1,316 @@
+﻿@model MDS.Models.ServiceJobEquip
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_LayoutTech.cshtml";
+}
+
+<link href="~/CSS/style.css" rel="stylesheet" />
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+
+
+
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
+
+<div id="service" style="width:100%;height:auto;position:relative;">
+    <h1 style="padding-left:30px">Add Customer Equipment to Service @MDS.Helper.Utility.GetBranchCode() S @Model.JobCode.ToString()</h1>
+
+    <div class="contact-info">
+        <div class="content">
+            @using (Html.BeginForm("AddServiceEquip", "Tech", FormMethod.Post, new { id = "Service" }))
+            {
+                @Html.HiddenFor(i => i.BranchID)
+                @Html.HiddenFor(i => i.ServiceJobUID)
+                @Html.HiddenFor(i => i.CustomerCode)
+
+            <table width="100%" align="center" style="background-color:lightgrey">
+                <tr>
+                    <td colspan="6">
+                        @Html.ValidationSummary(true, "", new { @style = "color:red" })
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <br />
+                        <br />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6" align="center"><h1><b>Create New Equipment & Add to Service</b></h1></td>
+                </tr>
+                <tr>
+                    <td><b>Serial#</b></td>
+                    <td>
+                        @Html.EditorFor(m => m.SerialNumber, new { htmlAttributes = new { @style = "border:1px solid black;width:100px", @onkeyup = "SerNosearch();" } })
+                        @Html.ValidationMessageFor(model => model.SerialNumber, "", new { @style = "color:red" })
+                    </td>
+                    <td><b>Asset#</b></td>
+                    <td>@Html.EditorFor(m => m.AssetNumber, new { htmlAttributes = new { @style = "border:1px solid black;width:100px" } })</td>
+                    <td><b>Notes</b></td>
+                    <td>@Html.EditorFor(m => m.Notes, new { htmlAttributes = new { @style = "border:1px solid black;width:400px" } })</td>
+                </tr>
+             
+                <tr>
+                    <td><b>Equip Type</b></td>
+                    <td>
+                        @Html.EditorFor(m => m.Equiptype, new { htmlAttributes = new { @AutoComplete = "off", @style = "border:1px solid black;width:200px", @onkeyup = "EqTypesearch();" } })
+                        @Html.ValidationMessageFor(model => model.Equiptype, "", new { @style = "color:red" })
+
+                        @Html.HiddenFor(m => m.EquiptypeID)
+                    </td>
+                    <td><b>Manufacturer</b></td>
+                    <td>
+                        @Html.EditorFor(m => m.Manufact, new { htmlAttributes = new { @AutoComplete = "off", @style = "border:1px solid black;width:200px", @onkeyup = "Manusearch();" } })
+                        @Html.ValidationMessageFor(model => model.Manufact, "", new { @style = "color:red" })
+                    </td>
+                    <td><b>Model</b></td>
+                    <td>
+                        @Html.EditorFor(m => m.Model, new { htmlAttributes = new { @AutoComplete = "off", @style = "border:1px solid black;width:200px", @onkeyup = "Modelsearch();" } })
+                        @Html.ValidationMessageFor(model => model.Model, "", new { @style = "color:red" })
+
+                        @Html.HiddenFor(m => m.ModelID)
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                    </td>
+                    <td>
+                        <div id="eqtypesearchresults">
+
+                        </div>
+                    </td>
+                    <td></td>
+                    <td>
+                        <div id="manusearchresults">
+
+                        </div>
+                    </td>
+                    <td></td>
+                    <td>
+                        <div id="modelsearchresults">
+
+                        </div>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td>
+                        <button type="submit" class="inputbuttonbg inputbig">Create Equipment & Add to Service</button>
+
+                    </td>
+                </tr>
+            </table>
+            }
+
+            <table align="center">
+                <tr style="font-size:16px">
+                    <th colspan="2" align="center"><h1><b>Selecting Existing Customer Equipment (Add to Service Job)</b></h1></th>
+
+                </tr>
+                <tr>
+                    <td colspan="2" width="100%">
+                        <div id="Equips"></div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+
+    function RefreshEquips(search) {
+        try {
+          //  alert('RefreshEquips');
+            var ServiceJobID = '@Model.ServiceJobUID';
+            var CustomerCode = '@Model.CustomerCode';
+            if (ServiceJobID == 0)
+                return;
+            var BranchID = '@MDS.Controllers.LoginController.BranchID(User.Identity.Name)';
+            $.ajax({
+                url: '@Url.Content("~/Tech/AddServiceEquips")',// ServiceJobUID, int BranchID, string CustomerCode,string search
+                type: 'POST',
+                data: { ServiceJobUID: ServiceJobID, BranchID: BranchID, CustomerCode: CustomerCode, search: search },
+                success: doSubmitSuccessEquips
+            });
+        }
+        catch (ex) {
+            alert('Error in init():' + ex.message);
+        }
+    }
+    RefreshEquips('');
+
+    function doSubmitSuccessEquips(result) {
+        try {
+            $('#Equips').html(result);
+        }
+        catch (ex) {
+            alert('Error in doSubmitSuccess ServiceWorkTimes():' + ex.message);
+        }
+
+    }
+
+    function selectmanu(num) {
+        try {
+            var res = num.split("~");
+            var id = res[0];
+            var nme = res[1];
+            $('#Manufact').val(nme);
+//            $('#EquiptypeID').val(id);
+            $("#manusearchresults").hide();
+            $('#Model').focus();
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+        return false;
+    }
+
+
+    function Manusearch()
+    {
+
+          try {
+              $("#manusearchresults").hide();
+             // $('#EquiptypeID').val('');
+
+              var searchString = $('#Manufact').val();// $(this).val(); //Get the value from this TextBox
+
+              var data = { searchString: searchString }
+            $.post('@Url.Action("ManuSearch","Tech")', data,
+            function (data) {
+                if (data.results == null)
+                    alert('no results');
+                else {
+                    $("#manusearchresults").show();
+                    var divstring = '';
+                    divstring = ''
+                    for (var i = 0; i < data.results.length; i++) {
+                        divstring = divstring + "<a href='' onclick='selectmanu(\"" + data.results[i].Code + "~" + data.results[i].Desc + "\");return false;'>"+ data.results[i].Desc + "</a><br/>"
+                    }
+                    $("#manusearchresults").html(divstring);
+                }
+            });
+        }
+        catch(ex)
+        {
+            alert(ex.message);
+        }
+    }
+
+</script>
+<script type="text/javascript">
+
+    function selecteqtype(num) {
+        try {
+            var res = num.split("~");
+            var id = res[0];
+            var nme = res[1];
+            $('#Equiptype').val(nme);
+            $('#EquiptypeID').val(id);
+            $("#eqtypesearchresults").hide();
+            $('#Manufact').focus();
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+        return false;
+    }
+    function SerNosearch() {
+        var SerialNumber = $('#SerialNumber').val();
+        //alert(SerialNumber);
+        RefreshEquips(SerialNumber);
+    }
+
+    function EqTypesearch()
+    {
+
+          try {
+              $("#eqtypesearchresults").hide();
+              $('#EquiptypeID').val('');
+
+              var searchString = $('#Equiptype').val();// $(this).val(); //Get the value from this TextBox
+              
+              var data = { searchString: searchString }
+            $.post('@Url.Action("EqTypeSearch","Tech")', data,
+            function (data) {
+                if (data.results == null)
+                    alert('no results');
+                else {
+                    $("#eqtypesearchresults").show();
+                    var divstring = '';
+                    divstring = ''
+                    for (var i = 0; i < data.results.length; i++) {
+                        divstring = divstring + "<a href='' onclick='selecteqtype(\"" + data.results[i].Code + "~" + data.results[i].Desc + "\");return false;'>"+ data.results[i].Desc + "</a><br/>"
+                    }
+                    $("#eqtypesearchresults").html(divstring);
+                }
+            });
+        }
+        catch(ex)
+        {
+            alert(ex.message);
+        }
+    }
+
+
+</script>
+
+
+<script type="text/javascript">
+
+    function selectmodel(num) {
+        try {
+            var res = num.split("~");
+            var id = res[0];
+            var nme = res[1];
+            $('#Model').val(nme);
+            $('#ModelID').val(id);
+            $("#modelsearchresults").hide();
+            
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+        return false;
+    }
+
+
+    function Modelsearch()
+    {
+
+          try {
+              $("#modelsearchresults").hide();
+              $('#ModelID').val('');
+
+              var searchString = $('#Model').val();// $(this).val(); //Get the value from this TextBox
+              var EquiptypeID = $('#EquiptypeID').val();
+              var data = { searchString: searchString, EquiptypeID: EquiptypeID }
+            $.post('@Url.Action("ModelSearch","Tech")', data,
+            function (data) {
+                if (data.results == null)
+                    alert('no results');
+                else {
+                    $("#modelsearchresults").show();
+                    var divstring = '';
+                    divstring = ''
+                    for (var i = 0; i < data.results.length; i++) {
+                        divstring = divstring + "<a href='' onclick='selectmodel(\"" + data.results[i].Code + "~" + data.results[i].Desc + "\");return false;'>"+ data.results[i].Desc + "</a><br/>"
+                    }
+                    $("#modelsearchresults").html(divstring);
+                }
+            });
+        }
+        catch(ex)
+        {
+            alert(ex.message);
+        }
+    }
+
+
+</script>
